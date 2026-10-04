@@ -1,0 +1,21 @@
+{
+  "paper_id": "paper_003",
+  "title": "Does Illumination Enhancement Really Help Deep Detectors in Extreme Darkness?",
+  "authors": ["Morales, S.", "Kumar, A."],
+  "year": 2025,
+  "venue": "ECCV 2025",
+  "abstract": "Common wisdom suggests that underexposed images must be enhanced before applying deep detectors. In this work, we rigorously question this assumption. Through extensive experiments on ExDark, we demonstrate that standalone illumination enhancement introduces artificial artifacts and noise amplification, resulting in no significant improvement or even degradation in mAP.",
+  "sections": {
+    "Abstract": "Common wisdom suggests that underexposed images must be enhanced before applying deep detectors. In this work, we rigorously question this assumption. Through extensive experiments on ExDark, we demonstrate that standalone illumination enhancement introduces artificial artifacts and noise amplification, resulting in no significant improvement or even degradation in mAP.",
+    "Introduction": "While visual enhancement produces images that look pleasing to the human eye, deep neural networks do not perceive images like humans. Enhancement models often distort subtle gradients and amplify sensor artifacts.",
+    "Methodology": "We benchmark 6 popular low-light enhancement algorithms coupled with Faster R-CNN, RetinaNet, and Deformable DETR on the 10-class ExDark dataset. We test both separated pipelines and jointly retrained detectors.",
+    "Experiments": "We measure strict mAP@0.5:0.95 and mAP@0.5 across all 12 classes of ExDark under varied nighttime lighting conditions (indoor dark, street night, twilight).",
+    "Results": "Our empirical evaluations show that illumination enhancement provides no significant improvement on the ExDark dataset, yielding a marginal -0.4% change in mAP@0.5:0.95 compared to detectors trained directly on raw dark imagery. The artifacts introduced by enhancement algorithms disrupt high-level feature representations in deep backbones.",
+    "Conclusion": "Detectors trained directly on low-light representations outperform or match two-stage enhancement pipelines on ExDark, demonstrating that separate enhancement is often redundant or counterproductive."
+  },
+  "metadata": {
+    "dataset": "ExDark",
+    "model_architecture": "Faster R-CNN",
+    "evaluation_metric": "mAP@0.5:0.95"
+  }
+}

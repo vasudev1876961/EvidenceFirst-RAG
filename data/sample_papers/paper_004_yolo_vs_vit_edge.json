@@ -1,0 +1,21 @@
+{
+  "paper_id": "paper_004",
+  "title": "Edge-Device Comparative Study: Lightweight YOLO versus Deformable Detection Transformers for Nighttime Surveillance",
+  "authors": ["Chen, R.", "Tan, K.", "Vasudevan, S."],
+  "year": 2026,
+  "venue": "IEEE T-PAMI 2026",
+  "abstract": "Deploying object detectors on embedded edge hardware for nighttime robotics demands balancing latency, power, and detection precision. We conduct an exhaustive evaluation comparing lightweight YOLOv8 models against Deformable DETR. We find that while Transformer attention excels in crowded night scenes, lightweight CNN detectors are 4.5x faster with 70% lower energy consumption on embedded platforms.",
+  "sections": {
+    "Abstract": "Deploying object detectors on embedded edge hardware for nighttime robotics demands balancing latency, power, and detection precision. We find that while Transformer attention excels in crowded night scenes, lightweight CNN detectors are 4.5x faster with 70% lower energy consumption on embedded platforms.",
+    "Introduction": "Real-time edge perception requires tight resource budgeting. Vision Transformers have established state-of-the-art accuracy, but their quadratic self-attention complexity and memory bandwidth footprint pose severe deployment bottlenecks on edge systems.",
+    "Methodology": "We benchmark YOLOv8-Nano, YOLOv8-Small, and Deformable DETR on NVIDIA Jetson Orin Nano across low-light urban sequences. Metrics include frames per second (FPS), Watt-hours per 10k frames, and mAP@0.5.",
+    "Experiments": "Inference latency was profiled using TensorRT FP16 quantization on 640x640 resolution streams under 0.1 lux ambient illumination.",
+    "Results": "Lightweight YOLOv8 achieves 68.4 FPS with 38.2% mAP@0.5, whereas Deformable DETR achieves 40.3% mAP@0.5 but only 14.8 FPS. Deformable DETR incurs substantial computational cost and memory overhead, making lightweight CNNs significantly more practical for resource-constrained low-light edge devices.",
+    "Conclusion": "For real-time low-light surveillance on edge hardware, CNN-based single-stage detectors remain the superior trade-off unless severe occlusions necessitate global context."
+  },
+  "metadata": {
+    "dataset": "NightOwls",
+    "model_architecture": "YOLOv8",
+    "evaluation_metric": "FPS"
+  }
+}

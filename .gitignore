@@ -1,0 +1,36 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.venv/
+ENV/
+
+# Data & Models (Local cache)
+data/raw/*.pdf
+data/processed/*.jsonl
+data/processed/*.bin
+models/*.bin
+models/*.safetensors
+*.faiss
+*.pkl
+
+# Environment & Keys
+.env
+.env.local
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Streamlit
+.streamlit/secrets.toml
+
+# OS
+.DS_Store
+Thumbs.db

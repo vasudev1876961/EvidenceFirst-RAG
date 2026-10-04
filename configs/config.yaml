@@ -1,0 +1,93 @@
+project:
+  name: "EvidenceFirst-RAG"
+  domain: "Computer Vision / Deep Learning"
+  version: "0.1.0"
+  description: "Claim-Level Evidence Verification and Contradiction-Aware RAG for Scientific Literature"
+
+paths:
+  raw_dir: "data/raw"
+  processed_dir: "data/processed"
+  metadata_dir: "data/metadata"
+  sample_papers_dir: "data/sample_papers"
+  cache_dir: "data/cache"
+
+ingestion:
+  supported_extensions: [".pdf", ".json", ".txt"]
+  min_paragraph_length: 50
+  section_headings:
+    - "abstract"
+    - "introduction"
+    - "related work"
+    - "methodology"
+    - "method"
+    - "proposed method"
+    - "experiments"
+    - "experimental setup"
+    - "results"
+    - "discussion"
+    - "conclusion"
+
+chunking:
+  strategy: "semantic_section"  # section-aware semantic chunking
+  target_chunk_size: 400        # words / tokens
+  chunk_overlap: 50
+  preserve_section_context: true
+
+retrieval:
+  bm25:
+    k1: 1.5
+    b: 0.75
+    top_k: 25
+  dense:
+    model_name: "sentence-transformers/all-MiniLM-L6-v2"
+    top_k: 25
+    dimension: 384
+  hybrid:
+    alpha: 0.5  # 0.5 * BM25 + 0.5 * Dense
+    merged_candidates: 35
+  reranker:
+    enabled: true
+    model_name: "cross-encoder/ms-marco-MiniLM-L-6-v2"
+    top_n: 12
+
+query_decomposition:
+  max_subqueries: 5
+  generate_keyword_variants: true
+
+claims:
+  max_claims_to_extract: 8
+  min_claim_length: 20
+  granularity: "atomic"
+
+verification:
+  nli_model: "cross-encoder/nli-deberta-v3-small"
+  use_fallback: true
+  weights:
+    w_semantic: 0.35
+    w_entailment: 0.45
+    w_source: 0.10
+    w_recency: 0.10
+  thresholds:
+    strong_support: 0.80
+    moderate_support: 0.60
+    weak_support: 0.40
+  contradiction:
+    threshold: 0.65
+  conflict_attribution:
+    attributes:
+      - "dataset"
+      - "model_architecture"
+      - "evaluation_metric"
+      - "illumination_condition"
+      - "image_resolution"
+      - "training_data"
+      - "publication_year"
+
+llm:
+  provider: "mock"  # mock | gemini | openai | groq
+  model: "mock"
+  temperature: 0.1
+  max_tokens: 2048
+
+evaluation:
+  benchmark_queries_file: "data/benchmark_queries.json"

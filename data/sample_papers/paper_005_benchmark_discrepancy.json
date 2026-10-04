@@ -1,0 +1,21 @@
+{
+  "paper_id": "paper_005",
+  "title": "A Critical Investigation into Discrepancies Across Low-Light Benchmark Datasets",
+  "authors": ["Patel, D.", "Zhang, M."],
+  "year": 2024,
+  "venue": "NeurIPS 2024",
+  "abstract": "The computer vision community increasingly evaluates low-light algorithms on diverse benchmarks without accounting for dataset distribution shift. We analyze DarkFace, ExDark, and LOL to identify structural discrepancies in photon counts, noise distributions, and annotation density. Our findings explain why literature often reaches contradictory conclusions regarding preprocessing methods.",
+  "sections": {
+    "Abstract": "The computer vision community increasingly evaluates low-light algorithms on diverse benchmarks without accounting for dataset distribution shift. We analyze DarkFace, ExDark, and LOL to identify structural discrepancies in photon counts, noise distributions, and annotation density. Our findings explain why literature often reaches contradictory conclusions regarding preprocessing methods.",
+    "Introduction": "Literature in low-light vision contains numerous conflicting reports regarding whether illumination enhancement benefits object detectors. In this work, we demonstrate that these contradictions originate from fundamental domain shifts between benchmark datasets.",
+    "Methodology": "We compute photon transfer curves, spatial frequency distributions, and signal-to-noise ratios across DarkFace and ExDark images. DarkFace features extreme uniform darkness with high ISO sensor noise, whereas ExDark contains diverse urban night settings with localized artificial light sources.",
+    "Experiments": "We cross-evaluate models trained on DarkFace on the ExDark test set and vice versa, tracking performance variance across mAP@0.5 and mAP@0.5:0.95.",
+    "Results": "Our analysis reveals that DarkFace benefits dramatically from noise suppression and curve adjustment because its baseline SNR is below 5 dB. In contrast, ExDark images have sufficient localized illumination; thus, global enhancement induces saturation artifacts. This divergence explains why papers evaluating exclusively on DarkFace report strong gains (+8%), whereas ExDark evaluations observe neutral or negative impacts.",
+    "Conclusion": "Conflicting findings in low-light vision literature are primarily artifacts of benchmark dataset composition and evaluation protocols rather than model capability."
+  },
+  "metadata": {
+    "dataset": "DarkFace",
+    "model_architecture": "General Detectors",
+    "evaluation_metric": "mAP"
+  }
+}

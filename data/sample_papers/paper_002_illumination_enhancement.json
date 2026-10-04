@@ -1,0 +1,21 @@
+{
+  "paper_id": "paper_002",
+  "title": "Joint Illumination Enhancement and Feature Preservation for Object Detection in the Dark",
+  "authors": ["Li, W.", "Wang, T."],
+  "year": 2025,
+  "venue": "ICCV 2025",
+  "abstract": "Detecting objects in underexposed scenarios suffers from low contrast and heavy color distortion. We propose an illumination-aware preprocessing network that restores dynamic range while preserving semantic gradients for downstream detectors. On DarkFace, our method improves mAP by 8.2% for both CNN and Transformer detectors.",
+  "sections": {
+    "Abstract": "Detecting objects in underexposed scenarios suffers from low contrast and heavy color distortion. We propose an illumination-aware preprocessing network that restores dynamic range while preserving semantic gradients for downstream detectors. On DarkFace, our method improves mAP by 8.2% for both CNN and Transformer detectors.",
+    "Introduction": "Low illumination severely affects the discriminative capacity of deep detectors. Standard low-light enhancement algorithms often amplify high-frequency sensor noise. We formulate an end-to-end framework where an illumination curve estimation module directly assists object detection heads.",
+    "Methodology": "The pipeline applies differentiable curve adjustment parameters conditioned on global image statistics. Feature maps from intermediate enhancement layers are fused with the detector backbone.",
+    "Experiments": "Evaluated on the DarkFace benchmark using standard detection metrics. We compare detectors with and without our illumination-aware module using YOLO and Swin-Transformer backbones.",
+    "Results": "The proposed illumination preprocessing method improves mAP@0.5 by 8.2% on the DarkFace dataset (from 42.1% to 50.3% mAP). Both CNN and Vision Transformer architectures exhibit substantial gains in precision when local contrast is restored prior to feature extraction.",
+    "Conclusion": "Explicit illumination preprocessing provides substantial gains for dark scene understanding when trained end-to-end with detection objectives."
+  },
+  "metadata": {
+    "dataset": "DarkFace",
+    "model_architecture": "Swin Transformer",
+    "evaluation_metric": "mAP@0.5"
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "paper_id": "paper_001",
+  "title": "Evaluating Vision Transformers under Extreme Low-Light Conditions",
+  "authors": ["Zheng, H.", "Liu, K.", "Zhao, Y."],
+  "year": 2024,
+  "venue": "CVPR 2024",
+  "abstract": "Vision Transformers (ViTs) have demonstrated impressive representation learning across visual benchmarks. However, their robustness under low-light imaging environments remains largely unexamined. In this paper, we conduct an extensive empirical study evaluating ViT backbones on low-light object detection. We observe that while global self-attention provides effective scene context, performance degrades substantially when severe noise and weak local gradients impair early patch projections. ViTs require substantial training data and regularization compared to CNNs to prevent overfitting under low-light regimes.",
+  "sections": {
+    "Abstract": "Vision Transformers (ViTs) have demonstrated impressive representation learning across visual benchmarks. However, their robustness under low-light imaging environments remains largely unexamined. We observe that while global self-attention provides effective scene context, performance degrades substantially when severe noise and weak local gradients impair early patch projections. ViTs require substantial training data and regularization compared to CNNs to prevent overfitting under low-light regimes.",
+    "Introduction": "Object detection in low-light environments is critical for autonomous systems and nighttime surveillance. Conventional approaches rely on Convolutional Neural Networks (CNNs) with localized inductive bias. Recently, Vision Transformers have emerged as powerful alternatives. Despite their success in daylight conditions, self-attention maps in ViTs exhibit heightened sensitivity to Poisson-Gaussian sensor noise prevalent in dark imagery.",
+    "Methodology": "We benchmark standard ViT-Base, Swin-Transformer, and ResNet-50 backbones integrated with a Feature Pyramid Network. Models are trained on the DarkFace dataset and evaluated across multiple illumination levels without illumination enhancement.",
+    "Experiments": "We train all models for 100 epochs using AdamW optimizer with cosine learning rate scheduling. We measure detection accuracy using mAP@0.5 and mAP@0.5:0.95 under varying photon noise levels on the DarkFace benchmark.",
+    "Results": "Experiments reveal that ViTs achieve 44.2% mAP@0.5 on DarkFace, compared to 46.8% for ResNet-50 when trained from scratch. Vision Transformers require substantially more training data to learn invariant local representations. Without pretraining on large daylight datasets, ViT patch self-attention degenerates in low SNR regimes due to weak local feature gradients.",
+    "Conclusion": "Vision Transformers can achieve competitive global-context modeling in low light, but their performance degrades when imagery contains weak local texture and high sensor noise. Addressing this limitation necessitates hybrid inductive biases or dedicated illumination-aware adaptation."
+  },
+  "metadata": {
+    "dataset": "DarkFace",
+    "model_architecture": "Vision Transformer",
+    "evaluation_metric": "mAP@0.5"
+  }
+}
