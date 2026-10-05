@@ -118,6 +118,47 @@ class EvidenceGraphData(BaseModel):
     edges: List[GraphEdge] = Field(default_factory=list)
 
 
+class EmpiricalBenchmarkRecord(BaseModel):
+    model_name: str
+    paper_id: str
+    dataset: str
+    metric_name: str
+    metric_value: float
+    unit: str = "%"
+    fps: Optional[float] = None
+    params_m: Optional[float] = None
+    notes: Optional[str] = None
+
+
+class EmpiricalMetaAnalysis(BaseModel):
+    records: List[EmpiricalBenchmarkRecord] = Field(default_factory=list)
+    dataset_comparison_table: List[Dict[str, Any]] = Field(default_factory=list)
+    model_leaderboard: List[Dict[str, Any]] = Field(default_factory=list)
+    cross_dataset_variance: Dict[str, float] = Field(default_factory=dict)
+    key_empirical_insights: List[str] = Field(default_factory=list)
+
+
+class RobustnessReport(BaseModel):
+    evidence_robustness_index: float  # ERI score between 0.0 and 1.0
+    consensus_divergence_score: float  # measure of variance in evidence directions
+    critical_papers: List[Dict[str, Any]] = Field(default_factory=list)
+    claim_stability_scores: Dict[str, float] = Field(default_factory=dict)
+    temporal_drift_findings: List[str] = Field(default_factory=list)
+    counterfactual_scenarios: List[Dict[str, Any]] = Field(default_factory=list)
+
+
+class ArxivPaperMetadata(BaseModel):
+    arxiv_id: str
+    title: str
+    authors: List[str] = Field(default_factory=list)
+    abstract: str
+    published_year: int
+    pdf_url: Optional[str] = None
+    categories: List[str] = Field(default_factory=list)
+    extracted_datasets: List[str] = Field(default_factory=list)
+    extracted_methods: List[str] = Field(default_factory=list)
+
+
 class SynthesisReport(BaseModel):
     query: str
     decomposed_subqueries: List[str] = Field(default_factory=list)
@@ -130,3 +171,8 @@ class SynthesisReport(BaseModel):
     citation_audit: CitationAudit
     evidence_graph: EvidenceGraphData
     references: List[Dict[str, Any]] = Field(default_factory=list)
+    meta_analysis: Optional[EmpiricalMetaAnalysis] = None
+    robustness: Optional[RobustnessReport] = None
+    latex_code: Optional[str] = None
+    bibtex_code: Optional[str] = None
+

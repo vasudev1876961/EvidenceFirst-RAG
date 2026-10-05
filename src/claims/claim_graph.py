@@ -116,14 +116,13 @@ class EvidenceGraphBuilder:
         return EvidenceGraphData(nodes=nodes, edges=edges)
 
     def to_plotly_figure(self, graph_data: Optional[EvidenceGraphData] = None):
-        """Generate interactive Plotly visualization for Streamlit dashboard."""
+        """Generate interactive Plotly visualization with contradiction highlighting and community clustering."""
         try:
             import plotly.graph_objects as go
         except ImportError:
             return None
 
         if len(self.graph.nodes) == 0 and graph_data:
-            # Reconstruct from graph_data if graph is empty
             for n in graph_data.nodes:
                 self.graph.add_node(n.id, label=n.label, type=n.node_type)
             for e in graph_data.edges:
@@ -134,26 +133,50 @@ class EvidenceGraphBuilder:
             fig.update_layout(title="No evidence graph data available")
             return fig
 
+        # 1. Community / School of Thought Clustering
+        community_map = {}
+        try:
+            undirected_g = self.graph.to_undirected()
+            communities = list(nx.community.greedy_modularity_communities(undirected_g))
+            for c_idx, comm in enumerate(communities):
+                for node_id in comm:
+                    community_map[node_id] = f"Cluster {c_idx + 1}"
+        except Exception:
+            for node_id in self.graph.nodes:
+                community_map[node_id] = "Cluster 1"
+
         pos = nx.spring_layout(self.graph, seed=42, k=1.2)
 
-        # Edges
-        edge_x = []
-        edge_y = []
-        edge_colors = []
-        for edge in self.graph.edges(data=True):
-            x0, y0 = pos[edge[0]]
-            x1, y1 = pos[edge[1]]
-            edge_x.extend([x0, x1, None])
-            edge_y.extend([y0, y1, None])
+        # 2. Separate Edges by Relationship Type for Rich Visual Distinction
+        edge_traces = []
+        edge_groups = {
+            "SUPPORTS": {"color": "#10B981", "width": 2.2, "dash": "solid", "name": "Supports"},
+            "CONTRADICTS": {"color": "#EF4444", "width": 3.0, "dash": "dash", "name": "Contradicts"},
+            "USES_DATASET": {"color": "#F59E0B", "width": 1.5, "dash": "dot", "name": "Uses Dataset"},
+            "SUBQUERY": {"color": "#8B5CF6", "width": 1.5, "dash": "solid", "name": "Subquery"},
+        }
 
-        edge_trace = go.Scatter(
-            x=edge_x, y=edge_y,
-            line=dict(width=1.5, color="#888"),
-            hoverinfo="none",
-            mode="lines"
-        )
+        for rel, style in edge_groups.items():
+            ex, ey = [], []
+            for u, v, data in self.graph.edges(data=True):
+                if data.get("relationship") == rel:
+                    x0, y0 = pos[u]
+                    x1, y1 = pos[v]
+                    ex.extend([x0, x1, None])
+                    ey.extend([y0, y1, None])
+            if ex:
+                edge_traces.append(
+                    go.Scatter(
+                        x=ex,
+                        y=ey,
+                        line=dict(width=style["width"], color=style["color"], dash=style["dash"]),
+                        hoverinfo="none",
+                        mode="lines",
+                        name=style["name"],
+                    )
+                )
 
-        # Nodes
+        # 3. Nodes
         node_x = []
         node_y = []
         node_text = []
@@ -173,17 +196,20 @@ class EvidenceGraphBuilder:
             node_x.append(x)
             node_y.append(y)
             ntype = data.get("type", "claim")
-            node_text.append(f"{data.get('label', node)}<br>Type: {ntype}")
+            comm_label = community_map.get(node, "Cluster")
+            node_text.append(f"<b>{data.get('label', node)}</b><br>Type: {ntype.upper()}<br>Paradigm: {comm_label}")
             node_color.append(COLOR_MAP.get(ntype, "#64748B"))
-            node_size.append(30 if ntype == "query" else (22 if ntype == "claim" else 16))
+            node_size.append(32 if ntype == "query" else (24 if ntype == "claim" else 18))
 
         node_trace = go.Scatter(
-            x=node_x, y=node_y,
+            x=node_x,
+            y=node_y,
             mode="markers+text",
             hoverinfo="text",
             text=[self.graph.nodes[n].get("label", n) for n in self.graph.nodes],
             textposition="top center",
             hovertext=node_text,
+            name="Nodes",
             marker=dict(
                 showscale=False,
                 color=node_color,
@@ -194,16 +220,28 @@ class EvidenceGraphBuilder:
         )
 
         fig = go.Figure(
-            data=[edge_trace, node_trace],
+            data=edge_traces + [node_trace],
             layout=go.Layout(
-                title=dict(text="Scientific Evidence & Contradiction Graph", font=dict(size=16, color="#E2E8F0")),
-                showlegend=False,
+                title=dict(
+                    text="Scientific Evidence & Contradiction Graph (Red = Conflict, Green = Support)",
+                    font=dict(size=16, color="#E2E8F0")
+                ),
+                showlegend=True,
+                legend=dict(
+                    orientation="h",
+                    yanchor="bottom",
+                    y=1.02,
+                    xanchor="right",
+                    x=1,
+                    font=dict(color="#E2E8F0")
+                ),
                 hovermode="closest",
-                margin=dict(b=20, l=5, r=5, t=40),
-                paper_bgcolor="rgba(15, 23, 42, 0.8)",
-                plot_bgcolor="rgba(15, 23, 42, 0.8)",
+                margin=dict(b=20, l=5, r=5, t=50),
+                paper_bgcolor="rgba(15, 23, 42, 0.9)",
+                plot_bgcolor="rgba(15, 23, 42, 0.9)",
                 xaxis=dict(showgrid=False, zeroline=False, showticklabels=False),
                 yaxis=dict(showgrid=False, zeroline=False, showticklabels=False)
             )
         )
         return fig
+

@@ -1,0 +1,243 @@
+"""FastAPI REST API for EvidenceFirst-RAG."""
+
+from __future__ import annotations
+import os
+import sys
+import yaml
+from contextlib import asynccontextmanager
+from typing import List, Dict, Any, Optional
+
+from fastapi import FastAPI, HTTPException, Query
+from pydantic import BaseModel, Field
+
+# Ensure src is importable
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+
+from src.models import (
+    Paper,
+    SynthesisReport,
+    RobustnessReport,
+    EmpiricalMetaAnalysis,
+    CitationAudit,
+)
+from src.pipeline import EvidenceFirstPipeline
+from src.ingestion.paper_loader import PaperLoader
+from src.evaluation.benchmark import BenchmarkRunner
+
+# Global Pipeline Instance
+pipeline_instance: Optional[EvidenceFirstPipeline] = None
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """Initialize pipeline and index seed corpus on application startup."""
+    global pipeline_instance
+    config_path = "configs/config.yaml"
+    config = {}
+    if os.path.exists(config_path):
+        with open(config_path, "r", encoding="utf-8") as f:
+            config = yaml.safe_load(f) or {}
+
+    pipeline_instance = EvidenceFirstPipeline(config=config)
+    loader = PaperLoader()
+    papers = loader.load_all_from_directory("data/sample_papers")
+    pipeline_instance.index_papers(papers)
+    yield
+
+
+app = FastAPI(
+    title="EvidenceFirst-RAG API",
+    description="RESTful API for Claim-Level Evidence Verification, Contradiction Attribution, and Empirical Synthesis",
+    version="0.2.0",
+    lifespan=lifespan,
+)
+
+
+# --- Request & Response Schemas ---
+class QueryRequest(BaseModel):
+    query: str = Field(..., json_schema_extra={"example": "What are the limitations of Vision Transformers for low-light object detection?"})
+    alpha: float = Field(0.5, ge=0.0, le=1.0, description="Balance between BM25 (1.0) and Dense (0.0)")
+
+
+class ArxivSearchRequest(BaseModel):
+    query: str = Field(..., json_schema_extra={"example": "low-light object detection vision transformer"})
+    max_results: int = Field(3, ge=1, le=10)
+    auto_index: bool = Field(True, description="Whether to immediately index retrieved papers into active corpus")
+
+
+class PaperIngestRequest(BaseModel):
+    paper: Paper
+
+
+@app.get("/health", tags=["System"])
+def health_check():
+    """Health status and corpus indexing metrics."""
+    if not pipeline_instance:
+        return {"status": "initializing"}
+    return {
+        "status": "healthy",
+        "service": "EvidenceFirst-RAG",
+        "version": "0.2.0",
+        "indexed_papers_count": len(pipeline_instance.indexed_papers),
+        "indexed_chunks_count": len(pipeline_instance.indexed_chunks),
+    }
+
+
+@app.post("/api/v1/query", response_model=Dict[str, Any], tags=["Research Synthesis"])
+def analyze_query(req: QueryRequest):
+    """Execute end-to-end EvidenceFirst-RAG pipeline on a scientific query."""
+    if not pipeline_instance:
+        raise HTTPException(status_code=503, detail="Pipeline not initialized")
+
+    pipeline_instance.hybrid.alpha = req.alpha
+    report = pipeline_instance.run(req.query)
+
+    return {
+        "query": report.query,
+        "executive_summary": report.executive_summary,
+        "overall_confidence": report.overall_confidence,
+        "decomposed_subqueries": report.decomposed_subqueries,
+        "citation_audit": {
+            "evidence_coverage_score": report.citation_audit.evidence_coverage_score,
+            "citation_integrity_score": report.citation_audit.citation_integrity_score,
+            "supported_claims": report.citation_audit.supported_claims,
+            "total_claims": report.citation_audit.total_claims,
+            "conflicting_claims": report.citation_audit.conflicting_claims,
+        },
+        "claims": [
+            {
+                "claim_id": c.claim_id,
+                "statement": c.statement,
+                "status": c.evidence_status,
+                "confidence": c.confidence_score,
+                "supporting_count": len(c.supporting_evidence),
+                "contradicting_count": len(c.contradicting_evidence),
+            }
+            for c in report.claims
+        ],
+        "conflicting_findings": [
+            {
+                "claim_id": cf.claim_id,
+                "statement": cf.claim_statement,
+                "likely_reason": cf.likely_reason,
+                "supporting_papers": [p.get("paper_id") for p in cf.supporting_papers],
+                "contradicting_papers": [p.get("paper_id") for p in cf.contradicting_papers],
+                "divergent_factors": cf.divergent_factors,
+            }
+            for cf in report.conflicting_findings
+        ],
+        "research_gaps": report.research_gaps,
+        "empirical_insights": report.meta_analysis.key_empirical_insights if report.meta_analysis else [],
+        "evidence_robustness_index": report.robustness.evidence_robustness_index if report.robustness else 1.0,
+    }
+
+
+@app.post("/api/v1/arxiv/search", tags=["Live Ingestion"])
+def search_arxiv(req: ArxivSearchRequest):
+    """Query live ArXiv API and optionally index found papers immediately."""
+    if not pipeline_instance:
+        raise HTTPException(status_code=503, detail="Pipeline not initialized")
+
+    if req.auto_index:
+        papers = pipeline_instance.fetch_and_index_arxiv(req.query, max_results=req.max_results)
+    else:
+        papers = pipeline_instance.arxiv_fetcher.search(req.query, max_results=req.max_results)
+
+    return {
+        "query": req.query,
+        "retrieved_count": len(papers),
+        "auto_indexed": req.auto_index,
+        "total_corpus_size": len(pipeline_instance.indexed_papers),
+        "papers": [
+            {
+                "paper_id": p.paper_id,
+                "title": p.title,
+                "authors": p.authors,
+                "year": p.year,
+                "venue": p.venue,
+                "url": p.url,
+                "abstract": p.abstract[:200] + "...",
+                "metadata": p.metadata,
+            }
+            for p in papers
+        ]
+    }
+
+
+@app.post("/api/v1/ingest/paper", tags=["Live Ingestion"])
+def ingest_paper(req: PaperIngestRequest):
+    """Ingest a single structured Paper into active retrieval index."""
+    if not pipeline_instance:
+        raise HTTPException(status_code=503, detail="Pipeline not initialized")
+
+    existing = [p for p in pipeline_instance.indexed_papers if p.paper_id != req.paper.paper_id]
+    existing.append(req.paper)
+    pipeline_instance.index_papers(existing)
+
+    return {
+        "status": "success",
+        "ingested_paper_id": req.paper.paper_id,
+        "total_papers": len(pipeline_instance.indexed_papers),
+        "total_chunks": len(pipeline_instance.indexed_chunks),
+    }
+
+
+@app.get("/api/v1/corpus", tags=["Corpus"])
+def get_corpus():
+    """List all papers currently indexed in the active pipeline."""
+    if not pipeline_instance:
+        raise HTTPException(status_code=503, detail="Pipeline not initialized")
+
+    return {
+        "total_papers": len(pipeline_instance.indexed_papers),
+        "papers": [
+            {
+                "paper_id": p.paper_id,
+                "title": p.title,
+                "year": p.year,
+                "venue": p.venue,
+                "dataset": p.metadata.get("dataset"),
+                "model": p.metadata.get("model_architecture"),
+                "metric": p.metadata.get("evaluation_metric"),
+            }
+            for p in pipeline_instance.indexed_papers
+        ]
+    }
+
+
+@app.get("/api/v1/benchmark", tags=["Evaluation"])
+def run_benchmark():
+    """Run systematic ablation study across 5 RAG architectures."""
+    if not pipeline_instance:
+        raise HTTPException(status_code=503, detail="Pipeline not initialized")
+
+    benchmarker = BenchmarkRunner()
+    results = benchmarker.run_ablation_study(pipeline_instance)
+    return {"benchmark_results": results}
+
+
+@app.post("/api/v1/export/latex", tags=["Export"])
+def export_latex(req: QueryRequest):
+    """Execute query and generate publication-ready LaTeX & BibTeX artifacts."""
+    if not pipeline_instance:
+        raise HTTPException(status_code=503, detail="Pipeline not initialized")
+
+    report = pipeline_instance.run(req.query)
+    return {
+        "query": report.query,
+        "latex_code": report.latex_code,
+        "bibtex_code": report.bibtex_code,
+    }
+
+
+@app.post("/api/v1/robustness", tags=["Robustness"])
+def evaluate_robustness(req: QueryRequest):
+    """Execute query and calculate counterfactual leave-one-out claim stability & critical papers."""
+    if not pipeline_instance:
+        raise HTTPException(status_code=503, detail="Pipeline not initialized")
+
+    report = pipeline_instance.run(req.query)
+    return {
+        "query": report.query,
+        "robustness": report.robustness.model_dump() if report.robustness else None,
+    }

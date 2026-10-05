@@ -3,6 +3,7 @@
 from __future__ import annotations
 import os
 import sys
+import json
 import yaml
 import streamlit as st
 import pandas as pd
@@ -97,16 +98,16 @@ def get_pipeline():
     config = {}
     if os.path.exists(config_path):
         with open(config_path, "r", encoding="utf-8") as f:
-            config = yaml.safe_load(f)
+            config = yaml.safe_load(f) or {}
 
     pipe = EvidenceFirstPipeline(config=config)
     loader = PaperLoader()
     papers = loader.load_all_from_directory("data/sample_papers")
     pipe.index_papers(papers)
-    return pipe, papers
+    return pipe
 
 
-pipeline, papers_catalog = get_pipeline()
+pipeline = get_pipeline()
 
 # ----------------- SIDEBAR -----------------
 with st.sidebar:
@@ -128,15 +129,17 @@ with st.sidebar:
     hybrid_alpha = st.slider("Retrieval Balance (α BM25 vs 1-α Dense)", min_value=0.0, max_value=1.0, value=0.5, step=0.1)
 
     st.markdown("---")
-    st.subheader("📚 Corpus Index")
-    st.write(f"Indexed Papers: **{len(papers_catalog)}**")
-    for p in papers_catalog:
-        st.caption(f"• **[{p.paper_id}]** {p.title[:38]}... ({p.year})")
+    st.subheader("📚 Active Corpus Index")
+    st.write(f"Indexed Papers: **{len(pipeline.indexed_papers)}**")
+    st.write(f"Indexed Chunks: **{len(pipeline.indexed_chunks)}**")
+    with st.expander("View Indexed Papers Catalog"):
+        for p in pipeline.indexed_papers:
+            st.caption(f"• **[{p.paper_id}]** {p.title[:40]}... ({p.year})")
 
 
 # ----------------- MAIN PANEL -----------------
 st.markdown('<div class="main-header">EvidenceFirst-RAG: Scientific Literature Dashboard</div>', unsafe_allow_html=True)
-st.markdown('<div class="sub-header">Claim-Level Verification, Contradiction Detection, and Citation Faithfulness Auditing</div>', unsafe_allow_html=True)
+st.markdown('<div class="sub-header">Claim-Level Verification, Contradiction Detection, Empirical Meta-Analysis & Robustness Auditing</div>', unsafe_allow_html=True)
 
 # Query selection / presets
 preset_queries = [
@@ -160,8 +163,7 @@ with col_btn:
 
 # Check session state for report
 if "report" not in st.session_state or run_btn:
-    with st.spinner("Executing EvidenceFirst-RAG Pipeline (Decomposition → Hybrid Search → Rerank → Claim Verification → Contradiction Engine)..."):
-        # Update pipeline alpha
+    with st.spinner("Executing EvidenceFirst-RAG Pipeline (Decomposition → Hybrid Search → Rerank → Claim Verification → Contradiction Engine → Meta-Analysis)..."):
         pipeline.hybrid.alpha = hybrid_alpha
         report = pipeline.run(user_query)
         st.session_state["report"] = report
@@ -169,7 +171,7 @@ if "report" not in st.session_state or run_btn:
 report = st.session_state["report"]
 
 # Top Metrics Row
-m1, m2, m3, m4, m5 = st.columns(5)
+m1, m2, m3, m4, m5, m6 = st.columns(6)
 with m1:
     st.metric("Overall Confidence", f"{report.overall_confidence * 100:.0f}%", delta="Reliable" if report.overall_confidence >= 0.75 else "Moderate")
 with m2:
@@ -177,21 +179,28 @@ with m2:
 with m3:
     st.metric("Citation Integrity (CIS)", f"{report.citation_audit.citation_integrity_score * 100:.0f}%", help="Citations passing entailment check / Total citations")
 with m4:
+    eri_val = report.robustness.evidence_robustness_index if report.robustness else 1.0
+    st.metric("Robustness Index (ERI)", f"{eri_val * 100:.0f}%", help="Leave-one-out claim stability score across all papers")
+with m5:
     num_conflicts = len(report.conflicting_findings)
     st.metric("Conflicting Claims", num_conflicts, delta=f"{num_conflicts} Detected", delta_color="inverse" if num_conflicts > 0 else "normal")
-with m5:
-    st.metric("Evaluated Claims", report.citation_audit.total_claims)
+with m6:
+    st.metric("Verified Claims", report.citation_audit.total_claims)
 
 st.markdown("---")
 
 # Navigation Tabs
-tab_syn, tab_claims, tab_conflicts, tab_graph, tab_audit, tab_ablation = st.tabs([
+tab_syn, tab_claims, tab_conflicts, tab_graph, tab_empirical, tab_robustness, tab_arxiv, tab_latex, tab_audit, tab_ablation = st.tabs([
     "📑 Executive Synthesis",
     "🔍 Claim-Level Evidence",
     "⚡ Contradiction Attribution",
-    "🕸️ Evidence Knowledge Graph",
+    "🕸️ Knowledge Graph",
+    "📊 Empirical Meta-Analysis",
+    "🛡️ Robustness & Counterfactuals",
+    "🌐 Live ArXiv Ingestion",
+    "📄 LaTeX & BibTeX Export",
     "🛡️ Citation Audit",
-    "📊 Ablation Study & Benchmarks"
+    "📈 Ablation Benchmarks"
 ])
 
 # ----------------- TAB 1: EXECUTIVE SYNTHESIS -----------------
@@ -300,7 +309,7 @@ with tab_conflicts:
 # ----------------- TAB 4: EVIDENCE KNOWLEDGE GRAPH -----------------
 with tab_graph:
     st.subheader("🕸️ Scientific Evidence Knowledge Graph")
-    st.caption("Directed graph illustrating connections between Query, Claims, Supporting/Contradicting Papers, and Datasets.")
+    st.caption("Directed graph illustrating connections between Query, Claims, Supporting/Contradicting Papers, and Datasets. Red dashed lines denote contradictions.")
 
     fig = pipeline.graph_builder.to_plotly_figure(report.evidence_graph)
     if fig:
@@ -309,7 +318,155 @@ with tab_graph:
         st.info("Graph visualization requires plotly.")
 
 
-# ----------------- TAB 5: CITATION AUDIT -----------------
+# ----------------- TAB 5: EMPIRICAL META-ANALYSIS MATRIX -----------------
+with tab_empirical:
+    st.subheader("📊 Cross-Paper Empirical Meta-Analysis Matrix")
+    st.caption("Synthesizing quantitative results across models, datasets, and computational metrics.")
+
+    if report.meta_analysis:
+        meta = report.meta_analysis
+
+        st.markdown("### 🏆 Cross-Dataset Benchmark Matrix")
+        if meta.dataset_comparison_table:
+            df_comp = pd.DataFrame(meta.dataset_comparison_table)
+            st.dataframe(df_comp, use_container_width=True)
+
+        col_lb, col_var = st.columns([3, 2])
+        with col_lb:
+            st.markdown("### 🥇 Empirical Model Leaderboard")
+            if meta.model_leaderboard:
+                df_lb = pd.DataFrame(meta.model_leaderboard)
+                st.dataframe(df_lb[["Rank", "Model", "Dataset", "Score", "FPS", "Notes"]], use_container_width=True)
+
+        with col_var:
+            st.markdown("### 📈 Cross-Dataset Benchmark Variance")
+            if meta.cross_dataset_variance:
+                df_var = pd.DataFrame([
+                    {"Dataset": k, "Standard Deviation (σ)": v}
+                    for k, v in meta.cross_dataset_variance.items()
+                ])
+                fig_var = px.bar(
+                    df_var, x="Dataset", y="Standard Deviation (σ)",
+                    title="Empirical Discrepancy by Benchmark Dataset",
+                    color="Standard Deviation (σ)",
+                    color_continuous_scale="Purples"
+                )
+                fig_var.update_layout(paper_bgcolor="rgba(15, 23, 42, 0.8)", plot_bgcolor="rgba(15, 23, 42, 0.8)", font=dict(color="#E2E8F0"))
+                st.plotly_chart(fig_var, use_container_width=True)
+
+        st.markdown("### 💡 Key Quantitative Findings")
+        for ins in meta.key_empirical_insights:
+            st.markdown(f"- 📌 {ins}")
+    else:
+        st.info("No empirical meta-analysis generated.")
+
+
+# ----------------- TAB 6: ROBUSTNESS & COUNTERFACTUAL STUDIO -----------------
+with tab_robustness:
+    st.subheader("🛡️ Counterfactual & Leave-One-Out Robustness Studio")
+    st.caption("Testing the fragility of synthesis conclusions when individual papers are ablated from the literature pool.")
+
+    if report.robustness:
+        rob = report.robustness
+        r1, r2, r3 = st.columns(3)
+        r1.metric("Evidence Robustness Index (ERI)", f"{rob.evidence_robustness_index * 100:.1f}%", help="Resilience score under single-paper removal")
+        r2.metric("Consensus Divergence Score", f"{rob.consensus_divergence_score * 100:.1f}%", help="Ratio of conflicting evidence in corpus")
+        r3.metric("Critical Pivot Papers", len(rob.critical_papers), help="Papers whose omission flips claim consensus")
+
+        st.markdown("### 🚨 Critical Pivot Papers Analysis")
+        if rob.critical_papers:
+            st.warning("The following papers act as single points of truth or contradiction. Removing them directly reverses claim outcomes:")
+            for cp in rob.critical_papers:
+                with st.expander(f"📌 [{cp['paper_id']}] {cp['title']} (Impacts {cp['impacted_claims_count']} claims)"):
+                    for imp in cp.get("impacts", []):
+                        st.markdown(f"- **Claim `{imp['claim_id']}`**: {imp['description']}")
+        else:
+            st.success("✅ The current synthesis exhibits high consensus stability: no single paper's omission flips claim verification status.")
+
+        st.markdown("### ⏱️ Temporal Drift Across Literature")
+        for tf in rob.temporal_drift_findings:
+            st.markdown(f"- 📅 {tf}")
+
+        if rob.counterfactual_scenarios:
+            st.markdown("### 🔬 Leave-One-Out Counterfactual Simulation Log")
+            df_cf = pd.DataFrame(rob.counterfactual_scenarios)
+            st.dataframe(df_cf[["omitted_paper_id", "affected_claim_id", "original_status", "counterfactual_status", "impact"]], use_container_width=True)
+    else:
+        st.info("Robustness analysis not available.")
+
+
+# ----------------- TAB 7: LIVE ARXIV INGESTION -----------------
+with tab_arxiv:
+    st.subheader("🌐 Live ArXiv Scientific Retrieval & On-the-Fly Ingestion")
+    st.caption("Search recent research from ArXiv and index papers into the active retrieval pipeline with one click.")
+
+    col_arx1, col_arx2 = st.columns([3, 1])
+    with col_arx1:
+        arxiv_q = st.text_input("Search ArXiv Query or ArXiv ID (e.g. '2405.08912'):", value="spectral vision transformer low light")
+    with col_arx2:
+        arx_count = st.number_input("Max Papers", min_value=1, max_value=5, value=2)
+
+    col_btn_arx, _ = st.columns([1, 4])
+    with col_btn_arx:
+        fetch_arx_btn = st.button("📥 Retrieve from ArXiv", type="secondary", use_container_width=True)
+
+    if fetch_arx_btn:
+        with st.spinner("Querying ArXiv API and parsing papers..."):
+            found_papers = pipeline.fetch_and_index_arxiv(arxiv_q, max_results=arx_count)
+            st.success(f"Indexed {len(found_papers)} papers into active corpus! Total papers now: {len(pipeline.indexed_papers)}")
+            for fp in found_papers:
+                with st.expander(f"📄 [{fp.paper_id}] {fp.title} ({fp.year})"):
+                    st.write(f"**Authors**: {', '.join(fp.authors)}")
+                    st.write(f"**Abstract**: {fp.abstract}")
+                    st.write(f"**Venue**: {fp.venue}")
+                    st.json(fp.metadata)
+
+
+# ----------------- TAB 8: ACADEMIC LATEX & BIBTEX EXPORT -----------------
+with tab_latex:
+    st.subheader("📄 Publication-Grade Academic LaTeX & BibTeX Export")
+    st.caption("Ready-to-compile LaTeX paper and BibTeX bibliography formatted for academic review.")
+
+    c_tex_down, c_bib_down, c_json_down = st.columns(3)
+    if report.latex_code:
+        with c_tex_down:
+            st.download_button(
+                label="⬇️ Download synthesis_paper.tex",
+                data=report.latex_code,
+                file_name="synthesis_paper.tex",
+                mime="text/x-tex",
+                use_container_width=True
+            )
+    if report.bibtex_code:
+        with c_bib_down:
+            st.download_button(
+                label="⬇️ Download references.bib",
+                data=report.bibtex_code,
+                file_name="references.bib",
+                mime="text/plain",
+                use_container_width=True
+            )
+    with c_json_down:
+        report_json = json.dumps(report.model_dump(), default=str, indent=2)
+        st.download_button(
+            label="⬇️ Download synthesis_report.json",
+            data=report_json,
+            file_name="synthesis_report.json",
+            mime="application/json",
+            use_container_width=True
+        )
+
+    col_tex_view, col_bib_view = st.columns(2)
+    with col_tex_view:
+        st.markdown("#### LaTeX Article Preview (`.tex`)")
+        st.code(report.latex_code or "% No LaTeX generated", language="latex", line_numbers=True)
+
+    with col_bib_view:
+        st.markdown("#### BibTeX Bibliography Preview (`.bib`)")
+        st.code(report.bibtex_code or "% No BibTeX generated", language="bibtex", line_numbers=True)
+
+
+# ----------------- TAB 9: CITATION AUDIT -----------------
 with tab_audit:
     st.subheader("🛡️ Citation Correctness & Faithfulness Audit")
     st.caption("Auditing whether cited sections genuinely entail the generated propositions.")
@@ -334,9 +491,9 @@ with tab_audit:
         st.dataframe(pd.DataFrame(audit_rows), use_container_width=True)
 
 
-# ----------------- TAB 6: ABLATION BENCHMARKS -----------------
+# ----------------- TAB 10: ABLATION BENCHMARKS -----------------
 with tab_ablation:
-    st.subheader("📊 Systematic Ablation Study (Section 20)")
+    st.subheader("📈 Systematic Ablation Study (Section 20)")
     st.caption("Evaluating the proposed EvidenceFirst-RAG architecture against traditional RAG baselines.")
 
     benchmarker = BenchmarkRunner()
@@ -366,4 +523,5 @@ with tab_ablation:
         labels={"value": "Score", "system": "RAG System Architecture", "variable": "Metric"},
         color_discrete_sequence=["#3B82F6", "#10B981", "#EF4444"]
     )
+    fig_ablation.update_layout(paper_bgcolor="rgba(15, 23, 42, 0.8)", plot_bgcolor="rgba(15, 23, 42, 0.8)", font=dict(color="#E2E8F0"))
     st.plotly_chart(fig_ablation, use_container_width=True)

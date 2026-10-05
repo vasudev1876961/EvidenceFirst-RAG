@@ -34,9 +34,23 @@ $$\text{ECS} = \frac{\text{Number of Claims Supported by Valid Evidence}}{\text{
 Rigorous Natural Language Inference (NLI) audits check whether cited sections genuinely entail the generated propositions:
 $$\text{CIS} = \frac{\text{Correctly Supported Cited Claims}}{\text{Total Cited Factual Claims}}$$
 
-### 5. Multi-Hop Evidence Knowledge Graph
-NetworkX and Plotly-powered directed graphs mapping relations:
-$$\text{Query} \longrightarrow \text{Claims} \xrightarrow{\text{SUPPORTS / CONTRADICTS}} \text{Papers} \xrightarrow{\text{USES}} \text{Datasets / Methods}$$
+### 5. Multi-Hop Evidence Knowledge Graph & Community Clustering
+NetworkX and Plotly-powered directed graphs with distinct edge styles (green = support, red dashed = contradiction) and community/school-of-thought detection.
+
+### 6. Cross-Paper Empirical Meta-Analysis Matrix
+Automated extraction and standardization of quantitative benchmark results across models, datasets, metrics, and compute footprints (mAP, FPS, Parameters), computing empirical variance and discrepancy indices.
+
+### 7. Counterfactual & Leave-One-Out Robustness (ERI)
+Jackknife ablation engine that measures the **Evidence Robustness Index (ERI)**, quantifying whether removing any single paper collapses a claim's consensus, and flags **Critical Pivot Papers**.
+
+### 8. Live ArXiv Ingestion Engine
+Dynamic on-the-fly retrieval and indexing of recent papers via the ArXiv API with automatic IMRaD section reconstruction and entity parsing.
+
+### 9. Publication-Grade LaTeX & BibTeX Exporter
+Generates ready-to-compile academic conference/journal drafts (`synthesis_paper.tex`) and validated bibliography files (`references.bib`).
+
+### 10. Headless REST API (FastAPI)
+Production async REST API with interactive Swagger documentation (`/docs`), automated health checks, and query endpoints.
 
 ---
 
@@ -86,11 +100,16 @@ $$\text{Query} \longrightarrow \text{Claims} \xrightarrow{\text{SUPPORTS / CONTR
                           ▼
              Evidence-Grounded Synthesis
                           │
+              ┌───────────┴───────────┐
+              ▼                       ▼
+     Empirical Meta-Analysis   Robustness (ERI) Check
+              │                       │
+              └───────────┬───────────┘
                           ▼
              Citation Faithfulness Audit
                           │
                           ▼
-                  FINAL RESEARCH REPORT
+              LaTeX / BibTeX / Report Export
 ```
 
 ---
@@ -119,14 +138,28 @@ Run a literature synthesis on any research query:
 python main.py --query "What are the limitations of Vision Transformers for low-light object detection?"
 ```
 
-### 4. Run Benchmark & Ablation Study
+### 4. Live ArXiv Ingestion & LaTeX Export
+Fetch recent papers from ArXiv, test robustness, and export publication-ready LaTeX & BibTeX:
+```bash
+python main.py --arxiv-search "spectral vision transformers" --robustness --export-latex
+```
+
+### 5. Launch FastAPI REST Server
+Start the high-performance async REST API on `http://127.0.0.1:8000`:
+```bash
+python main.py --serve-api
+# or: uvicorn app.api:app --reload
+```
+Interactive OpenAPI documentation available at: `http://127.0.0.1:8000/docs`
+
+### 6. Run Benchmark & Ablation Study
 Execute comparative evaluation across the 5 RAG architectures:
 ```bash
 python main.py --benchmark
 ```
 
-### 5. Launch Interactive Research Dashboard
-Launch the Streamlit Research Analysis Dashboard:
+### 7. Launch Interactive Research Dashboard
+Launch the Streamlit Research Analysis Dashboard with 10 interactive tabs:
 ```bash
 streamlit run app/streamlit_app.py
 ```
@@ -156,32 +189,50 @@ EvidenceFirst-RAG/
 │   ├── raw/                 # Incoming PDF papers
 │   ├── processed/           # Parsed paper catalog
 │   ├── sample_papers/       # Seed CV corpus (DarkFace, ExDark, ViT, YOLO)
-│   └── metadata/            # Extracted datasets, metrics, and models
+│   ├── synthesis_paper.tex  # Exported LaTeX paper draft
+│   └── references.bib       # Exported BibTeX citations
 │
 ├── configs/
 │   └── config.yaml          # Master configuration (weights, models, thresholds)
 │
 ├── src/
-│   ├── ingestion/           # PDF and section parsing (IMRaD extraction)
+│   ├── ingestion/           # PDF, section parsing & ArXiv Live Ingestion Engine
+│   │   ├── arxiv_fetcher.py # Live ArXiv API search & entity parsing
+│   │   ├── paper_loader.py  # Multi-format paper loader (.json, .pdf, .txt)
+│   │   └── section_parser.py# Academic section extractor
 │   ├── preprocessing/       # Academic text cleaner & semantic chunker
 │   ├── query/               # Query decomposer & BM25 keyword expander
 │   ├── retrieval/           # BM25, Dense embeddings, Hybrid fusion, Cross-Encoder
 │   ├── claims/              # Atomic claim extractor, normalizer, NetworkX graph
+│   │   └── claim_graph.py   # Multi-hop graph with community clustering
 │   ├── verification/        # NLI entailment, contradiction engine, citation audit
+│   │   ├── robustness.py    # Counterfactual & leave-one-out robustness (ERI)
+│   │   ├── contradiction.py # Contradiction attribution engine
+│   │   └── citation_checker.py # ECS & CIS audit
 │   ├── synthesis/           # Evidence-grounded synthesizer, conflict attribution
+│   │   ├── meta_analysis.py # Cross-paper empirical benchmark matrix
+│   │   ├── latex_exporter.py# LaTeX & BibTeX publication exporter
+│   │   └── report_generator.py # Structured synthesis report builder
 │   ├── evaluation/          # Retrieval metrics (MRR, nDCG) & ablation runner
 │   ├── llm/                 # Modular LLM client (Gemini, OpenAI, Groq, Mock)
 │   └── pipeline.py          # Master orchestrator
 │
 ├── app/
-│   └── streamlit_app.py     # Interactive Research Analysis Dashboard
+│   ├── api.py               # FastAPI REST API server
+│   └── streamlit_app.py     # 10-Tab Interactive Research Dashboard
 │
-├── tests/                   # Pytest test suite
+├── tests/                   # Pytest test suite (13 passing tests)
+│   ├── test_advanced.py     # ArXiv, Meta-Analysis, ERI, LaTeX & API tests
+│   ├── test_pipeline.py     # End-to-end integration & ablation tests
+│   ├── test_retrieval.py    # Hybrid retrieval tests
+│   └── test_verification.py # Contradiction & citation auditor tests
+│
 ├── requirements.txt         # Dependencies
-└── main.py                  # CLI runner
+└── main.py                  # CLI runner with ArXiv, LaTeX, Robustness & API flags
 ```
 
 ---
 
 ## 📄 License
 This project is licensed under the MIT License.
+

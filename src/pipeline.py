@@ -30,6 +30,10 @@ from src.verification.citation_checker import CitationAuditor
 from src.synthesis.evidence_synthesizer import EvidenceSynthesizer
 from src.synthesis.conflict_analyzer import ConflictAnalyzer
 from src.synthesis.report_generator import ReportGenerator
+from src.synthesis.meta_analysis import EmpiricalMetaAnalysisEngine
+from src.verification.robustness import RobustnessEngine
+from src.synthesis.latex_exporter import LatexExporter
+from src.ingestion.arxiv_fetcher import ArxivFetcher
 
 logger = logging.getLogger(__name__)
 
@@ -109,6 +113,12 @@ class EvidenceFirstPipeline:
         self.conflict_analyzer = ConflictAnalyzer()
         self.report_generator = ReportGenerator()
 
+        # 8. Advanced Scientific Modules
+        self.meta_analysis_engine = EmpiricalMetaAnalysisEngine()
+        self.robustness_engine = RobustnessEngine(scorer=self.scorer)
+        self.latex_exporter = LatexExporter()
+        self.arxiv_fetcher = ArxivFetcher()
+
         # State
         self.indexed_papers: List[Paper] = []
         self.indexed_chunks: List[SemanticChunk] = []
@@ -140,6 +150,16 @@ class EvidenceFirstPipeline:
         # Update retrieval indices
         self.bm25.index_chunks(all_chunks)
         self.dense.index_chunks(all_chunks)
+
+    def fetch_and_index_arxiv(self, query: str, max_results: int = 3) -> List[Paper]:
+        """Dynamically retrieve recent research from ArXiv and index into the active corpus."""
+        papers = self.arxiv_fetcher.search(query=query, max_results=max_results)
+        existing_ids = {p.paper_id for p in self.indexed_papers}
+        new_papers = [p for p in papers if p.paper_id not in existing_ids]
+        if new_papers:
+            self.index_papers(self.indexed_papers + new_papers)
+            logger.info(f"Ingested and indexed {len(new_papers)} new ArXiv papers into active pipeline.")
+        return papers
 
     def run(self, query: str) -> SynthesisReport:
         """Execute full EvidenceFirst-RAG pipeline on a user query."""
@@ -232,4 +252,19 @@ class EvidenceFirstPipeline:
             papers=self.indexed_papers,
         )
 
+        # Step 11: Cross-Paper Empirical Meta-Analysis Matrix
+        report.meta_analysis = self.meta_analysis_engine.extract_from_papers_and_claims(
+            papers=self.indexed_papers, claims=claims
+        )
+
+        # Step 12: Robustness & Counterfactual Leave-One-Out Evaluation
+        report.robustness = self.robustness_engine.evaluate_robustness(
+            claims=claims, papers_pool=self.indexed_papers
+        )
+
+        # Step 13: Export LaTeX & BibTeX Publication Artifacts
+        report.latex_code = self.latex_exporter.generate_latex(report)
+        report.bibtex_code = self.latex_exporter.generate_bibtex(report)
+
         return report
+

@@ -57,8 +57,38 @@ def main():
         default="configs/config.yaml",
         help="Path to YAML configuration file",
     )
+    parser.add_argument(
+        "--arxiv-search",
+        type=str,
+        default=None,
+        help="Search ArXiv live API and index retrieved papers into active corpus",
+    )
+    parser.add_argument(
+        "--export-latex",
+        action="store_true",
+        help="Export research synthesis to compilation-ready LaTeX and BibTeX files",
+    )
+    parser.add_argument(
+        "--robustness",
+        action="store_true",
+        help="Run Leave-One-Out counterfactual robustness stress-test on synthesis claims",
+    )
+    parser.add_argument(
+        "--serve-api",
+        action="store_true",
+        help="Launch the EvidenceFirst-RAG FastAPI REST server on port 8000",
+    )
 
     args = parser.parse_args()
+
+    # Serve API Mode
+    if args.serve_api:
+        import uvicorn
+        print("\n🚀 Starting EvidenceFirst-RAG FastAPI Server on http://127.0.0.1:8000 ...")
+        print("📖 Interactive OpenAPI Documentation: http://127.0.0.1:8000/docs\n")
+        uvicorn.run("app.api:app", host="127.0.0.1", port=8000, reload=False)
+        return
+
     config = load_config(args.config)
 
     print("\n" + "=" * 80)
@@ -77,6 +107,15 @@ def main():
 
     print(f"📚 Indexing {len(papers)} research papers from '{args.data_dir}'...")
     pipeline.index_papers(papers)
+
+    # ArXiv Live Ingestion Flag
+    if args.arxiv_search:
+        print(f"\n🌐 Querying ArXiv Live API for: '{args.arxiv_search}'...")
+        arxiv_papers = pipeline.fetch_and_index_arxiv(args.arxiv_search, max_results=3)
+        print(f"📥 Successfully indexed {len(arxiv_papers)} papers from ArXiv:")
+        for ap in arxiv_papers:
+            print(f"   • [{ap.paper_id}] {ap.title[:55]}... ({ap.year})")
+        print(f"📊 Active Corpus Size: {len(pipeline.indexed_papers)} papers.\n")
 
     # 3. Benchmark Ablation Mode
     if args.benchmark:
@@ -109,6 +148,32 @@ def main():
     with open(output_path, "w", encoding="utf-8") as f:
         f.write(markdown_output)
     print(f"\n💾 Saved full report to: {output_path}")
+
+    # Robustness Analysis Output
+    if args.robustness and report.robustness:
+        print("\n" + "=" * 80)
+        print("  🛡️ Leave-One-Out Robustness & Counterfactual Analysis (ERI)")
+        print("=" * 80)
+        print(f"Evidence Robustness Index (ERI): {report.robustness.evidence_robustness_index * 100:.1f}%")
+        print(f"Consensus Divergence Score:     {report.robustness.consensus_divergence_score * 100:.1f}%\n")
+        if report.robustness.critical_papers:
+            print("🚨 Critical Pivot Papers (omission flips claim verification status):")
+            for cp in report.robustness.critical_papers:
+                print(f"   • [{cp['paper_id']}] {cp['title'][:48]}... (Impacts {cp['impacted_claims_count']} claims)")
+        else:
+            print("✅ Consensus is stable across all individual paper omissions.")
+        print("=" * 80 + "\n")
+
+    # LaTeX & BibTeX Export Flag
+    if args.export_latex and report.latex_code and report.bibtex_code:
+        tex_path = "data/synthesis_paper.tex"
+        bib_path = "data/references.bib"
+        with open(tex_path, "w", encoding="utf-8") as f:
+            f.write(report.latex_code)
+        with open(bib_path, "w", encoding="utf-8") as f:
+            f.write(report.bibtex_code)
+        print(f"📄 LaTeX paper exported to: {tex_path}")
+        print(f"📚 BibTeX bibliography exported to: {bib_path}\n")
 
 
 if __name__ == "__main__":
