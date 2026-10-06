@@ -158,3 +158,108 @@ class ReportGenerator:
                 lines.append(f"- **[{ref['paper_id']}]** {ref['title']}. *{ref['venue']}*, {ref['year']}.")
 
         return "\n".join(lines)
+
+    def format_html(self, report: SynthesisReport) -> str:
+        """Format SynthesisReport as publication-grade standalone HTML document."""
+        audit = report.citation_audit
+        conflicts_html = ""
+        if report.conflicting_findings:
+            conflicts_cards = []
+            for c in report.conflicting_findings:
+                sup_p = ", ".join([p.get("paper_id", "") for p in c.supporting_papers]) or "None"
+                contra_p = ", ".join([p.get("paper_id", "") for p in c.contradicting_papers]) or "None"
+                factors_rows = ""
+                for f in c.divergent_factors:
+                    factors_rows += f"<tr><td><b>{f.get('factor', 'Aspect')}</b></td><td>{f.get('support', f.get('supporting_side', 'N/A'))}</td><td>{f.get('contradict', f.get('contradicting_side', 'N/A'))}</td></tr>"
+
+                factors_table = f"""
+                <table class="data-table">
+                    <thead><tr><th>Divergent Factor</th><th>Supporting Setup</th><th>Contradicting Setup</th></tr></thead>
+                    <tbody>{factors_rows}</tbody>
+                </table>
+                """ if factors_rows else ""
+
+                conflicts_cards.append(f"""
+                <div class="conflict-box">
+                    <h3>⚡ Contradiction in Claim {c.claim_id}</h3>
+                    <p class="claim-stmt">"{c.claim_statement}"</p>
+                    <p><b>Supporting Papers:</b> <span class="badge-sup">{sup_p}</span> &nbsp;|&nbsp; <b>Contradicting Papers:</b> <span class="badge-contra">{contra_p}</span></p>
+                    <div class="attribution-reason"><b>Likely Disagreement Cause:</b> {c.likely_reason}</div>
+                    {factors_table}
+                </div>
+                """)
+            conflicts_html = f"<h2>3. Contradiction Detection & Conflict Attribution</h2>{''.join(conflicts_cards)}"
+
+        findings_html = ""
+        for f in report.key_findings:
+            status_class = "badge-sup" if "Strong" in f["status"] else ("badge-contra" if "Conflicting" in f["status"] else "badge-mod")
+            snippets_html = ""
+            for s in f.get("evidence_snippets", []):
+                snippets_html += f"<blockquote><b>[{s.get('paper_id')}]</b> {s.get('snippet')} <small>({s.get('section')}, {s.get('year')})</small></blockquote>"
+
+            findings_html += f"""
+            <div class="finding-card">
+                <span class="badge {status_class}">{f['status'].upper()}</span>
+                <h4>{f['aspect'].title()} (Claim {f['claim_id']})</h4>
+                <p class="statement">{f['statement']}</p>
+                <div class="meta">Confidence: <b>{f['confidence_score']:.2f}</b> | Supporting: <b>{f['supporting_count']}</b> | Contradicting: <b>{f['contradicting_count']}</b></div>
+                {snippets_html}
+            </div>
+            """
+
+        refs_html = "".join([f"<li><b>[{r['paper_id']}]</b> {r['title']}. <i>{r.get('venue', '')}</i> ({r.get('year', '')})</li>" for r in report.references])
+
+        html_template = f"""<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>EvidenceFirst-RAG: Literature Synthesis</title>
+<style>
+    body {{ font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; line-height: 1.6; color: #1E293B; background: #F8FAFC; margin: 0; padding: 40px 20px; }}
+    .container {{ max-width: 960px; margin: 0 auto; background: #FFFFFF; border-radius: 12px; padding: 40px; box-shadow: 0 4px 20px rgba(0,0,0,0.06); }}
+    h1 {{ font-size: 2rem; color: #0F172A; border-bottom: 2px solid #3B82F6; padding-bottom: 12px; }}
+    h2 {{ font-size: 1.4rem; color: #1E293B; margin-top: 32px; border-bottom: 1px solid #E2E8F0; padding-bottom: 8px; }}
+    .metrics-bar {{ display: flex; gap: 16px; margin: 24px 0; flex-wrap: wrap; }}
+    .metric-item {{ flex: 1; min-width: 140px; background: #F1F5F9; border-radius: 8px; padding: 12px 16px; text-align: center; }}
+    .metric-num {{ font-size: 1.6rem; font-weight: 700; color: #2563EB; }}
+    .metric-label {{ font-size: 0.8rem; color: #64748B; font-weight: 600; text-transform: uppercase; }}
+    .finding-card {{ background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 8px; padding: 18px; margin-bottom: 16px; }}
+    .conflict-box {{ background: #FFF1F2; border-left: 4px solid #E11D48; border-radius: 8px; padding: 20px; margin-bottom: 24px; }}
+    .badge {{ display: inline-block; padding: 4px 10px; border-radius: 999px; font-size: 0.75rem; font-weight: 700; }}
+    .badge-sup {{ background: #DCFCE7; color: #15803D; }}
+    .badge-contra {{ background: #FFE4E6; color: #BE123C; }}
+    .badge-mod {{ background: #DBEAFE; color: #1D4ED8; }}
+    .data-table {{ width: 100%; border-collapse: collapse; margin-top: 14px; background: white; }}
+    .data-table th, .data-table td {{ border: 1px solid #CBD5E1; padding: 10px 14px; text-align: left; font-size: 0.9rem; }}
+    .data-table th {{ background: #F1F5F9; font-weight: 600; }}
+    blockquote {{ border-left: 3px solid #94A3B8; margin: 10px 0; padding-left: 12px; font-style: italic; color: #475569; }}
+</style>
+</head>
+<body>
+<div class="container">
+    <h1>🔬 EvidenceFirst-RAG: Scientific Literature Synthesis</h1>
+    <p><b>Research Query:</b> <i>"{report.query}"</i></p>
+
+    <div class="metrics-bar">
+        <div class="metric-item"><div class="metric-num">{report.overall_confidence * 100:.0f}%</div><div class="metric-label">Confidence</div></div>
+        <div class="metric-item"><div class="metric-num">{audit.evidence_coverage_score * 100:.0f}%</div><div class="metric-label">Evidence Coverage (ECS)</div></div>
+        <div class="metric-item"><div class="metric-num">{audit.citation_integrity_score * 100:.0f}%</div><div class="metric-label">Citation Integrity (CIS)</div></div>
+        <div class="metric-item"><div class="metric-num">{len(report.conflicting_findings)}</div><div class="metric-label">Conflicts Detected</div></div>
+    </div>
+
+    <h2>1. Executive Summary</h2>
+    <p>{report.executive_summary}</p>
+
+    <h2>2. Verified Factual Claims & Evidence</h2>
+    {findings_html}
+
+    {conflicts_html}
+
+    <h2>4. Academic References</h2>
+    <ul>{refs_html}</ul>
+</div>
+</body>
+</html>
+"""
+        return html_template
+

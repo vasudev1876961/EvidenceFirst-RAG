@@ -120,9 +120,14 @@ with st.sidebar:
 
     domain = st.selectbox(
         "Scientific Domain",
-        ["Computer Vision / Deep Learning", "NLP / LLMs (ACL)", "Biomedical Literature (PubMed)"],
-        index=0,
+        ["All Domains", "Computer Vision / Deep Learning", "NLP / LLMs (ACL)", "Biomedical Literature (PubMed)"],
+        index=1,
     )
+
+    # Trigger re-indexing if domain filter changed
+    if "active_domain" not in st.session_state or st.session_state["active_domain"] != domain:
+        st.session_state["active_domain"] = domain
+        pipeline.filter_by_domain(domain if domain != "All Domains" else None)
 
     year_range = st.slider("Publication Year Range", min_value=2018, max_value=2026, value=(2020, 2026))
     evidence_threshold = st.slider("Evidence Confidence Threshold", min_value=0.30, max_value=0.95, value=0.60, step=0.05)
@@ -134,32 +139,48 @@ with st.sidebar:
     st.write(f"Indexed Chunks: **{len(pipeline.indexed_chunks)}**")
     with st.expander("View Indexed Papers Catalog"):
         for p in pipeline.indexed_papers:
-            st.caption(f"• **[{p.paper_id}]** {p.title[:40]}... ({p.year})")
+            st.caption(f"• **[{p.paper_id}]** {p.title[:38]}... ({p.year}) [{p.metadata.get('domain', 'CV')[:10]}]")
 
 
 # ----------------- MAIN PANEL -----------------
 st.markdown('<div class="main-header">EvidenceFirst-RAG: Scientific Literature Dashboard</div>', unsafe_allow_html=True)
 st.markdown('<div class="sub-header">Claim-Level Verification, Contradiction Detection, Empirical Meta-Analysis & Robustness Auditing</div>', unsafe_allow_html=True)
 
-# Query selection / presets
-preset_queries = [
-    "What are the limitations of Vision Transformers for low-light object detection?",
-    "Compare CNNs and Vision Transformers for low-light object detection and identify their limitations.",
-    "Does illumination enhancement preprocessing consistently improve object detection accuracy across dark datasets?",
-    "Edge-device computational trade-offs between lightweight YOLO and Deformable DETR.",
-    "Custom Query..."
-]
+# Query selection / presets adapted to domain
+if domain == "NLP / LLMs (ACL)":
+    preset_queries = [
+        "Compare modular RAG against native long-context windows for multi-hop scientific reasoning.",
+        "How does claim-level verification impact hallucination and reasoning in scientific RAG?",
+        "What are the risks of text chunking boundary fragmentation on multi-paragraph discourse?",
+        "Custom Query..."
+    ]
+elif domain == "Biomedical Literature (PubMed)":
+    preset_queries = [
+        "What are the risks and efficacy of dense retrieval in clinical decision support and contraindication queries?",
+        "Factuality and citation faithfulness in biomedical question answering with PubMedBERT.",
+        "Why do dense embeddings struggle with negated drug-drug interactions?",
+        "Custom Query..."
+    ]
+else:
+    preset_queries = [
+        "What are the limitations of Vision Transformers for low-light object detection?",
+        "Compare CNNs and Vision Transformers for low-light object detection and identify their limitations.",
+        "Does illumination enhancement preprocessing consistently improve object detection accuracy across dark datasets?",
+        "Edge-device computational trade-offs between lightweight YOLO and Deformable DETR.",
+        "Custom Query..."
+    ]
 
 selected_preset = st.selectbox("Select Research Query Template or Custom", preset_queries, index=0)
 
 if selected_preset == "Custom Query...":
-    user_query = st.text_input("Enter your research question:", value="What are the limitations of Vision Transformers for low-light object detection?")
+    user_query = st.text_input("Enter your research question:", value=preset_queries[0])
 else:
     user_query = selected_preset
 
 col_btn, _ = st.columns([1, 4])
 with col_btn:
     run_btn = st.button("🚀 Analyze Literature", type="primary", use_container_width=True)
+
 
 # Check session state for report
 if "report" not in st.session_state or run_btn:
@@ -424,14 +445,17 @@ with tab_arxiv:
 
 # ----------------- TAB 8: ACADEMIC LATEX & BIBTEX EXPORT -----------------
 with tab_latex:
-    st.subheader("📄 Publication-Grade Academic LaTeX & BibTeX Export")
-    st.caption("Ready-to-compile LaTeX paper and BibTeX bibliography formatted for academic review.")
+    st.subheader("📄 Publication-Grade Academic Export Studio")
+    st.caption("Ready-to-compile LaTeX paper, BibTeX bibliography, standalone HTML report, and markdown.")
 
-    c_tex_down, c_bib_down, c_json_down = st.columns(3)
+    report_html = pipeline.report_generator.format_html(report)
+    report_md = pipeline.report_generator.format_markdown(report)
+
+    c_tex_down, c_bib_down, c_html_down, c_md_down = st.columns(4)
     if report.latex_code:
         with c_tex_down:
             st.download_button(
-                label="⬇️ Download synthesis_paper.tex",
+                label="⬇️ Download synthesis.tex",
                 data=report.latex_code,
                 file_name="synthesis_paper.tex",
                 mime="text/x-tex",
@@ -446,15 +470,25 @@ with tab_latex:
                 mime="text/plain",
                 use_container_width=True
             )
-    with c_json_down:
-        report_json = json.dumps(report.model_dump(), default=str, indent=2)
+    with c_html_down:
         st.download_button(
-            label="⬇️ Download synthesis_report.json",
-            data=report_json,
-            file_name="synthesis_report.json",
-            mime="application/json",
+            label="⬇️ Download report.html",
+            data=report_html,
+            file_name="synthesis_report.html",
+            mime="text/html",
             use_container_width=True
         )
+    with c_md_down:
+        st.download_button(
+            label="⬇️ Download report.md",
+            data=report_md,
+            file_name="synthesis_report.md",
+            mime="text/markdown",
+            use_container_width=True
+        )
+
+    with st.expander("🌐 Preview Standalone Publication HTML Report"):
+        st.components.v1.html(report_html, height=450, scrolling=True)
 
     col_tex_view, col_bib_view = st.columns(2)
     with col_tex_view:
@@ -464,6 +498,7 @@ with tab_latex:
     with col_bib_view:
         st.markdown("#### BibTeX Bibliography Preview (`.bib`)")
         st.code(report.bibtex_code or "% No BibTeX generated", language="bibtex", line_numbers=True)
+
 
 
 # ----------------- TAB 9: CITATION AUDIT -----------------
@@ -491,37 +526,77 @@ with tab_audit:
         st.dataframe(pd.DataFrame(audit_rows), use_container_width=True)
 
 
-# ----------------- TAB 10: ABLATION BENCHMARKS -----------------
+# ----------------- TAB 10: BENCHMARK & EVALUATION STUDIO -----------------
 with tab_ablation:
-    st.subheader("📈 Systematic Ablation Study (Section 20)")
-    st.caption("Evaluating the proposed EvidenceFirst-RAG architecture against traditional RAG baselines.")
+    st.subheader("📈 Systematic Benchmark & Information Retrieval Studio")
+    st.caption("Evaluate EvidenceFirst-RAG against standard RAG baselines and measure IR ranking metrics (MRR, nDCG, Precision, Recall).")
+
+    eval_mode = st.radio("Select Benchmark Evaluation View:", ["Ablation Study (Section 20 Architecture Comparison)", "Quantitative IR Metrics (MRR, nDCG@K, Precision, Recall)"], horizontal=True)
 
     benchmarker = BenchmarkRunner()
-    ablation_data = benchmarker.run_ablation_study(pipeline)
-    df_ablation = pd.DataFrame(ablation_data)
 
-    st.dataframe(
-        df_ablation[[
-            "system", "evidence_verification", "contradiction_detection",
-            "citation_accuracy", "evidence_coverage", "hallucination_rate", "conflict_detection_rate"
-        ]].style.format({
-            "citation_accuracy": "{:.1%}",
-            "evidence_coverage": "{:.1%}",
-            "hallucination_rate": "{:.1%}",
-            "conflict_detection_rate": "{:.1%}",
-        }),
-        use_container_width=True
-    )
+    if "Ablation" in eval_mode:
+        ablation_data = benchmarker.run_ablation_study(pipeline)
+        df_ablation = pd.DataFrame(ablation_data)
 
-    # Plotly comparison bar chart
-    fig_ablation = px.bar(
-        df_ablation,
-        x="system",
-        y=["citation_accuracy", "evidence_coverage", "conflict_detection_rate"],
-        barmode="group",
-        title="Comparative Evaluation: Baseline RAG vs EvidenceFirst-RAG",
-        labels={"value": "Score", "system": "RAG System Architecture", "variable": "Metric"},
-        color_discrete_sequence=["#3B82F6", "#10B981", "#EF4444"]
-    )
-    fig_ablation.update_layout(paper_bgcolor="rgba(15, 23, 42, 0.8)", plot_bgcolor="rgba(15, 23, 42, 0.8)", font=dict(color="#E2E8F0"))
-    st.plotly_chart(fig_ablation, use_container_width=True)
+        st.dataframe(
+            df_ablation[[
+                "system", "evidence_verification", "contradiction_detection",
+                "citation_accuracy", "evidence_coverage", "hallucination_rate", "conflict_detection_rate"
+            ]].style.format({
+                "citation_accuracy": "{:.1%}",
+                "evidence_coverage": "{:.1%}",
+                "hallucination_rate": "{:.1%}",
+                "conflict_detection_rate": "{:.1%}",
+            }),
+            use_container_width=True
+        )
+
+        fig_ablation = px.bar(
+            df_ablation,
+            x="system",
+            y=["citation_accuracy", "evidence_coverage", "conflict_detection_rate"],
+            barmode="group",
+            title="Comparative Evaluation: Baseline RAG vs EvidenceFirst-RAG",
+            labels={"value": "Score", "system": "RAG System Architecture", "variable": "Metric"},
+            color_discrete_sequence=["#3B82F6", "#10B981", "#EF4444"]
+        )
+        fig_ablation.update_layout(paper_bgcolor="rgba(15, 23, 42, 0.8)", plot_bgcolor="rgba(15, 23, 42, 0.8)", font=dict(color="#E2E8F0"))
+        st.plotly_chart(fig_ablation, use_container_width=True)
+
+    else:
+        st.markdown("### 🎯 Formal Information Retrieval Metrics on Ground-Truth Queries")
+        st.caption("Evaluating hybrid retrieval quality against gold-standard scientific papers across domains.")
+
+        run_ir_btn = st.button("🚀 Run IR Evaluation Suite", type="secondary")
+        if run_ir_btn or "ir_results" in st.session_state:
+            if run_ir_btn or "ir_results" not in st.session_state:
+                with st.spinner("Computing MRR, nDCG@5, Precision@5, and Recall@5 across benchmark suite..."):
+                    dom_filter = domain if domain != "All Domains" else None
+                    ir_res = benchmarker.run_ir_benchmark(pipeline, domain=dom_filter, top_k=5)
+                    st.session_state["ir_results"] = ir_res
+
+            ir_res = st.session_state["ir_results"]
+
+            ir1, ir2, ir3, ir4, ir5 = st.columns(5)
+            ir1.metric("Macro MRR", f"{ir_res['macro_mrr']:.3f}", help="Mean Reciprocal Rank")
+            ir2.metric("Macro nDCG@5", f"{ir_res['macro_ndcg_at_k']:.3f}", help="Normalized Discounted Cumulative Gain")
+            ir3.metric("Macro Precision@5", f"{ir_res['macro_precision_at_k'] * 100:.1f}%")
+            ir4.metric("Macro Recall@5", f"{ir_res['macro_recall_at_k'] * 100:.1f}%")
+            ir5.metric("Conflict Det. Rate", f"{ir_res['conflict_detection_rate'] * 100:.1f}%")
+
+            st.markdown("#### Per-Query Detailed IR Metrics Breakdown")
+            df_ir = pd.DataFrame(ir_res["per_query_metrics"])
+            st.dataframe(df_ir[["query_id", "domain", "query", "mrr", "ndcg_at_k", "precision_at_k", "recall_at_k", "has_known_conflict", "conflict_detected"]], use_container_width=True)
+
+            fig_ir = px.bar(
+                df_ir,
+                x="query_id",
+                y=["mrr", "ndcg_at_k", "precision_at_k", "recall_at_k"],
+                barmode="group",
+                title="IR Metric Scores per Benchmark Query",
+                labels={"value": "Score", "query_id": "Benchmark Query ID", "variable": "IR Metric"}
+            )
+            fig_ir.update_layout(paper_bgcolor="rgba(15, 23, 42, 0.8)", plot_bgcolor="rgba(15, 23, 42, 0.8)", font=dict(color="#E2E8F0"))
+            st.plotly_chart(fig_ir, use_container_width=True)
+

@@ -21,6 +21,7 @@ class DenseRetriever:
         self._model = None
         self._use_fallback = False
 
+        self._vector_cache: dict = {}
         self._init_model()
 
     def _init_model(self):
@@ -54,7 +55,7 @@ class DenseRetriever:
         return matrix / norms
 
     def index_chunks(self, chunks: List[SemanticChunk]):
-        """Encode and index semantic chunks."""
+        """Encode and index semantic chunks with vector caching."""
         self.chunks = chunks
         if not chunks:
             self.embeddings = None
@@ -64,12 +65,20 @@ class DenseRetriever:
 
         if not self._use_fallback and self._model is not None:
             try:
-                self.embeddings = self._model.encode(texts, convert_to_numpy=True, normalize_embeddings=True)
+                uncached_indices = [i for i, t in enumerate(texts) if t not in self._vector_cache]
+                if uncached_indices:
+                    uncached_texts = [texts[i] for i in uncached_indices]
+                    new_vecs = self._model.encode(uncached_texts, convert_to_numpy=True, normalize_embeddings=True)
+                    for t, v in zip(uncached_texts, new_vecs):
+                        self._vector_cache[t] = v
+
+                self.embeddings = np.array([self._vector_cache[t] for t in texts], dtype=np.float32)
             except Exception as e:
                 logger.warning(f"Dense encoding failed: {e}. Falling back to lightweight encoder.")
                 self.embeddings = self._fallback_embed(texts)
         else:
             self.embeddings = self._fallback_embed(texts)
+
 
     def search(self, query: str, top_k: int = 25) -> List[Tuple[SemanticChunk, float]]:
         """Dense similarity search."""

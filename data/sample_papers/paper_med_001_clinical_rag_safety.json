@@ -1,0 +1,22 @@
+{
+  "paper_id": "paper_med_001",
+  "title": "Clinical Evidence Retrieval: High-Precision RAG for PubMed Medical Decision Support",
+  "authors": ["O'Connor, K.", "Bhatia, N.", "Alvarez, J."],
+  "year": 2024,
+  "venue": "JAMIA 2024",
+  "abstract": "Automating evidence retrieval for clinical guidelines requires zero tolerance for hallucination. We present a domain-adapted dense retriever powered by PubMedBERT coupled with strict citation verification. On PubMedQA and MedQA benchmarks, our system delivers 84.1% diagnostic answer accuracy and 98.2% verified citation fidelity, establishing that specialized biomedical retrieval provides safe, evidence-grounded medical answers.",
+  "sections": {
+    "Abstract": "Automating evidence retrieval for clinical guidelines requires zero tolerance for hallucination. We present a domain-adapted dense retriever powered by PubMedBERT coupled with strict citation verification. On PubMedQA and MedQA benchmarks, our system delivers 84.1% diagnostic answer accuracy and 98.2% verified citation fidelity, establishing that specialized biomedical retrieval provides safe, evidence-grounded medical answers.",
+    "Introduction": "In clinical medicine, inaccurate summaries can jeopardize patient outcomes. Dense representations trained on general text fail to capture biochemical interactions and clinical terminology. Fine-tuning retrievers on scientific biomedical literature enables high-precision evidence location.",
+    "Methodology": "We train a bi-encoder over PubMed abstracts using PubMedBERT, evaluated against medical multiple-choice and open-ended queries from PubMedQA and MedQA.",
+    "Experiments": "We measure diagnostic accuracy, evidence retrieval recall@5, and citation integrity score across 2,000 clinical question-answer pairs.",
+    "Results": "PubMedBERT dense retrieval attains 84.1% accuracy on PubMedQA, significantly outperforming generalist dense retrievers (67.4%). More than 98% of generated medical propositions were strictly entailed by cited clinical literature passages.",
+    "Conclusion": "Domain-adapted biomedical retrieval produces dependable, faithful evidence bases for clinical decision support systems."
+  },
+  "metadata": {
+    "domain": "Biomedical Literature (PubMed)",
+    "dataset": "PubMedQA",
+    "model_architecture": "PubMedBERT",
+    "evaluation_metric": "Accuracy"
+  }
+}

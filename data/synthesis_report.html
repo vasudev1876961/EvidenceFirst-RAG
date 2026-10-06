@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>EvidenceFirst-RAG: Literature Synthesis</title>
+<style>
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; line-height: 1.6; color: #1E293B; background: #F8FAFC; margin: 0; padding: 40px 20px; }
+    .container { max-width: 960px; margin: 0 auto; background: #FFFFFF; border-radius: 12px; padding: 40px; box-shadow: 0 4px 20px rgba(0,0,0,0.06); }
+    h1 { font-size: 2rem; color: #0F172A; border-bottom: 2px solid #3B82F6; padding-bottom: 12px; }
+    h2 { font-size: 1.4rem; color: #1E293B; margin-top: 32px; border-bottom: 1px solid #E2E8F0; padding-bottom: 8px; }
+    .metrics-bar { display: flex; gap: 16px; margin: 24px 0; flex-wrap: wrap; }
+    .metric-item { flex: 1; min-width: 140px; background: #F1F5F9; border-radius: 8px; padding: 12px 16px; text-align: center; }
+    .metric-num { font-size: 1.6rem; font-weight: 700; color: #2563EB; }
+    .metric-label { font-size: 0.8rem; color: #64748B; font-weight: 600; text-transform: uppercase; }
+    .finding-card { background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 8px; padding: 18px; margin-bottom: 16px; }
+    .conflict-box { background: #FFF1F2; border-left: 4px solid #E11D48; border-radius: 8px; padding: 20px; margin-bottom: 24px; }
+    .badge { display: inline-block; padding: 4px 10px; border-radius: 999px; font-size: 0.75rem; font-weight: 700; }
+    .badge-sup { background: #DCFCE7; color: #15803D; }
+    .badge-contra { background: #FFE4E6; color: #BE123C; }
+    .badge-mod { background: #DBEAFE; color: #1D4ED8; }
+    .data-table { width: 100%; border-collapse: collapse; margin-top: 14px; background: white; }
+    .data-table th, .data-table td { border: 1px solid #CBD5E1; padding: 10px 14px; text-align: left; font-size: 0.9rem; }
+    .data-table th { background: #F1F5F9; font-weight: 600; }
+    blockquote { border-left: 3px solid #94A3B8; margin: 10px 0; padding-left: 12px; font-style: italic; color: #475569; }
+</style>
+</head>
+<body>
+<div class="container">
+    <h1>🔬 EvidenceFirst-RAG: Scientific Literature Synthesis</h1>
+    <p><b>Research Query:</b> <i>"Compare modular RAG against native long-context windows for multi-hop scientific reasoning."</i></p>
+
+    <div class="metrics-bar">
+        <div class="metric-item"><div class="metric-num">76%</div><div class="metric-label">Confidence</div></div>
+        <div class="metric-item"><div class="metric-num">50%</div><div class="metric-label">Evidence Coverage (ECS)</div></div>
+        <div class="metric-item"><div class="metric-num">100%</div><div class="metric-label">Citation Integrity (CIS)</div></div>
+        <div class="metric-item"><div class="metric-num">2</div><div class="metric-label">Conflicts Detected</div></div>
+    </div>
+
+    <h2>1. Executive Summary</h2>
+    <p>Regarding the query 'Compare modular RAG against native long-context windows for multi-hop scientific reasoning.', empirical evidence demonstrates that architectural choices significantly influence performance. However, conflicting findings persist regarding whether Modular RAG reduces hallucinations by 41.5% and improves multi-hop F1 by filtering irrelevant context., primarily stemming from divergent benchmark datasets and evaluation protocols.</p>
+
+    <h2>2. Verified Factual Claims & Evidence</h2>
+    
+            <div class="finding-card">
+                <span class="badge badge-contra">CONFLICTING</span>
+                <h4>Rag Hallucination Reduction (Claim C001)</h4>
+                <p class="statement">Modular RAG reduces hallucinations by 41.5% and improves multi-hop F1 by filtering irrelevant context.</p>
+                <div class="meta">Confidence: <b>0.78</b> | Supporting: <b>2</b> | Contradicting: <b>1</b></div>
+                <blockquote><b>[paper_nlp_001]</b> While recent Large Language Models support context windows exceeding 128k tokens, their ability to accurately synthesize multi-hop evidence across long documents remains suboptimal. In this work, we demonstrate that modular Retrieval-Augmented Generation (RAG) significantly outpe... <small>(Abstract, 2024)</small></blockquote><blockquote><b>[paper_nlp_001]</b> Our findings show that RAG achieves 74.2% F1 on HotpotQA, outperforming full-context 128k prompting at 65.8% F1. The targeted retrieval reduces distracting context noise and enforces verifiable source citations. On long multi-document reasoning, RAG prevents attention dilution an... <small>(Results, 2024)</small></blockquote>
+            </div>
+            
+            <div class="finding-card">
+                <span class="badge badge-contra">CONFLICTING</span>
+                <h4>Context Window Vs Rag (Claim C002)</h4>
+                <p class="statement">Native long-context windows without retrieval outperform chunked RAG on holistic multi-paragraph document synthesis.</p>
+                <div class="meta">Confidence: <b>0.78</b> | Supporting: <b>3</b> | Contradicting: <b>1</b></div>
+                <blockquote><b>[paper_nlp_001]</b> While recent Large Language Models support context windows exceeding 128k tokens, their ability to accurately synthesize multi-hop evidence across long documents remains suboptimal. In this work, we demonstrate that modular Retrieval-Augmented Generation (RAG) significantly outpe... <small>(Abstract, 2024)</small></blockquote><blockquote><b>[paper_nlp_001]</b> Our findings show that RAG achieves 74.2% F1 on HotpotQA, outperforming full-context 128k prompting at 65.8% F1. The targeted retrieval reduces distracting context noise and enforces verifiable source citations. On long multi-document reasoning, RAG prevents attention dilution an... <small>(Results, 2024)</small></blockquote>
+            </div>
+            
+            <div class="finding-card">
+                <span class="badge badge-mod">MODERATE SUPPORT</span>
+                <h4>Chunking Boundary Limitations (Claim C003)</h4>
+                <p class="statement">Text chunking in RAG pipelines omits crucial qualifying caveats 34% of the time.</p>
+                <div class="meta">Confidence: <b>0.80</b> | Supporting: <b>2</b> | Contradicting: <b>0</b></div>
+                <blockquote><b>[paper_nlp_002]</b> Full-context models without retrieval outperform RAG by 4.8% in comprehensive multi-paragraph synthesis, achieving 79.0% F1 compared to 74.2% for chunk-based RAG. When claims rely on subtle caveats buried in appendices, retrieval pipelines fail to recall the qualifying chunk 34% ... <small>(Results, 2025)</small></blockquote><blockquote><b>[paper_nlp_002]</b> We evaluate Claude-3 and LLaMA-3 with 200k native context against state-of-the-art hybrid RAG pipelines on full-length biomedical and NLP manuscripts from SQuAD and MultiHop benchmarks. <small>(Methodology, 2025)</small></blockquote>
+            </div>
+            
+            <div class="finding-card">
+                <span class="badge badge-mod">MODERATE SUPPORT</span>
+                <h4>Citation Verification (Claim C004)</h4>
+                <p class="statement">Step-by-step natural language inference verification increases citation faithfulness to over 96%.</p>
+                <div class="meta">Confidence: <b>0.70</b> | Supporting: <b>2</b> | Contradicting: <b>0</b></div>
+                <blockquote><b>[paper_nlp_003]</b> Verification improves Citation Faithfulness to 96.4% and raises reasoning accuracy on MMLU scientific subsets to 82.5%, compared to 71.2% for naive retrieval. <small>(Results, 2025)</small></blockquote><blockquote><b>[paper_nlp_003]</b> Standard RAG models blindly condition LLM generation on retrieved passages without verifying whether retrieved text logically entails intermediate premises. We propose a self-reflective reasoning framework that performs step-by-step claim decomposition and natural language infere... <small>(Abstract, 2025)</small></blockquote>
+            </div>
+            
+
+    <h2>3. Contradiction Detection & Conflict Attribution</h2>
+                <div class="conflict-box">
+                    <h3>⚡ Contradiction in Claim C001</h3>
+                    <p class="claim-stmt">"Modular RAG reduces hallucinations by 41.5% and improves multi-hop F1 by filtering irrelevant context."</p>
+                    <p><b>Supporting Papers:</b> <span class="badge-sup">paper_nlp_001, paper_nlp_001</span> &nbsp;|&nbsp; <b>Contradicting Papers:</b> <span class="badge-contra">paper_nlp_002</span></p>
+                    <div class="attribution-reason"><b>Likely Disagreement Cause:</b> Vision Transformers have emerged as powerful architectures for computer vision, but face challenges under low-light imaging conditions. While global self-attention captures long-range dependencies, weak local gradient signals can degrade attention maps. Furthermore, performance varies depending on illumination enhancement preprocessing and benchmark dataset characteristics.</div>
+                    
+                <table class="data-table">
+                    <thead><tr><th>Divergent Factor</th><th>Supporting Setup</th><th>Contradicting Setup</th></tr></thead>
+                    <tbody><tr><td><b>Evaluation Benchmark Dataset</b></td><td>Evaluated on HotpotQA</td><td>Evaluated on MultiHop</td></tr><tr><td><b>Evaluation Metric Protocol</b></td><td>Reported Exact Match, F1</td><td>Reported F1</td></tr></tbody>
+                </table>
+                
+                </div>
+                
+                <div class="conflict-box">
+                    <h3>⚡ Contradiction in Claim C002</h3>
+                    <p class="claim-stmt">"Native long-context windows without retrieval outperform chunked RAG on holistic multi-paragraph document synthesis."</p>
+                    <p><b>Supporting Papers:</b> <span class="badge-sup">paper_nlp_001, paper_nlp_001, paper_nlp_002</span> &nbsp;|&nbsp; <b>Contradicting Papers:</b> <span class="badge-contra">paper_nlp_002</span></p>
+                    <div class="attribution-reason"><b>Likely Disagreement Cause:</b> Vision Transformers have emerged as powerful architectures for computer vision, but face challenges under low-light imaging conditions. While global self-attention captures long-range dependencies, weak local gradient signals can degrade attention maps. Furthermore, performance varies depending on illumination enhancement preprocessing and benchmark dataset characteristics.</div>
+                    
+                <table class="data-table">
+                    <thead><tr><th>Divergent Factor</th><th>Supporting Setup</th><th>Contradicting Setup</th></tr></thead>
+                    <tbody><tr><td><b>Evaluation Benchmark Dataset</b></td><td>Evaluated on MultiHop, HotpotQA</td><td>Evaluated on MultiHop</td></tr><tr><td><b>Evaluation Metric Protocol</b></td><td>Reported Exact Match, F1</td><td>Reported F1</td></tr></tbody>
+                </table>
+                
+                </div>
+                
+
+    <h2>4. Academic References</h2>
+    <ul><li><b>[paper_nlp_001]</b> Retrieval-Augmented Generation Outperforms Long-Context LLMs in Multi-Hop Reasoning. <i>ACL 2024</i> (2024)</li><li><b>[paper_nlp_002]</b> The Chunking Fallacy: Why Native Long-Context Windows Surpass RAG in Scientific Document Synthesis. <i>EMNLP 2024</i> (2025)</li><li><b>[paper_nlp_003]</b> Self-Reflective Claim Verification for Scientific Retrieval-Augmented Generation. <i>ICLR 2025</i> (2025)</li></ul>
+</div>
+</body>
+</html>

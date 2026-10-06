@@ -14,6 +14,7 @@
     "Conclusion": "Conflicting findings in low-light vision literature are primarily artifacts of benchmark dataset composition and evaluation protocols rather than model capability."
   },
   "metadata": {
+    "domain": "Computer Vision / Deep Learning",
     "dataset": "DarkFace",
     "model_architecture": "General Detectors",
     "evaluation_metric": "mAP"

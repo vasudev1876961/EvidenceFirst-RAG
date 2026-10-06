@@ -1,0 +1,22 @@
+{
+  "paper_id": "paper_nlp_002",
+  "title": "The Chunking Fallacy: Why Native Long-Context Windows Surpass RAG in Scientific Document Synthesis",
+  "authors": ["Venkatesh, P.", "Dupont, M."],
+  "year": 2025,
+  "venue": "EMNLP 2024",
+  "abstract": "Common wisdom assumes that retrieval modules provide clean evidence subsets for LLMs. In this empirical critique, we prove that text chunking irreversibly destroys cross-section discourse structure and inter-paragraph co-reference in scientific literature. On complex academic synthesis queries, full-context attention without retrieval preserves holistic argumentation, yielding higher factual coherence and avoiding retrieval omission errors.",
+  "sections": {
+    "Abstract": "Common wisdom assumes that retrieval modules provide clean evidence subsets for LLMs. In this empirical critique, we prove that text chunking irreversibly destroys cross-section discourse structure and inter-paragraph co-reference in scientific literature. On complex academic synthesis queries, full-context attention without retrieval preserves holistic argumentation, yielding higher factual coherence and avoiding retrieval omission errors.",
+    "Introduction": "Retrieval-augmented architectures enforce an artificial discretization of scientific texts into arbitrary chunks (typically 200-500 words). When evidence requires synthesizing hypotheses from the Introduction with empirical exceptions in the Discussion, top-k retrievers frequently drop the contradictory nuance.",
+    "Methodology": "We evaluate Claude-3 and LLaMA-3 with 200k native context against state-of-the-art hybrid RAG pipelines on full-length biomedical and NLP manuscripts from SQuAD and MultiHop benchmarks.",
+    "Experiments": "We measure answer completeness and cross-document reasoning accuracy under varying document lengths (10k to 100k tokens).",
+    "Results": "Full-context models without retrieval outperform RAG by 4.8% in comprehensive multi-paragraph synthesis, achieving 79.0% F1 compared to 74.2% for chunk-based RAG. When claims rely on subtle caveats buried in appendices, retrieval pipelines fail to recall the qualifying chunk 34% of the time, causing unjustified confidence in partial evidence.",
+    "Conclusion": "For complex scientific literature, native long-context attention outperforms chunk-based RAG by preserving holistic context and eliminating retriever omission failures."
+  },
+  "metadata": {
+    "domain": "NLP / LLMs (ACL)",
+    "dataset": "MultiHop",
+    "model_architecture": "LLaMA-3",
+    "evaluation_metric": "F1"
+  }
+}

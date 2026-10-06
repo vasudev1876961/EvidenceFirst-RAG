@@ -58,6 +58,22 @@ def main():
         help="Path to YAML configuration file",
     )
     parser.add_argument(
+        "--domain",
+        type=str,
+        default=None,
+        help="Filter corpus by scientific domain (e.g. 'Computer Vision', 'NLP', 'Biomedical')",
+    )
+    parser.add_argument(
+        "--benchmark-ir",
+        action="store_true",
+        help="Run formal Information Retrieval evaluation suite (MRR, nDCG, Precision, Recall)",
+    )
+    parser.add_argument(
+        "--export-html",
+        action="store_true",
+        help="Export research synthesis to standalone interactive HTML report",
+    )
+    parser.add_argument(
         "--arxiv-search",
         type=str,
         default=None,
@@ -78,6 +94,7 @@ def main():
         action="store_true",
         help="Launch the EvidenceFirst-RAG FastAPI REST server on port 8000",
     )
+
 
     args = parser.parse_args()
 
@@ -117,6 +134,12 @@ def main():
             print(f"   • [{ap.paper_id}] {ap.title[:55]}... ({ap.year})")
         print(f"📊 Active Corpus Size: {len(pipeline.indexed_papers)} papers.\n")
 
+    # Domain filter
+    if args.domain:
+        print(f"🎯 Filtering corpus to domain: '{args.domain}'...")
+        pipeline.filter_by_domain(args.domain)
+        print(f"📊 Active Domain Corpus Size: {len(pipeline.indexed_papers)} papers ({len(pipeline.indexed_chunks)} chunks).\n")
+
     # 3. Benchmark Ablation Mode
     if args.benchmark:
         print("\n📊 Executing Ablation Study (Basic RAG vs Hybrid vs Reranker vs Verification vs EvidenceFirst)...")
@@ -133,6 +156,25 @@ def main():
             )
         print("-" * 88 + "\n")
         return
+
+    # IR Evaluation Mode
+    if args.benchmark_ir:
+        print("\n🎯 Running Formal IR Evaluation Suite (MRR, nDCG@5, Precision@5, Recall@5)...")
+        benchmarker = BenchmarkRunner()
+        ir_res = benchmarker.run_ir_benchmark(pipeline, domain=args.domain, top_k=5)
+        print("\n" + "=" * 70)
+        print(f"  Macro MRR:          {ir_res['macro_mrr']:.4f}")
+        print(f"  Macro nDCG@5:       {ir_res['macro_ndcg_at_k']:.4f}")
+        print(f"  Macro Precision@5:  {ir_res['macro_precision_at_k']*100:.1f}%")
+        print(f"  Macro Recall@5:     {ir_res['macro_recall_at_k']*100:.1f}%")
+        print(f"  Conflict Det Rate:  {ir_res['conflict_detection_rate']*100:.1f}%")
+        print("=" * 70)
+        print("\nPer-Query Breakdown:")
+        for q in ir_res.get("per_query_metrics", []):
+            print(f" • [{q['query_id']}] MRR: {q['mrr']:.2f} | nDCG: {q['ndcg_at_k']:.2f} | P@5: {q['precision_at_k']:.2f} | {q['query'][:48]}...")
+        print("\n")
+        return
+
 
     # 4. Standard Synthesis Mode
     print(f"\n🔍 Processing Research Query: \"{args.query}\"\n")
@@ -174,6 +216,15 @@ def main():
             f.write(report.bibtex_code)
         print(f"📄 LaTeX paper exported to: {tex_path}")
         print(f"📚 BibTeX bibliography exported to: {bib_path}\n")
+
+    # HTML Export Flag
+    if args.export_html:
+        html_code = pipeline.report_generator.format_html(report)
+        html_path = "data/synthesis_report.html"
+        with open(html_path, "w", encoding="utf-8") as f:
+            f.write(html_code)
+        print(f"🌐 Standalone HTML report exported to: {html_path}\n")
+
 
 
 if __name__ == "__main__":

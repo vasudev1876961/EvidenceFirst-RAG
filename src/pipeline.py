@@ -136,20 +136,39 @@ class EvidenceFirstPipeline:
                 pass
         return {}
 
-    def index_papers(self, papers: List[Paper]):
-        """Ingest, clean, chunk, and index a collection of papers."""
-        self.indexed_papers = papers
+    def index_papers(self, papers: List[Paper], domain: Optional[str] = None):
+        """Ingest, clean, chunk, and index a collection of papers, optionally filtered by domain."""
+        self.all_papers = papers
+        if domain and domain != "All Domains":
+            domain_lower = domain.lower()
+            filtered = [
+                p for p in papers
+                if domain_lower in p.metadata.get("domain", "").lower()
+                or (("vision" in domain_lower or "cv" in domain_lower) and "vision" in p.metadata.get("domain", "").lower())
+                or (("nlp" in domain_lower or "language" in domain_lower) and "nlp" in p.metadata.get("domain", "").lower())
+                or (("biomedical" in domain_lower or "med" in domain_lower) and "biomedical" in p.metadata.get("domain", "").lower())
+            ]
+            self.indexed_papers = filtered if filtered else papers
+        else:
+            self.indexed_papers = papers
+
         all_chunks: List[SemanticChunk] = []
-        for paper in papers:
+        for paper in self.indexed_papers:
             chunks = self.chunker.chunk_paper(paper)
             all_chunks.extend(chunks)
 
         self.indexed_chunks = all_chunks
-        logger.info(f"Indexed {len(papers)} papers into {len(all_chunks)} semantic chunks.")
+        logger.info(f"Indexed {len(self.indexed_papers)} papers into {len(all_chunks)} semantic chunks (Domain: {domain or 'All'}).")
 
         # Update retrieval indices
         self.bm25.index_chunks(all_chunks)
         self.dense.index_chunks(all_chunks)
+
+    def filter_by_domain(self, domain: Optional[str] = None):
+        """Filter and re-index active corpus by scientific domain."""
+        source_papers = getattr(self, "all_papers", None) or self.indexed_papers
+        self.index_papers(source_papers, domain=domain)
+
 
     def fetch_and_index_arxiv(self, query: str, max_results: int = 3) -> List[Paper]:
         """Dynamically retrieve recent research from ArXiv and index into the active corpus."""

@@ -1,0 +1,22 @@
+{
+  "paper_id": "paper_nlp_001",
+  "title": "Retrieval-Augmented Generation Outperforms Long-Context LLMs in Multi-Hop Reasoning",
+  "authors": ["Kaufman, E.", "Srinivasan, R.", "Tan, L."],
+  "year": 2024,
+  "venue": "ACL 2024",
+  "abstract": "While recent Large Language Models support context windows exceeding 128k tokens, their ability to accurately synthesize multi-hop evidence across long documents remains suboptimal. In this work, we demonstrate that modular Retrieval-Augmented Generation (RAG) significantly outperforms direct long-context prompting on multi-hop scientific question answering. By filtering out irrelevant context, RAG reduces hallucinations by 41.5% and improves Exact Match scores on HotpotQA by 8.4 points.",
+  "sections": {
+    "Abstract": "While recent Large Language Models support context windows exceeding 128k tokens, their ability to accurately synthesize multi-hop evidence across long documents remains suboptimal. In this work, we demonstrate that modular Retrieval-Augmented Generation (RAG) significantly outperforms direct long-context prompting on multi-hop scientific question answering. By filtering out irrelevant context, RAG reduces hallucinations by 41.5% and improves Exact Match scores on HotpotQA by 8.4 points.",
+    "Introduction": "The expansion of transformer context windows has sparked debate on whether external retrieval remains necessary. Naive retrieval introduces chunking boundaries, but feeding hundreds of pages into attention layers suffers from the 'Lost in the Middle' phenomenon where reasoning over distant paragraphs degrades.",
+    "Methodology": "We benchmark LLaMA-3-70B and GPT-4 across both 128k full-context input and an evidence-grounded RAG pipeline with BM25 + dense hybrid retrieval. Evaluations are conducted across the multi-hop HotpotQA and MultiHop benchmark datasets.",
+    "Experiments": "We measure Exact Match (EM), F1 accuracy, and Citation Faithfulness across 1,500 multi-hop reasoning questions under standardized temperature settings.",
+    "Results": "Our findings show that RAG achieves 74.2% F1 on HotpotQA, outperforming full-context 128k prompting at 65.8% F1. The targeted retrieval reduces distracting context noise and enforces verifiable source citations. On long multi-document reasoning, RAG prevents attention dilution and hallucinations.",
+    "Conclusion": "Explicit retrieval and evidence verification remain superior to raw context window scaling for fact-critical scientific reasoning."
+  },
+  "metadata": {
+    "domain": "NLP / LLMs (ACL)",
+    "dataset": "HotpotQA",
+    "model_architecture": "LLaMA-3",
+    "evaluation_metric": "F1"
+  }
+}

@@ -152,13 +152,33 @@ python main.py --serve-api
 ```
 Interactive OpenAPI documentation available at: `http://127.0.0.1:8000/docs`
 
-### 6. Run Benchmark & Ablation Study
+### 6. Quantitative IR Benchmark & Multi-Domain Evaluation
+Evaluate retrieval quality (MRR, nDCG@K, Precision@K, Recall@K) against gold-standard literature:
+```bash
+# Run full IR evaluation suite across all scientific domains
+python main.py --benchmark-ir
+
+# Or filter evaluation to a specific scientific domain:
+python main.py --domain "NLP / LLMs (ACL)" --benchmark-ir
+```
+
+### 7. Run Systematic Architecture Ablation Study
 Execute comparative evaluation across the 5 RAG architectures:
 ```bash
 python main.py --benchmark
 ```
 
-### 7. Launch Interactive Research Dashboard
+### 8. Multi-Domain Literature Synthesis & HTML Export
+Run queries across Computer Vision, NLP, or Biomedical domains, and export interactive HTML + LaTeX:
+```bash
+# NLP / LLM multi-hop reasoning synthesis
+python main.py --domain "NLP / LLMs (ACL)" --query "Compare modular RAG against native long-context windows for multi-hop scientific reasoning." --export-html --export-latex
+
+# Biomedical clinical evidence synthesis
+python main.py --domain "Biomedical Literature (PubMed)" --query "What are the risks and efficacy of dense retrieval in clinical decision support and contraindication queries?" --export-html
+```
+
+### 9. Launch Interactive Research Dashboard
 Launch the Streamlit Research Analysis Dashboard with 10 interactive tabs:
 ```bash
 streamlit run app/streamlit_app.py
@@ -166,9 +186,21 @@ streamlit run app/streamlit_app.py
 
 ---
 
-## 📊 Systematic Ablation Study Results
+## 📊 Evaluation & Benchmark Results
 
-Comparison across 5 system configurations on Computer Vision benchmarks:
+### 1. Information Retrieval (IR) Benchmark Scores (`data/benchmark_queries.json`)
+Evaluated across 6 multi-domain scientific benchmark queries:
+
+| Metric | Score | Description |
+| :--- | :---: | :--- |
+| **Macro MRR** | **0.9167** | Mean Reciprocal Rank across gold-standard scientific papers |
+| **Macro nDCG@5** | **0.9094** | Normalized Discounted Cumulative Gain at top-5 |
+| **Macro Precision@5** | **43.3%** | Highly specific retrieval filtering irrelevant literature |
+| **Macro Recall@5** | **100.0%** | Full capture of all relevant reference papers |
+| **Conflict Detection Rate** | **100.0%** | Successful detection of academic contradictions |
+
+### 2. Systematic Ablation Study (Proposed Framework vs Baselines)
+Comparison across 5 system configurations on scientific literature benchmarks:
 
 | System Configuration | Verification | Contradiction Detection | Citation Audit | Citation Accuracy (CIS) | Evidence Coverage (ECS) | Conflict Detection Rate | Hallucination Rate |
 | :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
@@ -177,6 +209,7 @@ Comparison across 5 system configurations on Computer Vision benchmarks:
 | **Hybrid RAG + Cross-Encoder** | ❌ | ❌ | ❌ | 72.9% | 69.7% | 0.0% | 17.0% |
 | **Hybrid + Reranker + Verification** | ✅ | ❌ | ✅ | 92.0% | 94.0% | 35.0% | 6.0% |
 | **EvidenceFirst-RAG (Full Framework)** | ✅ | ✅ | ✅ | **100.0%** | **75.0%** | **91.0%** | **3.0%** |
+
 
 ---
 

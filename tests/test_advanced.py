@@ -93,6 +93,17 @@ def test_latex_exporter():
     assert "@article{" in bibtex
 
 
+def test_package_exports():
+    from src.ingestion import ArxivFetcher as IngestionArxiv
+    from src.synthesis import EmpiricalMetaAnalysisEngine as SynthesisMeta, LatexExporter as SynthesisLatex
+    from src.verification import RobustnessEngine as VerificationRobustness
+
+    assert IngestionArxiv is not None
+    assert SynthesisMeta is not None
+    assert SynthesisLatex is not None
+    assert VerificationRobustness is not None
+
+
 def test_fastapi_endpoints():
     with TestClient(app) as client:
         # 1. Health
@@ -108,16 +119,36 @@ def test_fastapi_endpoints():
         corpus_data = res_corpus.json()
         assert corpus_data["total_papers"] >= 3
 
-        # 3. Arxiv Search
+        # 3. Domains
+        res_domains = client.get("/api/v1/domains")
+        assert res_domains.status_code == 200
+        domain_data = res_domains.json()
+        assert len(domain_data["domains"]) >= 1
+
+        # 4. Arxiv Search
         res_arxiv = client.post("/api/v1/arxiv/search", json={"query": "vision transformers", "max_results": 2, "auto_index": False})
         assert res_arxiv.status_code == 200
         arxiv_data = res_arxiv.json()
         assert len(arxiv_data["papers"]) > 0
 
-        # 4. Query Analysis
-        res_query = client.post("/api/v1/query", json={"query": "Vision Transformers in extreme low-light", "alpha": 0.5})
+        # 5. Query Analysis with Domain Filter
+        res_query = client.post("/api/v1/query", json={"query": "Vision Transformers in extreme low-light", "alpha": 0.5, "domain": "Computer Vision / Deep Learning"})
         assert res_query.status_code == 200
         q_data = res_query.json()
         assert "executive_summary" in q_data
         assert "claims" in q_data
         assert "evidence_robustness_index" in q_data
+
+        # 6. HTML Export
+        res_html = client.post("/api/v1/export/html", json={"query": "Vision Transformers in low-light", "alpha": 0.5})
+        assert res_html.status_code == 200
+        html_data = res_html.json()
+        assert "<!DOCTYPE html>" in html_data["html_code"]
+
+        # 7. IR Benchmark
+        res_ir = client.post("/api/v1/benchmark/ir?domain=Computer%20Vision%20%2F%20Deep%20Learning")
+        assert res_ir.status_code == 200
+        ir_data = res_ir.json()
+        assert "macro_mrr" in ir_data
+        assert ir_data["macro_mrr"] > 0.0
+

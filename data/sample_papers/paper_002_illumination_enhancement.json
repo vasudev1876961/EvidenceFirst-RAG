@@ -14,6 +14,7 @@
     "Conclusion": "Explicit illumination preprocessing provides substantial gains for dark scene understanding when trained end-to-end with detection objectives."
   },
   "metadata": {
+    "domain": "Computer Vision / Deep Learning",
     "dataset": "DarkFace",
     "model_architecture": "Swin Transformer",
     "evaluation_metric": "mAP@0.5"

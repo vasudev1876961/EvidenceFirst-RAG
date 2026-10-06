@@ -14,6 +14,7 @@
     "Conclusion": "Vision Transformers can achieve competitive global-context modeling in low light, but their performance degrades when imagery contains weak local texture and high sensor noise. Addressing this limitation necessitates hybrid inductive biases or dedicated illumination-aware adaptation."
   },
   "metadata": {
+    "domain": "Computer Vision / Deep Learning",
     "dataset": "DarkFace",
     "model_architecture": "Vision Transformer",
     "evaluation_metric": "mAP@0.5"

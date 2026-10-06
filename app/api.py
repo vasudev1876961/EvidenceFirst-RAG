@@ -57,6 +57,8 @@ app = FastAPI(
 class QueryRequest(BaseModel):
     query: str = Field(..., json_schema_extra={"example": "What are the limitations of Vision Transformers for low-light object detection?"})
     alpha: float = Field(0.5, ge=0.0, le=1.0, description="Balance between BM25 (1.0) and Dense (0.0)")
+    domain: Optional[str] = Field(None, description="Optional scientific domain filter")
+
 
 
 class ArxivSearchRequest(BaseModel):
@@ -89,8 +91,12 @@ def analyze_query(req: QueryRequest):
     if not pipeline_instance:
         raise HTTPException(status_code=503, detail="Pipeline not initialized")
 
+    if req.domain:
+        pipeline_instance.filter_by_domain(req.domain)
+
     pipeline_instance.hybrid.alpha = req.alpha
     report = pipeline_instance.run(req.query)
+
 
     return {
         "query": report.query,
@@ -241,3 +247,53 @@ def evaluate_robustness(req: QueryRequest):
         "query": report.query,
         "robustness": report.robustness.model_dump() if report.robustness else None,
     }
+
+
+@app.get("/api/v1/domains", tags=["Corpus"])
+def get_domains():
+    """List all supported scientific domains and paper counts."""
+    if not pipeline_instance:
+        raise HTTPException(status_code=503, detail="Pipeline not initialized")
+
+    all_papers = getattr(pipeline_instance, "all_papers", pipeline_instance.indexed_papers)
+    domain_counts: Dict[str, int] = {}
+    for p in all_papers:
+        d = p.metadata.get("domain", "General")
+        domain_counts[d] = domain_counts.get(d, 0) + 1
+
+    return {
+        "active_domain_filter": getattr(pipeline_instance, "current_domain", "All Domains"),
+        "domains": [
+            {"domain": dom, "paper_count": count}
+            for dom, count in domain_counts.items()
+        ]
+    }
+
+
+@app.post("/api/v1/benchmark/ir", tags=["Evaluation"])
+def run_ir_benchmark(domain: Optional[str] = Query(None, description="Optional domain filter")):
+    """Run formal Information Retrieval benchmark (MRR, nDCG, Precision, Recall)."""
+    if not pipeline_instance:
+        raise HTTPException(status_code=503, detail="Pipeline not initialized")
+
+    benchmarker = BenchmarkRunner()
+    results = benchmarker.run_ir_benchmark(pipeline_instance, domain=domain)
+    return results
+
+
+@app.post("/api/v1/export/html", tags=["Export"])
+def export_html(req: QueryRequest):
+    """Execute query and generate publication-grade standalone HTML report."""
+    if not pipeline_instance:
+        raise HTTPException(status_code=503, detail="Pipeline not initialized")
+
+    if req.domain:
+        pipeline_instance.filter_by_domain(req.domain)
+
+    report = pipeline_instance.run(req.query)
+    html_code = pipeline_instance.report_generator.format_html(report)
+    return {
+        "query": report.query,
+        "html_code": html_code,
+    }
+

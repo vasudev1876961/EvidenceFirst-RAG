@@ -1,0 +1,22 @@
+{
+  "paper_id": "paper_med_002",
+  "title": "The Peril of Dense Similarity: Why Standard RAG Fails in Contraindication and Adverse Drug Interaction Discovery",
+  "authors": ["Gupta, S.", "Lindqvist, T."],
+  "year": 2025,
+  "venue": "Lancet Digital Health 2025",
+  "abstract": "Dense embedding spaces cluster semantically related terms regardless of polarity or negated assertions. When querying complex drug-drug interactions, standard RAG retrieves sentences describing combined efficacy alongside severe contraindications without distinguishing them, causing a 16.2% adverse hallucination rate on BioASQ and ClinicalQA. We demonstrate that pure dense retrieval is hazardous in pharmacology unless combined with explicit negation and contradiction attribution engines.",
+  "sections": {
+    "Abstract": "Dense embedding spaces cluster semantically related terms regardless of polarity or negated assertions. When querying complex drug-drug interactions, standard RAG retrieves sentences describing combined efficacy alongside severe contraindications without distinguishing them, causing a 16.2% adverse hallucination rate on BioASQ and ClinicalQA. We demonstrate that pure dense retrieval is hazardous in pharmacology unless combined with explicit negation and contradiction attribution engines.",
+    "Introduction": "In clinical pharmacology, whether two drugs can be safely co-administered hinges on precise negation and conditional factors. Standard bi-encoders map 'Drug X is contraindicated with Drug Y' and 'Drug X is co-administered with Drug Y' into nearly identical vector coordinates.",
+    "Methodology": "We test 5 commercial and open-source RAG pipelines on 850 adverse drug interaction queries from BioASQ and MIMIC-III, measuring polarity inversion and contradiction detection.",
+    "Experiments": "We quantify the rate of hazardous contradictions where retrieved passages conflict with clinical consensus or where generated answers reverse contraindication guidance.",
+    "Results": "Standard dense RAG achieves only 68.3% accuracy on BioASQ contraindication benchmarks, generating misleading safety recommendations in 16.2% of cases due to inability to detect negative evidence. Contradiction-aware verification is mandatory to prevent dangerous clinical conclusions.",
+    "Conclusion": "Dense similarity is insufficient for clinical pharmacology. Safe biomedical RAG requires explicit contradiction detection and negative-evidence attribution."
+  },
+  "metadata": {
+    "domain": "Biomedical Literature (PubMed)",
+    "dataset": "BioASQ",
+    "model_architecture": "ClinicalBERT",
+    "evaluation_metric": "Accuracy"
+  }
+}

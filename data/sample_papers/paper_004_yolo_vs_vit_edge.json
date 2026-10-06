@@ -14,6 +14,7 @@
     "Conclusion": "For real-time low-light surveillance on edge hardware, CNN-based single-stage detectors remain the superior trade-off unless severe occlusions necessitate global context."
   },
   "metadata": {
+    "domain": "Computer Vision / Deep Learning",
     "dataset": "NightOwls",
     "model_architecture": "YOLOv8",
     "evaluation_metric": "FPS"

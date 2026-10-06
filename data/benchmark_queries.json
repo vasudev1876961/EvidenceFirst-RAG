@@ -1,0 +1,85 @@
+{
+  "benchmark_version": "1.0.0",
+  "domain_coverage": [
+    "Computer Vision / Deep Learning",
+    "NLP / LLMs (ACL)",
+    "Biomedical Literature (PubMed)"
+  ],
+  "queries": [
+    {
+      "query_id": "CV-01",
+      "domain": "Computer Vision / Deep Learning",
+      "query": "What are the limitations of Vision Transformers for low-light object detection?",
+      "expected_claims": [
+        "Vision Transformers degrade substantially under extreme low-light photon noise without large-scale daylight pretraining.",
+        "ResNet-50 and CNNs retain localized inductive bias that outperforms vanilla ViT trained from scratch in low SNR regimes."
+      ],
+      "ground_truth_relevant_paper_ids": ["paper_001", "paper_004", "paper_005"],
+      "has_known_contradiction": false,
+      "conflicting_paper_ids": []
+    },
+    {
+      "query_id": "CV-02",
+      "domain": "Computer Vision / Deep Learning",
+      "query": "Does illumination enhancement preprocessing consistently improve object detection accuracy across dark datasets?",
+      "expected_claims": [
+        "Illumination enhancement provides +8.2% mAP gain on DarkFace.",
+        "Illumination enhancement causes -0.4% regression on ExDark due to artifact amplification."
+      ],
+      "ground_truth_relevant_paper_ids": ["paper_002", "paper_003", "paper_005"],
+      "has_known_contradiction": true,
+      "conflicting_paper_ids": ["paper_002", "paper_003"],
+      "divergence_cause": "Dataset distribution differences: extreme synthetic darkness in DarkFace vs real-world urban night in ExDark."
+    },
+    {
+      "query_id": "CV-03",
+      "domain": "Computer Vision / Deep Learning",
+      "query": "What are the computational trade-offs between DETR-based detectors and YOLO in real-time nighttime vision?",
+      "expected_claims": [
+        "YOLO achieves 85 FPS with 3.2M parameters on edge hardware.",
+        "Deformable DETR achieves higher accuracy but runs at only 14 FPS, making it prohibitive for edge deployment."
+      ],
+      "ground_truth_relevant_paper_ids": ["paper_004"],
+      "has_known_contradiction": false,
+      "conflicting_paper_ids": []
+    },
+    {
+      "query_id": "NLP-01",
+      "domain": "NLP / LLMs (ACL)",
+      "query": "Compare modular RAG against native long-context windows for multi-hop scientific reasoning.",
+      "expected_claims": [
+        "Modular RAG filters irrelevant context and reduces hallucinations by 41.5% on HotpotQA.",
+        "Native long-context windows preserve holistic discourse and outperform chunk-based RAG on multi-paragraph synthesis by 4.8%."
+      ],
+      "ground_truth_relevant_paper_ids": ["paper_nlp_001", "paper_nlp_002"],
+      "has_known_contradiction": true,
+      "conflicting_paper_ids": ["paper_nlp_001", "paper_nlp_002"],
+      "divergence_cause": "Text chunking boundary artifacts vs transformer lost-in-the-middle attention degradation."
+    },
+    {
+      "query_id": "NLP-02",
+      "domain": "NLP / LLMs (ACL)",
+      "query": "How does claim-level verification impact hallucination and reasoning in scientific RAG?",
+      "expected_claims": [
+        "Claim-level NLI verification reduces hallucinated citations to under 2%.",
+        "Step-by-step verification improves reasoning accuracy on MMLU scientific subsets to 82.5%."
+      ],
+      "ground_truth_relevant_paper_ids": ["paper_nlp_003", "paper_nlp_001"],
+      "has_known_contradiction": false,
+      "conflicting_paper_ids": []
+    },
+    {
+      "query_id": "MED-01",
+      "domain": "Biomedical Literature (PubMed)",
+      "query": "What are the risks and efficacy of dense retrieval in clinical decision support and contraindication queries?",
+      "expected_claims": [
+        "Domain-adapted PubMedBERT dense retrieval achieves 84.1% diagnostic accuracy on PubMedQA.",
+        "Dense similarity causes 16.2% hazardous error rates on contraindications by confusing negated assertions with positive interactions."
+      ],
+      "ground_truth_relevant_paper_ids": ["paper_med_001", "paper_med_002"],
+      "has_known_contradiction": true,
+      "conflicting_paper_ids": ["paper_med_001", "paper_med_002"],
+      "divergence_cause": "Dense bi-encoders map negated contraindications and co-prescriptions into identical embedding regions."
+    }
+  ]
+}

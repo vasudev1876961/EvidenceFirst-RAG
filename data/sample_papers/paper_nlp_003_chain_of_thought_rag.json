@@ -1,0 +1,22 @@
+{
+  "paper_id": "paper_nlp_003",
+  "title": "Self-Reflective Claim Verification for Scientific Retrieval-Augmented Generation",
+  "authors": ["Chen, W.", "Morales, D."],
+  "year": 2025,
+  "venue": "ICLR 2025",
+  "abstract": "Standard RAG models blindly condition LLM generation on retrieved passages without verifying whether retrieved text logically entails intermediate premises. We propose a self-reflective reasoning framework that performs step-by-step claim decomposition and natural language inference over retrieved passages prior to synthesis. Our method reduces hallucinated citations to under 2% while boosting reasoning accuracy on GSM8K and MMLU.",
+  "sections": {
+    "Abstract": "Standard RAG models blindly condition LLM generation on retrieved passages without verifying whether retrieved text logically entails intermediate premises. We propose a self-reflective reasoning framework that performs step-by-step claim decomposition and natural language inference over retrieved passages prior to synthesis. Our method reduces hallucinated citations to under 2% while boosting reasoning accuracy on GSM8K and MMLU.",
+    "Introduction": "Hallucination in language model reasoning remains a primary bottleneck for scientific adoption. While retrieval provides grounded facts, language models frequently hallucinate relationships not supported by the cited excerpts.",
+    "Methodology": "We integrate NLI verification directly into the decoding loop, verifying entailment of each generated clause against retrieved chunks.",
+    "Experiments": "Evaluated on GSM8K reasoning benchmarks and scientific subsets of MMLU across Mistral and LLaMA backbones.",
+    "Results": "Verification improves Citation Faithfulness to 96.4% and raises reasoning accuracy on MMLU scientific subsets to 82.5%, compared to 71.2% for naive retrieval.",
+    "Conclusion": "Explicit claim-level verification is essential to ensure retrieved evidence is authentically reflected in scientific generation."
+  },
+  "metadata": {
+    "domain": "NLP / LLMs (ACL)",
+    "dataset": "MMLU",
+    "model_architecture": "Mistral",
+    "evaluation_metric": "Accuracy"
+  }
+}

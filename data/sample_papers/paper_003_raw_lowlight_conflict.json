@@ -14,6 +14,7 @@
     "Conclusion": "Detectors trained directly on low-light representations outperform or match two-stage enhancement pipelines on ExDark, demonstrating that separate enhancement is often redundant or counterproductive."
   },
   "metadata": {
+    "domain": "Computer Vision / Deep Learning",
     "dataset": "ExDark",
     "model_architecture": "Faster R-CNN",
     "evaluation_metric": "mAP@0.5:0.95"
