@@ -211,10 +211,14 @@ with m6:
 st.markdown("---")
 
 # Navigation Tabs
-tab_syn, tab_claims, tab_conflicts, tab_graph, tab_empirical, tab_robustness, tab_arxiv, tab_latex, tab_audit, tab_ablation = st.tabs([
+tab_syn, tab_claims, tab_conflicts, tab_hypo, tab_trajectory, tab_rigor, tab_sankey, tab_graph, tab_empirical, tab_robustness, tab_arxiv, tab_latex, tab_audit, tab_ablation = st.tabs([
     "📑 Executive Synthesis",
     "🔍 Claim-Level Evidence",
     "⚡ Contradiction Attribution",
+    "💡 Scientific Hypotheses",
+    "🧬 Agentic Trajectory",
+    "⚖️ Methodological Rigor",
+    "🔀 Sankey Flow",
     "🕸️ Knowledge Graph",
     "📊 Empirical Meta-Analysis",
     "🛡️ Robustness & Counterfactuals",
@@ -223,6 +227,7 @@ tab_syn, tab_claims, tab_conflicts, tab_graph, tab_empirical, tab_robustness, ta
     "🛡️ Citation Audit",
     "📈 Ablation Benchmarks"
 ])
+
 
 # ----------------- TAB 1: EXECUTIVE SYNTHESIS -----------------
 with tab_syn:
@@ -325,6 +330,154 @@ with tab_conflicts:
             st.markdown("---")
     else:
         st.success("No active scientific contradictions detected for the extracted claims in this query.")
+
+
+# ----------------- TAB 4: SCIENTIFIC HYPOTHESES & PROTOCOLS -----------------
+with tab_hypo:
+    st.subheader("💡 Automated Scientific Hypotheses & Proposed Experimental Protocols")
+    st.caption("AI-synthesized falsifiable research hypotheses designed to resolve literature tensions and empirical contradictions.")
+
+    if report.hypotheses:
+        for h in report.hypotheses:
+            with st.container():
+                st.markdown(f"### 🔬 [{h.hypothesis_id}] {h.title}")
+                st.info(f"**Formal Hypothesis Statement:**\n\n\"{h.statement}\"")
+
+                col_h1, col_h2 = st.columns(2)
+                with col_h1:
+                    st.markdown("**Underlying Tension Addressed:**")
+                    st.write(h.tension_addressed)
+                    st.markdown("**Theoretical Rationale:**")
+                    st.write(h.rationale)
+
+                with col_h2:
+                    st.markdown("**Proposed Experimental Protocol:**")
+                    st.write(h.proposed_methodology)
+                    st.markdown("**Falsification Criteria:**")
+                    st.error(h.falsification_criteria)
+
+                if h.testable_predictions:
+                    st.markdown("**🎯 Testable Quantitative Predictions:**")
+                    for p in h.testable_predictions:
+                        st.markdown(f"- • `{p}`")
+
+                m_col1, m_col2, m_col3 = st.columns(3)
+                m_col1.metric("Feasibility Tier", h.feasibility_tier)
+                m_col2.metric("Novelty & Impact", h.novelty_impact_tier)
+                m_col3.metric("Estimated Impact Score", f"{h.estimated_impact_score * 100:.0f}%")
+                st.markdown("---")
+    else:
+        st.info("No hypothesis synthesis triggered for this query.")
+
+
+# ----------------- TAB 5: AGENTIC VERIFICATION TRAJECTORY -----------------
+with tab_trajectory:
+    st.subheader("🧬 Agentic Multi-Hop Verification Trajectory")
+    st.caption("Auditable trace of targeted counter-queries generated to resolve scientific ambiguities and under-supported claims.")
+
+    if report.verification_trajectory and report.verification_trajectory.steps:
+        st.success(f"**Trajectory Overview:** {report.verification_trajectory.trajectory_summary}")
+
+        traj_rows = []
+        for step in report.verification_trajectory.steps:
+            traj_rows.append({
+                "Step": step.step_number,
+                "Claim ID": step.claim_id,
+                "Targeted Query Generated": step.query_generated,
+                "Chunks Retrieved": step.retrieved_chunks_count,
+                "Initial Status": step.initial_status,
+                "Updated Status": step.updated_status,
+                "Confidence Delta": f"{step.confidence_delta:+.2f}",
+                "Reasoning": step.reasoning,
+            })
+        st.dataframe(pd.DataFrame(traj_rows), use_container_width=True)
+
+        for step in report.verification_trajectory.steps:
+            with st.expander(f"Step {step.step_number}: [{step.claim_id}] {step.initial_status} ➔ {step.updated_status} (ΔConf: {step.confidence_delta:+.2f})"):
+                st.write(f"**Target Claim**: {step.target_statement}")
+                st.write(f"**Generated Search Query**: `{step.query_generated}`")
+                st.write(f"**Targeted Chunks Retrieved**: `{step.retrieved_chunks_count}`")
+                st.info(f"**Verification Reasoning**: {step.reasoning}")
+    else:
+        st.info("Initial retrieval satisfied high evidence confidence; no secondary agentic hops were required.")
+
+
+# ----------------- TAB 6: METHODOLOGICAL RIGOR & EVIDENCE HIERARCHY -----------------
+with tab_rigor:
+    st.subheader("⚖️ Corpus Methodological Rigor & Evidence Hierarchy")
+    st.caption("Evaluation of scientific methodology rigor and study designs, dynamically weighting empirical evidence.")
+
+    if report.rigor_report:
+        r_rep = report.rigor_report
+        rc1, rc2, rc3 = st.columns(3)
+        rc1.metric("Overall Corpus Rigor", f"{r_rep.overall_corpus_rigor * 100:.1f}%")
+        rc2.metric("High-Rigor Evidence Ratio", f"{r_rep.high_rigor_paper_ratio * 100:.1f}%")
+        rc3.metric("Evaluated Studies", len(r_rep.assessments))
+
+        if r_rep.methodology_distribution:
+            df_dist = pd.DataFrame(list(r_rep.methodology_distribution.items()), columns=["Methodology Tier", "Paper Count"])
+            fig_rigor = px.pie(
+                df_dist,
+                names="Methodology Tier",
+                values="Paper Count",
+                title="Scientific Methodology Distribution Across Corpus",
+                hole=0.45,
+                color_discrete_sequence=["#10B981", "#3B82F6", "#8B5CF6", "#F59E0B", "#64748B"]
+            )
+            fig_rigor.update_layout(paper_bgcolor="rgba(15, 23, 42, 0.8)", font=dict(color="#E2E8F0"))
+            st.plotly_chart(fig_rigor, use_container_width=True)
+
+        st.markdown("### 📋 Study Methodology Hierarchy & Weight Multipliers")
+        rigor_table_data = [
+            {
+                "Paper ID": a.paper_id,
+                "Title": a.paper_title[:45] + "...",
+                "Year": a.year,
+                "Methodology Type": a.methodology_type,
+                "Rigor Score": f"{a.rigor_score:.2f}",
+                "Weight Multiplier": f"x{a.evidence_weight_multiplier:.2f}",
+                "Datasets Count": a.sample_size_or_datasets_count,
+            }
+            for a in r_rep.assessments
+        ]
+        st.dataframe(pd.DataFrame(rigor_table_data), use_container_width=True)
+    else:
+        st.info("Methodological rigor assessment not available.")
+
+
+# ----------------- TAB 7: SANKEY EVIDENCE FLOW -----------------
+with tab_sankey:
+    st.subheader("🔀 Multi-Stage Literature Verification Flow (Sankey)")
+    st.caption("Traceability flow: Research Query ➔ Extracted Claims ➔ Supporting/Contradicting Papers ➔ Final Verification Consensus.")
+
+    if report.sankey_data:
+        sdata = report.sankey_data
+        fig_sankey = go.Figure(data=[go.Sankey(
+            node=dict(
+                pad=18,
+                thickness=24,
+                line=dict(color="#0F172A", width=1.5),
+                label=sdata["nodes"],
+                color=sdata["node_colors"]
+            ),
+            link=dict(
+                source=sdata["sources"],
+                target=sdata["targets"],
+                value=sdata["values"],
+                color=sdata["link_colors"]
+            )
+        )])
+        fig_sankey.update_layout(
+            paper_bgcolor="rgba(15, 23, 42, 0.8)",
+            plot_bgcolor="rgba(15, 23, 42, 0.8)",
+            font=dict(color="#F8FAFC", size=12),
+            height=600,
+            margin=dict(l=20, r=20, t=25, b=25)
+        )
+        st.plotly_chart(fig_sankey, use_container_width=True)
+    else:
+        st.info("Sankey diagram data is not available.")
+
 
 
 # ----------------- TAB 4: EVIDENCE KNOWLEDGE GRAPH -----------------

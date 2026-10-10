@@ -3,6 +3,8 @@ from src.verification.evidence_score import EvidenceScorer
 from src.verification.contradiction import ContradictionEngine
 from src.verification.citation_checker import CitationAuditor
 from src.verification.robustness import RobustnessEngine
+from src.verification.agentic_verifier import AgenticVerifier
+from src.verification.rigor_analyzer import MethodologyRigorAnalyzer
 
 __all__ = [
     "NLIEntailmentChecker",
@@ -10,5 +12,8 @@ __all__ = [
     "ContradictionEngine",
     "CitationAuditor",
     "RobustnessEngine",
+    "AgenticVerifier",
+    "MethodologyRigorAnalyzer",
 ]
+
 

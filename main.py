@@ -90,13 +90,38 @@ def main():
         help="Run Leave-One-Out counterfactual robustness stress-test on synthesis claims",
     )
     parser.add_argument(
+        "--iterative",
+        action="store_true",
+        help="Display agentic iterative verification trajectory across uncertain claims",
+    )
+    parser.add_argument(
+        "--hypotheses",
+        action="store_true",
+        help="Synthesize and display automated testable scientific hypotheses from literature tensions",
+    )
+    parser.add_argument(
+        "--rigor",
+        action="store_true",
+        help="Display methodological rigor and evidence hierarchy analysis across active corpus",
+    )
+    parser.add_argument(
+        "--export-sankey",
+        action="store_true",
+        help="Export interactive Sankey verification flow diagram to standalone HTML file",
+    )
+    parser.add_argument(
+        "--export-network",
+        action="store_true",
+        help="Export interactive Physics Network Graph to standalone HTML file",
+    )
+    parser.add_argument(
         "--serve-api",
         action="store_true",
         help="Launch the EvidenceFirst-RAG FastAPI REST server on port 8000",
     )
 
-
     args = parser.parse_args()
+
 
     # Serve API Mode
     if args.serve_api:
@@ -217,15 +242,63 @@ def main():
         print(f"📄 LaTeX paper exported to: {tex_path}")
         print(f"📚 BibTeX bibliography exported to: {bib_path}\n")
 
-    # HTML Export Flag
-    if args.export_html:
-        html_code = pipeline.report_generator.format_html(report)
-        html_path = "data/synthesis_report.html"
-        with open(html_path, "w", encoding="utf-8") as f:
-            f.write(html_code)
-        print(f"🌐 Standalone HTML report exported to: {html_path}\n")
+    # Agentic Verification Trajectory
+    if args.iterative and report.verification_trajectory and report.verification_trajectory.steps:
+        print("\n" + "=" * 80)
+        print("  🧬 Agentic Iterative Verification Trajectory")
+        print("=" * 80)
+        print(f"Summary: {report.verification_trajectory.trajectory_summary}\n")
+        for step in report.verification_trajectory.steps:
+            print(f" • Step {step.step_number} [{step.claim_id}]: {step.initial_status} -> {step.updated_status} (ΔConf: {step.confidence_delta:+.2f})")
+            print(f"   Targeted Query: '{step.query_generated}'")
+            print(f"   Reasoning: {step.reasoning}")
+        print("=" * 80 + "\n")
+
+    # Methodological Rigor Analysis
+    if args.rigor and report.rigor_report:
+        print("\n" + "=" * 80)
+        print("  ⚖️ Corpus Methodological Rigor & Evidence Hierarchy")
+        print("=" * 80)
+        print(f"Overall Corpus Rigor: {report.rigor_report.overall_corpus_rigor * 100:.1f}%")
+        print(f"High-Rigor Ratio:     {report.rigor_report.high_rigor_paper_ratio * 100:.1f}%\n")
+        for a in report.rigor_report.assessments:
+            print(f" • [{a.paper_id}] {a.methodology_type} | Rigor: {a.rigor_score:.2f} | Multiplier: x{a.evidence_weight_multiplier:.2f}")
+        print("=" * 80 + "\n")
+
+    # Automated Scientific Hypotheses
+    if args.hypotheses and report.hypotheses:
+        print("\n" + "=" * 80)
+        print("  💡 Automated Scientific Hypotheses & Proposed Experimental Protocols")
+        print("=" * 80)
+        for h in report.hypotheses:
+            print(f"\n🔬 [{h.hypothesis_id}] {h.title}")
+            print(f"   Statement:     \"{h.statement}\"")
+            print(f"   Tension:       {h.tension_addressed}")
+            print(f"   Rationale:     {h.rationale}")
+            print(f"   Protocol:      {h.proposed_methodology}")
+            print(f"   Predictions:   {', '.join(h.testable_predictions)}")
+            print(f"   Falsification: {h.falsification_criteria}")
+            print(f"   Feasibility:   {h.feasibility_tier} | Novelty: {h.novelty_impact_tier} | Impact: {h.estimated_impact_score * 100:.0f}%")
+        print("\n" + "=" * 80 + "\n")
+
+    # Interactive Sankey Export Flag
+    if args.export_sankey:
+        sankey_html = pipeline.graph_visualizer.generate_sankey_html(report)
+        sankey_path = "data/synthesis_sankey.html"
+        with open(sankey_path, "w", encoding="utf-8") as f:
+            f.write(sankey_html)
+        print(f"🔀 Interactive Sankey diagram exported to: {sankey_path}")
+
+    # Interactive Network Export Flag
+    if args.export_network:
+        network_html = pipeline.graph_visualizer.generate_network_html(report)
+        network_path = "data/synthesis_network.html"
+        with open(network_path, "w", encoding="utf-8") as f:
+            f.write(network_html)
+        print(f"🌐 Interactive Physics Network Graph exported to: {network_path}\n")
 
 
 
 if __name__ == "__main__":
     main()
+

@@ -49,15 +49,15 @@ Each proposition extracted from the corpus was evaluated against indexed literat
 
 
 \paragraph{C002: Vision Transformers incur higher computational overhead and slower inference speed than lightweight CNNs on edge devices.}
-\textbf{Status:} \textcolor{blue}{Moderate support} (Confidence: 0.80) \cite{paper_004}\cite{arxiv_2206.10552v2}.
+\textbf{Status:} \textcolor{blue}{Moderate support} (Confidence: 0.80) \cite{paper_004}\cite{paper_004}.
 \begin{itemize}
     \item \textit{Edge-Device Comparative Study: Lightweight YOLO versus Deformable Detection Transformers for Nighttime Surveillance} (2026): ``Real-time edge perception requires tight resource budgeting. Vision Transformers have established state-of-the-art accuracy, but their quadratic self-...'' \cite{paper_004}
-    \item \textit{Vicinity Vision Transformer} (2022): ``Empirical experiments evaluating Top-1 Accuracy demonstrate: Moreover, since our Vicinity Attention requires the token length to be much larger than t...'' \cite{arxiv_2206.10552v2}
+    \item \textit{Edge-Device Comparative Study: Lightweight YOLO versus Deformable Detection Transformers for Nighttime Surveillance} (2026): ``Lightweight YOLOv8 achieves 68.4 FPS with 38.2\% mAP@0.5, whereas Deformable DETR achieves 40.3\% mAP@0.5 but only 14.8 FPS. Deformable DETR incurs subs...'' \cite{paper_004}
 \end{itemize}
 
 
 \paragraph{C003: Vision Transformers outperform CNNs in low-light object detection without requiring illumination enhancement.}
-\textbf{Status:} \textcolor{blue}{Moderate support} (Confidence: 0.76) \cite{paper_003}\cite{paper_005}\cite{paper_001}\cite{paper_002}\cite{paper_001}.
+\textbf{Status:} \textcolor{blue}{Moderate support} (Confidence: 0.76) \cite{paper_003}\cite{paper_005}\cite{paper_001}\cite{paper_001}\cite{paper_002}.
 \begin{itemize}
     \item \textit{Does Illumination Enhancement Really Help Deep Detectors in Extreme Darkness?} (2025): ``Detectors trained directly on low-light representations outperform or match two-stage enhancement pipelines on ExDark, demonstrating that separate enh...'' \cite{paper_003}
     \item \textit{A Critical Investigation into Discrepancies Across Low-Light Benchmark Datasets} (2024): ``Literature in low-light vision contains numerous conflicting reports regarding whether illumination enhancement benefits object detectors. In this wor...'' \cite{paper_005}
@@ -68,7 +68,7 @@ Each proposition extracted from the corpus was evaluated against indexed literat
 \textbf{Status:} \textcolor{blue}{Moderate support} (Confidence: 0.72) \cite{paper_001}\cite{paper_001}\cite{paper_001}\cite{paper_001}.
 \begin{itemize}
     \item \textit{Evaluating Vision Transformers under Extreme Low-Light Conditions} (2024): ``Object detection in low-light environments is critical for autonomous systems and nighttime surveillance. Conventional approaches rely on Convolutiona...'' \cite{paper_001}
-    \item \textit{Evaluating Vision Transformers under Extreme Low-Light Conditions} (2024): ``Vision Transformers (ViTs) have demonstrated impressive representation learning across visual benchmarks. However, their robustness under low-light im...'' \cite{paper_001}
+    \item \textit{Evaluating Vision Transformers under Extreme Low-Light Conditions} (2024): ``Vision Transformers can achieve competitive global-context modeling in low light, but their performance degrades when imagery contains weak local text...'' \cite{paper_001}
 \end{itemize}
 
 
@@ -121,10 +121,9 @@ To guarantee strict grounding and eliminate hallucinations:
 
 \section{Identified Research Gaps}
 \begin{enumerate}
-    \item Limited cross-dataset evaluation across real-world darkness vs synthetic low-light noise
-    \item Lack of standardized low-light evaluation metrics that account for inference latency and power on edge devices
-    \item Scarcity of unified benchmarks testing transformer patch attention resilience under non-uniform illumination
-\end{enumerate}
+
+
+
 
 \bibliographystyle{plain}
 \bibliography{references}

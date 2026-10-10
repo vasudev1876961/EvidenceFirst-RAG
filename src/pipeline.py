@@ -32,7 +32,11 @@ from src.synthesis.conflict_analyzer import ConflictAnalyzer
 from src.synthesis.report_generator import ReportGenerator
 from src.synthesis.meta_analysis import EmpiricalMetaAnalysisEngine
 from src.verification.robustness import RobustnessEngine
+from src.verification.agentic_verifier import AgenticVerifier
+from src.verification.rigor_analyzer import MethodologyRigorAnalyzer
 from src.synthesis.latex_exporter import LatexExporter
+from src.synthesis.hypothesis_generator import ScientificHypothesisGenerator
+from src.claims.graph_visualizer import EvidenceGraphVisualizer
 from src.ingestion.arxiv_fetcher import ArxivFetcher
 
 logger = logging.getLogger(__name__)
@@ -40,6 +44,7 @@ logger = logging.getLogger(__name__)
 
 class EvidenceFirstPipeline:
     """End-to-end Claim-Level Evidence Verification and Contradiction-Aware RAG Pipeline."""
+
 
     def __init__(self, config: Optional[Dict[str, Any]] = None):
         if config is None:
@@ -118,10 +123,21 @@ class EvidenceFirstPipeline:
         self.robustness_engine = RobustnessEngine(scorer=self.scorer)
         self.latex_exporter = LatexExporter()
         self.arxiv_fetcher = ArxivFetcher()
+        self.agentic_verifier = AgenticVerifier(
+            hybrid_retriever=self.hybrid,
+            reranker=self.reranker,
+            contradiction_engine=self.contradiction_engine,
+            scorer=self.scorer,
+            llm_client=self.llm,
+        )
+        self.rigor_analyzer = MethodologyRigorAnalyzer()
+        self.hypothesis_generator = ScientificHypothesisGenerator(llm_client=self.llm)
+        self.graph_visualizer = EvidenceGraphVisualizer()
 
         # State
         self.indexed_papers: List[Paper] = []
         self.indexed_chunks: List[SemanticChunk] = []
+
 
     def _load_default_config(self) -> Dict[str, Any]:
         """Load default configuration from configs/config.yaml."""
@@ -244,6 +260,16 @@ class EvidenceFirstPipeline:
                     claim=claim, supporting=sup, contradicting=contra
                 )
 
+        # Step 5b: Agentic Iterative Verification Loop (resolves uncertain & conflicting claims)
+        claims, trajectory = self.agentic_verifier.run_verification_loop(claims, max_iterations=1)
+
+        # Step 5c: Methodological Rigor Calibration (weights evidence based on empirical rigor)
+        corpus_rigor_report = self.rigor_analyzer.analyze_corpus(self.indexed_papers)
+        corpus_assessments = {a.paper_id: a for a in corpus_rigor_report.assessments}
+        for claim in claims:
+            claim.supporting_evidence = self.rigor_analyzer.apply_rigor_weighting(claim.supporting_evidence, corpus_assessments)
+            claim.contradicting_evidence = self.rigor_analyzer.apply_rigor_weighting(claim.contradicting_evidence, corpus_assessments)
+
         # Step 6: Evidence Knowledge Graph
         graph_data = self.graph_builder.build_graph(query=query, claims=claims)
 
@@ -285,5 +311,24 @@ class EvidenceFirstPipeline:
         report.latex_code = self.latex_exporter.generate_latex(report)
         report.bibtex_code = self.latex_exporter.generate_bibtex(report)
 
+        # Step 14: Agentic Verification Trajectory
+        report.verification_trajectory = trajectory
+
+        # Step 15: Corpus Methodological Rigor Assessment
+        report.rigor_report = corpus_rigor_report
+
+        # Step 16: Automated Scientific Hypothesis Generation
+        report.hypotheses = self.hypothesis_generator.generate_hypotheses(
+            query=query,
+            conflicts=conflicts,
+            claims=claims,
+            meta_analysis=report.meta_analysis,
+            research_gaps=research_gaps,
+        )
+
+        # Step 17: Interactive Sankey Diagram Data
+        report.sankey_data = self.graph_visualizer.build_sankey_data(report)
+
         return report
+
 

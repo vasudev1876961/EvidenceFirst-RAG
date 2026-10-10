@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <title>EvidenceFirst-RAG: Verification Flow</title>
+  <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
+  <style>
+    body {
+      margin: 0;
+      padding: 24px;
+      background-color: #0F172A;
+      color: #F8FAFC;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+    .header {
+      margin-bottom: 20px;
+      border-bottom: 1px solid #334155;
+      padding-bottom: 12px;
+    }
+    h1 {
+      font-size: 24px;
+      color: #38BDF8;
+      margin: 0 0 6px 0;
+    }
+    p {
+      color: #94A3B8;
+      margin: 0;
+      font-size: 14px;
+    }
+    #sankey-div {
+      width: 100%;
+      height: 650px;
+      border-radius: 12px;
+      background: #1E293B;
+      border: 1px solid #334155;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>🔬 EvidenceFirst-RAG: Citation & Verification Sankey Flow</h1>
+    <p>Traceability flow: Research Query ➔ Extracted Claims ➔ Supporting / Contradicting Papers ➔ Final Verification Consensus</p>
+  </div>
+  <div id="sankey-div"></div>
+  <script>
+    const data = {"nodes": ["Query: What are the limitations of Vision ...", "[C001] Vision Transformers require subs...", "Paper: paper_001 (2024)", "Status: Moderate support", "[C002] Vision Transformers incur higher...", "Paper: paper_004 (2026)", "[C003] Vision Transformers outperform C...", "Paper: paper_003 (2025)", "Paper: paper_005 (2024)", "[C004] Local texture degradation in low..."], "node_colors": ["#8B5CF6", "#EC4899", "#10B981", "#3B82F6", "#EC4899", "#10B981", "#EC4899", "#10B981", "#10B981", "#EC4899"], "sources": [0, 1, 1, 1, 0, 4, 4, 4, 0, 6, 6, 6, 0, 9, 9, 9], "targets": [1, 2, 2, 3, 4, 5, 5, 3, 6, 7, 8, 3, 9, 2, 2, 3], "values": [1.0, 0.9, 0.878, 1.2, 1.0, 0.68, 0.579, 1.2, 1.0, 0.951, 0.942, 1.2, 1.0, 0.9, 0.88, 1.2], "link_colors": ["rgba(139, 92, 246, 0.4)", "rgba(16, 185, 129, 0.4)", "rgba(16, 185, 129, 0.4)", "#3B82F666", "rgba(139, 92, 246, 0.4)", "rgba(16, 185, 129, 0.4)", "rgba(16, 185, 129, 0.4)", "#3B82F666", "rgba(139, 92, 246, 0.4)", "rgba(16, 185, 129, 0.4)", "rgba(16, 185, 129, 0.4)", "#3B82F666", "rgba(139, 92, 246, 0.4)", "rgba(16, 185, 129, 0.4)", "rgba(16, 185, 129, 0.4)", "#3B82F666"]};
+    const plotData = [{
+      type: "sankey",
+      orientation: "h",
+      node: {
+        pad: 18,
+        thickness: 24,
+        line: { color: "#0F172A", width: 1.5 },
+        label: data.nodes,
+        color: data.node_colors
+      },
+      link: {
+        source: data.sources,
+        target: data.targets,
+        value: data.values,
+        color: data.link_colors
+      }
+    }];
+    const layout = {
+      paper_bgcolor: "#1E293B",
+      plot_bgcolor: "#1E293B",
+      font: { color: "#F8FAFC", size: 12, family: "sans-serif" },
+      margin: { l: 20, r: 20, t: 25, b: 25 }
+    };
+    Plotly.newPlot("sankey-div", plotData, layout, { responsive: true, displayModeBar: false });
+  </script>
+</body>
+</html>

@@ -135,7 +135,11 @@ def analyze_query(req: QueryRequest):
         "research_gaps": report.research_gaps,
         "empirical_insights": report.meta_analysis.key_empirical_insights if report.meta_analysis else [],
         "evidence_robustness_index": report.robustness.evidence_robustness_index if report.robustness else 1.0,
+        "hypotheses": [h.model_dump() for h in report.hypotheses],
+        "verification_trajectory": report.verification_trajectory.model_dump() if report.verification_trajectory else None,
+        "rigor_report": report.rigor_report.model_dump() if report.rigor_report else None,
     }
+
 
 
 @app.post("/api/v1/arxiv/search", tags=["Live Ingestion"])
@@ -296,4 +300,94 @@ def export_html(req: QueryRequest):
         "query": report.query,
         "html_code": html_code,
     }
+
+
+@app.post("/api/v1/hypotheses", tags=["Scientific Intelligence"])
+def generate_hypotheses(req: QueryRequest):
+    """Synthesize formal testable scientific hypotheses resolving observed literature contradictions."""
+    if not pipeline_instance:
+        raise HTTPException(status_code=503, detail="Pipeline not initialized")
+
+    if req.domain:
+        pipeline_instance.filter_by_domain(req.domain)
+
+    report = pipeline_instance.run(req.query)
+    return {
+        "query": report.query,
+        "hypotheses_count": len(report.hypotheses),
+        "hypotheses": [h.model_dump() for h in report.hypotheses],
+    }
+
+
+@app.get("/api/v1/rigor/assess", tags=["Methodology"])
+def assess_methodological_rigor():
+    """Assess methodological tiers and evidence hierarchy weights across active corpus."""
+    if not pipeline_instance:
+        raise HTTPException(status_code=503, detail="Pipeline not initialized")
+
+    report = pipeline_instance.rigor_analyzer.analyze_corpus(pipeline_instance.indexed_papers)
+    return report.model_dump()
+
+
+@app.post("/api/v1/verify/iterative", tags=["Agentic Verification"])
+def run_iterative_verification(req: QueryRequest):
+    """Execute multi-hop agentic verification loop and return auditable trajectory."""
+    if not pipeline_instance:
+        raise HTTPException(status_code=503, detail="Pipeline not initialized")
+
+    if req.domain:
+        pipeline_instance.filter_by_domain(req.domain)
+
+    report = pipeline_instance.run(req.query)
+    return {
+        "query": report.query,
+        "trajectory": report.verification_trajectory.model_dump() if report.verification_trajectory else None,
+        "claims": [
+            {
+                "claim_id": c.claim_id,
+                "statement": c.statement,
+                "status": c.evidence_status,
+                "confidence": c.confidence_score,
+            }
+            for c in report.claims
+        ],
+    }
+
+
+@app.post("/api/v1/visualize/sankey", tags=["Visualization"])
+def export_sankey_visualization(req: QueryRequest):
+    """Generate standalone interactive Sankey diagram HTML visualizing literature verification flow."""
+    if not pipeline_instance:
+        raise HTTPException(status_code=503, detail="Pipeline not initialized")
+
+    if req.domain:
+        pipeline_instance.filter_by_domain(req.domain)
+
+    report = pipeline_instance.run(req.query)
+    html_code = pipeline_instance.graph_visualizer.generate_sankey_html(report)
+    return {
+        "query": report.query,
+        "sankey_data": report.sankey_data,
+        "html_code": html_code,
+    }
+
+
+@app.post("/api/v1/visualize/network", tags=["Visualization"])
+def export_network_visualization(req: QueryRequest):
+    """Generate standalone interactive Physics Network Graph HTML visualizing evidence entailment & contradictions."""
+    if not pipeline_instance:
+        raise HTTPException(status_code=503, detail="Pipeline not initialized")
+
+    if req.domain:
+        pipeline_instance.filter_by_domain(req.domain)
+
+    report = pipeline_instance.run(req.query)
+    html_code = pipeline_instance.graph_visualizer.generate_network_html(report)
+    return {
+        "query": report.query,
+        "nodes_count": len(report.evidence_graph.nodes),
+        "edges_count": len(report.evidence_graph.edges),
+        "html_code": html_code,
+    }
+
 

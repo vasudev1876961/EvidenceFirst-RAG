@@ -146,17 +146,72 @@ To guarantee strict grounding and eliminate hallucinations:
 \\section{{Identified Research Gaps}}
 \\begin{{enumerate}}
 """
-        for gap in report.research_gaps:
-            latex_template += f"    \\item {self._escape_latex(gap)}\n"
+        # Build Hypotheses Section
+        hypotheses_latex = ""
+        if report.hypotheses:
+            hypo_blocks = []
+            for h in report.hypotheses:
+                preds = "\n".join([f"    \\item \\textit{{{self._escape_latex(p)}}}" for p in h.testable_predictions])
+                hypo_blocks.append(f"""
+\\subsection*{{{self._escape_latex(h.hypothesis_id)}: {self._escape_latex(h.title)}}}
+\\noindent\\textbf{{Hypothesis Statement:}} {self._escape_latex(h.statement)}
 
-        latex_template += """\\end{enumerate}
+\\noindent\\textbf{{Tension Addressed:}} {self._escape_latex(h.tension_addressed)} \\\\
+\\noindent\\textbf{{Theoretical Rationale:}} {self._escape_latex(h.rationale)} \\\\
+\\noindent\\textbf{{Proposed Protocol:}} {self._escape_latex(h.proposed_methodology)}
 
-\\bibliographystyle{plain}
-\\bibliography{references}
+\\noindent\\textbf{{Testable Predictions:}}
+\\begin{{itemize}}
+{preds}
+\\end{{itemize}}
 
-\\end{document}
+\\noindent\\textbf{{Falsification Criteria:}} {self._escape_latex(h.falsification_criteria)} \\\\
+\\noindent\\textbf{{Feasibility Tier:}} \\texttt{{{h.feasibility_tier}}} \\quad \\textbf{{Novelty:}} \\texttt{{{h.novelty_impact_tier}}} \\quad \\textbf{{Impact Score:}} {h.estimated_impact_score*100:.0f}\\%
+""")
+            hypotheses_latex = f"""
+\\section{{Automated Scientific Hypotheses \\& Proposed Protocols}}
+Derived from identified empirical contradictions, our system generates falsifiable hypotheses to resolve literature divergence:
+{"".join(hypo_blocks)}
+"""
+
+        # Build Rigor Section
+        rigor_latex = ""
+        if report.rigor_report and report.rigor_report.assessments:
+            rigor_rows = []
+            for a in report.rigor_report.assessments:
+                rigor_rows.append(
+                    f"    \\texttt{{{self._escape_latex(a.paper_id)}}} & {self._escape_latex(a.methodology_type)} & {a.rigor_score:.2f} & $\\times {a.evidence_weight_multiplier:.2f}$ & \\cite{{{a.paper_id}}} \\\\"
+                )
+            rigor_table_body = "\n".join(rigor_rows)
+            rigor_latex = f"""
+\\section{{Methodological Rigor \\& Evidence Hierarchy}}
+Literature evidence is weighted by study design rigor (Overall Corpus Rigor: {report.rigor_report.overall_corpus_rigor*100:.1f}\\%):
+
+\\begin{{table}}[ht]
+\\centering
+\\caption{{Methodological Rigor and Evidence Weight Multipliers}}
+\\label{{tab:rigor}}
+\\begin{{tabular}}{{lllrl}}
+\\toprule
+\\textbf{{Paper ID}} & \\textbf{{Methodology Tier}} & \\textbf{{Rigor Score}} & \\textbf{{Multiplier}} & \\textbf{{Ref.}} \\\\
+\\midrule
+{rigor_table_body}
+\\bottomrule
+\\end{{tabular}}
+\\end{{table}}
+"""
+
+        latex_template += f"""{hypotheses_latex}
+
+{rigor_latex}
+
+\\bibliographystyle{{plain}}
+\\bibliography{{references}}
+
+\\end{{document}}
 """
         return latex_template
+
 
     def generate_bibtex(self, report: SynthesisReport) -> str:
         """Generate valid BibTeX entries for all references in the synthesis."""

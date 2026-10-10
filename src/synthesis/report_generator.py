@@ -135,13 +135,49 @@ class ReportGenerator:
                         lines.append(f"| {factor.get('factor', 'Experimental')} | {factor.get('supporting_side', 'N/A')} | {factor.get('contradicting_side', 'N/A')} |")
                     lines.append("")
 
+        if report.verification_trajectory and report.verification_trajectory.steps:
+            lines.append("## 4. Agentic Verification Trajectory")
+            lines.append(f"> {report.verification_trajectory.trajectory_summary}\n")
+            lines.append("| Step | Target Claim | Generated Targeted Query | Chunks | Previous Status | Updated Status | ΔConf |")
+            lines.append("| :--- | :--- | :--- | :---: | :--- | :--- | :---: |")
+            for st in report.verification_trajectory.steps:
+                lines.append(f"| {st.step_number} | {st.claim_id} | `{st.query_generated[:40]}...` | {st.retrieved_chunks_count} | {st.initial_status} | **{st.updated_status}** | `{st.confidence_delta:+.2f}` |")
+            lines.append("")
+
+        if report.rigor_report and report.rigor_report.assessments:
+            lines.append("## 5. Methodological Rigor & Evidence Hierarchy")
+            lines.append(f"- **Overall Corpus Rigor**: `{report.rigor_report.overall_corpus_rigor * 100:.1f}%`")
+            lines.append(f"- **High-Rigor Evidence Ratio**: `{report.rigor_report.high_rigor_paper_ratio * 100:.1f}%`\n")
+            lines.append("| Paper ID | Methodology Tier | Rigor Score | Weight Multiplier | Sample / Datasets |")
+            lines.append("| :--- | :--- | :---: | :---: | :---: |")
+            for a in report.rigor_report.assessments:
+                lines.append(f"| `{a.paper_id}` | {a.methodology_type} | `{a.rigor_score:.2f}` | `x{a.evidence_weight_multiplier:.2f}` | {a.sample_size_or_datasets_count} |")
+            lines.append("")
+
+        if report.hypotheses:
+            lines.append("## 6. Automated Scientific Hypotheses & Experimental Designs")
+            for h in report.hypotheses:
+                lines.append(f"### [{h.hypothesis_id}] {h.title}")
+                lines.append(f"> **Hypothesis**: *\"{h.statement}\"*")
+                lines.append(f">")
+                lines.append(f"> **Tension Addressed**: {h.tension_addressed}")
+                lines.append(f"> **Theoretical Rationale**: {h.rationale}")
+                lines.append(f"> **Proposed Experimental Protocol**: {h.proposed_methodology}")
+                if h.testable_predictions:
+                    lines.append(f"> **Testable Predictions**:")
+                    for pred in h.testable_predictions:
+                        lines.append(f"> - 🎯 {pred}")
+                lines.append(f"> **Falsification Criteria**: {h.falsification_criteria}")
+                lines.append(f"> **Feasibility**: `{h.feasibility_tier}` | **Novelty**: `{h.novelty_impact_tier}` | **Estimated Impact**: `{h.estimated_impact_score * 100:.0f}%`")
+                lines.append("")
+
         if report.research_gaps:
-            lines.append("## 4. Identified Research Gaps")
+            lines.append("## 7. Identified Research Gaps")
             for gap in report.research_gaps:
                 lines.append(f"- 🔬 {gap}")
             lines.append("")
 
-        lines.append("## 5. Citation Faithfulness & Reliability Audit")
+        lines.append("## 8. Citation Faithfulness & Reliability Audit")
         audit = report.citation_audit
         lines.append(f"- **Total Evaluated Claims**: `{audit.total_claims}`")
         lines.append(f"- **Fully Supported Claims**: `{audit.supported_claims}`")
@@ -153,11 +189,12 @@ class ReportGenerator:
         lines.append("")
 
         if report.references:
-            lines.append("## 6. References")
+            lines.append("## 9. References")
             for ref in report.references:
                 lines.append(f"- **[{ref['paper_id']}]** {ref['title']}. *{ref['venue']}*, {ref['year']}.")
 
         return "\n".join(lines)
+
 
     def format_html(self, report: SynthesisReport) -> str:
         """Format SynthesisReport as publication-grade standalone HTML document."""

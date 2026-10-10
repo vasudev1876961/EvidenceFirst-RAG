@@ -52,7 +52,22 @@ Generates ready-to-compile academic conference/journal drafts (`synthesis_paper.
 ### 10. Headless REST API (FastAPI)
 Production async REST API with interactive Swagger documentation (`/docs`), automated health checks, and query endpoints.
 
+### 11. Agentic Multi-Hop Verification Trajectory
+When claims display ambiguity or conflicting evidence, the **Iterative Agentic Verifier** formulates targeted counter-queries and precision sub-inquiries, retrieves supplementary high-precision chunks in a secondary pass, and records an auditable **Verification Trajectory** trace with before/after confidence deltas.
+
+### 12. Automated Scientific Hypothesis Generation & Protocol Synthesis
+Transforms discovered contradictions into scientific progress: automatically synthesizes formal, falsifiable **Scientific Hypotheses** (`HYP-XXX`), theoretical rationales, concrete experimental protocols, testable quantitative predictions, and empirical falsification criteria.
+
+### 13. Methodological Rigor & Evidence Hierarchy Analyzer
+Scientifically weights evidence by study design tier (**Methodology Rigor Score**): Large-Scale Empirical Benchmarks ($\times 1.25$) and Controlled Ablations ($\times 1.15$) receive priority over anecdotal case studies or conceptual surveys ($\times 0.85$).
+
+### 14. Multi-Stage Sankey & Physics Network Visualizations
+Generates publication-grade standalone interactive visualizers:
+- **Plotly Sankey Flow**: Traces literature flow from Query $\to$ Extracted Claims $\to$ Evidence Studies $\to$ Final Verification Consensus.
+- **Vis.js Physics Network**: Interactive force-directed topology highlighting entailment (green) and academic contradiction (red dashed) edges.
+
 ---
+
 
 ## 🏛️ Pipeline Architecture
 
@@ -178,11 +193,37 @@ python main.py --domain "NLP / LLMs (ACL)" --query "Compare modular RAG against 
 python main.py --domain "Biomedical Literature (PubMed)" --query "What are the risks and efficacy of dense retrieval in clinical decision support and contraindication queries?" --export-html
 ```
 
-### 9. Launch Interactive Research Dashboard
-Launch the Streamlit Research Analysis Dashboard with 10 interactive tabs:
+### 9. Agentic Verification, Hypothesis Synthesis & Rigor Assessment
+Run literature synthesis with iterative multi-hop counter-query verification, automated hypothesis generation, and methodological rigor scoring:
+```bash
+python main.py --query "What are the limitations of Vision Transformers for low-light object detection?" \
+  --iterative \
+  --hypotheses \
+  --rigor \
+  --export-sankey \
+  --export-network
+```
+
+### 10. Launch Interactive Research Dashboard
+Launch the Streamlit Research Analysis Dashboard with **14 interactive tabs**:
 ```bash
 streamlit run app/streamlit_app.py
 ```
+Tabs include:
+1. 📑 Executive Literature Synthesis
+2. 🔍 Claim-Level Evidence Inspector
+3. ⚡ Contradiction Attribution Engine
+4. 💡 Automated Scientific Hypotheses & Protocols
+5. 🧬 Agentic Multi-Hop Verification Trajectory
+6. ⚖️ Methodological Rigor & Evidence Hierarchy
+7. 🔀 Multi-Stage Literature Sankey Flow
+8. 🕸️ Scientific Knowledge Graph (Plotly)
+9. 📊 Cross-Paper Empirical Meta-Analysis Matrix
+10. 🛡️ Robustness & Counterfactuals (ERI)
+11. 🌐 Live ArXiv Ingestion Engine
+12. 📄 Publication LaTeX & BibTeX Exporter
+13. 🛡️ Citation Faithfulness & Reliability Audit
+14. 📈 Architecture Ablation & IR Benchmarks
 
 ---
 
@@ -218,12 +259,17 @@ Comparison across 5 system configurations on scientific literature benchmarks:
 ```
 EvidenceFirst-RAG/
 │
+├── .github/workflows/       # GitHub Actions CI matrix testing & validation
+│   └── ci.yml
+│
 ├── data/
 │   ├── raw/                 # Incoming PDF papers
 │   ├── processed/           # Parsed paper catalog
-│   ├── sample_papers/       # Seed CV corpus (DarkFace, ExDark, ViT, YOLO)
+│   ├── sample_papers/       # Multi-domain seed corpus (CV, NLP, Biomedical)
 │   ├── synthesis_paper.tex  # Exported LaTeX paper draft
-│   └── references.bib       # Exported BibTeX citations
+│   ├── references.bib       # Exported BibTeX citations
+│   ├── synthesis_sankey.html# Standalone interactive Sankey diagram
+│   └── synthesis_network.html# Standalone interactive Physics Network Graph
 │
 ├── configs/
 │   └── config.yaml          # Master configuration (weights, models, thresholds)
@@ -237,12 +283,16 @@ EvidenceFirst-RAG/
 │   ├── query/               # Query decomposer & BM25 keyword expander
 │   ├── retrieval/           # BM25, Dense embeddings, Hybrid fusion, Cross-Encoder
 │   ├── claims/              # Atomic claim extractor, normalizer, NetworkX graph
-│   │   └── claim_graph.py   # Multi-hop graph with community clustering
+│   │   ├── claim_graph.py   # Multi-hop graph with community clustering
+│   │   └── graph_visualizer.py # Sankey & Vis.js network visualizers
 │   ├── verification/        # NLI entailment, contradiction engine, citation audit
+│   │   ├── agentic_verifier.py # Iterative multi-hop counter-query verifier
+│   │   ├── rigor_analyzer.py# Methodological rigor & evidence hierarchy
 │   │   ├── robustness.py    # Counterfactual & leave-one-out robustness (ERI)
 │   │   ├── contradiction.py # Contradiction attribution engine
 │   │   └── citation_checker.py # ECS & CIS audit
 │   ├── synthesis/           # Evidence-grounded synthesizer, conflict attribution
+│   │   ├── hypothesis_generator.py # Automated scientific hypothesis synthesis
 │   │   ├── meta_analysis.py # Cross-paper empirical benchmark matrix
 │   │   ├── latex_exporter.py# LaTeX & BibTeX publication exporter
 │   │   └── report_generator.py # Structured synthesis report builder
@@ -251,18 +301,22 @@ EvidenceFirst-RAG/
 │   └── pipeline.py          # Master orchestrator
 │
 ├── app/
-│   ├── api.py               # FastAPI REST API server
-│   └── streamlit_app.py     # 10-Tab Interactive Research Dashboard
+│   ├── api.py               # FastAPI REST API server (Swagger /docs)
+│   └── streamlit_app.py     # 14-Tab Interactive Research Dashboard
 │
-├── tests/                   # Pytest test suite (13 passing tests)
+├── tests/                   # Pytest test suite (22 passing tests)
+│   ├── test_v2_advanced.py  # Agentic verification, hypotheses, rigor & visualizers
 │   ├── test_advanced.py     # ArXiv, Meta-Analysis, ERI, LaTeX & API tests
+│   ├── test_domain_corpus.py# Multi-domain & IR benchmark tests
+│   ├── test_chunker.py      # Semantic chunking tests
 │   ├── test_pipeline.py     # End-to-end integration & ablation tests
 │   ├── test_retrieval.py    # Hybrid retrieval tests
 │   └── test_verification.py # Contradiction & citation auditor tests
 │
 ├── requirements.txt         # Dependencies
-└── main.py                  # CLI runner with ArXiv, LaTeX, Robustness & API flags
+└── main.py                  # CLI runner with v2.0 flags & exporters
 ```
+
 
 ---
 

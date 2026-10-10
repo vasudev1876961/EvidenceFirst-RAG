@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <title>EvidenceFirst-RAG: Interactive Knowledge Graph</title>
+  <script type="text/javascript" src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
+  <style>
+    body {
+      margin: 0;
+      padding: 24px;
+      background-color: #0B1120;
+      color: #F8FAFC;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+    .header {
+      margin-bottom: 16px;
+      border-bottom: 1px solid #1E293B;
+      padding-bottom: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    h1 {
+      font-size: 22px;
+      color: #38BDF8;
+      margin: 0 0 6px 0;
+    }
+    p {
+      color: #94A3B8;
+      margin: 0;
+      font-size: 13px;
+    }
+    .legend {
+      display: flex;
+      gap: 16px;
+      font-size: 13px;
+    }
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .legend-color {
+      width: 14px;
+      height: 14px;
+      border-radius: 3px;
+    }
+    #network-container {
+      width: 100%;
+      height: 700px;
+      border-radius: 12px;
+      background: #111827;
+      border: 1px solid #1E293B;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.4);
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div>
+      <h1>🔬 Multi-Hop Scientific Evidence & Contradiction Graph</h1>
+      <p>Interactive knowledge graph showing directional entailment (Green) and contradiction (Red dashed) flows.</p>
+    </div>
+    <div class="legend">
+      <div class="legend-item"><div class="legend-color" style="background: #10B981;"></div> Entailment / Support</div>
+      <div class="legend-item"><div class="legend-color" style="background: #EF4444;"></div> Contradiction / Conflict</div>
+      <div class="legend-item"><div class="legend-color" style="background: #8B5CF6;"></div> Query Root</div>
+    </div>
+  </div>
+  <div id="network-container"></div>
+  <script>
+    const nodes = new vis.DataSet([{"id": "query_root", "label": "Query:\nWhat are the limitations of Vision Transforme...", "group": "query", "color": {"background": "#8B5CF6", "border": "#FFFFFF", "highlight": {"background": "#F59E0B", "border": "#FFFFFF"}}, "font": {"color": "#FFFFFF", "size": 13, "face": "sans-serif"}, "shape": "box"}, {"id": "C001", "label": "[C001]\nVision Transformers require substantiall...", "group": "claim", "color": {"background": "#3B82F6", "border": "#FFFFFF", "highlight": {"background": "#F59E0B", "border": "#FFFFFF"}}, "font": {"color": "#FFFFFF", "size": 13, "face": "sans-serif"}, "shape": "box"}, {"id": "paper_paper_001", "label": "\ud83d\udcc4 paper_001\n(2024)", "group": "paper", "color": {"background": "#059669", "border": "#FFFFFF", "highlight": {"background": "#F59E0B", "border": "#FFFFFF"}}, "font": {"color": "#FFFFFF", "size": 13, "face": "sans-serif"}, "shape": "ellipse"}, {"id": "C002", "label": "[C002]\nVision Transformers incur higher computa...", "group": "claim", "color": {"background": "#3B82F6", "border": "#FFFFFF", "highlight": {"background": "#F59E0B", "border": "#FFFFFF"}}, "font": {"color": "#FFFFFF", "size": 13, "face": "sans-serif"}, "shape": "box"}, {"id": "paper_paper_004", "label": "\ud83d\udcc4 paper_004\n(2026)", "group": "paper", "color": {"background": "#059669", "border": "#FFFFFF", "highlight": {"background": "#F59E0B", "border": "#FFFFFF"}}, "font": {"color": "#FFFFFF", "size": 13, "face": "sans-serif"}, "shape": "ellipse"}, {"id": "C003", "label": "[C003]\nVision Transformers outperform CNNs in l...", "group": "claim", "color": {"background": "#3B82F6", "border": "#FFFFFF", "highlight": {"background": "#F59E0B", "border": "#FFFFFF"}}, "font": {"color": "#FFFFFF", "size": 13, "face": "sans-serif"}, "shape": "box"}, {"id": "paper_paper_003", "label": "\ud83d\udcc4 paper_003\n(2025)", "group": "paper", "color": {"background": "#059669", "border": "#FFFFFF", "highlight": {"background": "#F59E0B", "border": "#FFFFFF"}}, "font": {"color": "#FFFFFF", "size": 13, "face": "sans-serif"}, "shape": "ellipse"}, {"id": "paper_paper_005", "label": "\ud83d\udcc4 paper_005\n(2024)", "group": "paper", "color": {"background": "#059669", "border": "#FFFFFF", "highlight": {"background": "#F59E0B", "border": "#FFFFFF"}}, "font": {"color": "#FFFFFF", "size": 13, "face": "sans-serif"}, "shape": "ellipse"}, {"id": "paper_paper_002", "label": "\ud83d\udcc4 paper_002\n(2025)", "group": "paper", "color": {"background": "#059669", "border": "#FFFFFF", "highlight": {"background": "#F59E0B", "border": "#FFFFFF"}}, "font": {"color": "#FFFFFF", "size": 13, "face": "sans-serif"}, "shape": "ellipse"}, {"id": "C004", "label": "[C004]\nLocal texture degradation in low-light i...", "group": "claim", "color": {"background": "#3B82F6", "border": "#FFFFFF", "highlight": {"background": "#F59E0B", "border": "#FFFFFF"}}, "font": {"color": "#FFFFFF", "size": 13, "face": "sans-serif"}, "shape": "box"}]);
+    const edges = new vis.DataSet([{"from": "query_root", "to": "C001", "label": "CLAIM", "color": {"color": "#8B5CF6", "opacity": 0.5}, "arrows": "to"}, {"from": "paper_paper_001", "to": "C001", "label": "SUPPORTS (0.90)", "color": {"color": "#10B981", "highlight": "#34D399"}, "width": 2.5, "arrows": "to"}, {"from": "paper_paper_001", "to": "C001", "label": "SUPPORTS (0.88)", "color": {"color": "#10B981", "highlight": "#34D399"}, "width": 2.5, "arrows": "to"}, {"from": "paper_paper_001", "to": "C001", "label": "SUPPORTS (0.86)", "color": {"color": "#10B981", "highlight": "#34D399"}, "width": 2.5, "arrows": "to"}, {"from": "query_root", "to": "C002", "label": "CLAIM", "color": {"color": "#8B5CF6", "opacity": 0.5}, "arrows": "to"}, {"from": "paper_paper_004", "to": "C002", "label": "SUPPORTS (0.68)", "color": {"color": "#10B981", "highlight": "#34D399"}, "width": 2.5, "arrows": "to"}, {"from": "paper_paper_004", "to": "C002", "label": "SUPPORTS (0.58)", "color": {"color": "#10B981", "highlight": "#34D399"}, "width": 2.5, "arrows": "to"}, {"from": "query_root", "to": "C003", "label": "CLAIM", "color": {"color": "#8B5CF6", "opacity": 0.5}, "arrows": "to"}, {"from": "paper_paper_003", "to": "C003", "label": "SUPPORTS (0.95)", "color": {"color": "#10B981", "highlight": "#34D399"}, "width": 2.5, "arrows": "to"}, {"from": "paper_paper_005", "to": "C003", "label": "SUPPORTS (0.94)", "color": {"color": "#10B981", "highlight": "#34D399"}, "width": 2.5, "arrows": "to"}, {"from": "paper_paper_001", "to": "C003", "label": "SUPPORTS (0.90)", "color": {"color": "#10B981", "highlight": "#34D399"}, "width": 2.5, "arrows": "to"}, {"from": "paper_paper_001", "to": "C003", "label": "SUPPORTS (0.88)", "color": {"color": "#10B981", "highlight": "#34D399"}, "width": 2.5, "arrows": "to"}, {"from": "paper_paper_002", "to": "C003", "label": "SUPPORTS (0.87)", "color": {"color": "#10B981", "highlight": "#34D399"}, "width": 2.5, "arrows": "to"}, {"from": "query_root", "to": "C004", "label": "CLAIM", "color": {"color": "#8B5CF6", "opacity": 0.5}, "arrows": "to"}, {"from": "paper_paper_001", "to": "C004", "label": "SUPPORTS (0.90)", "color": {"color": "#10B981", "highlight": "#34D399"}, "width": 2.5, "arrows": "to"}, {"from": "paper_paper_001", "to": "C004", "label": "SUPPORTS (0.88)", "color": {"color": "#10B981", "highlight": "#34D399"}, "width": 2.5, "arrows": "to"}, {"from": "paper_paper_001", "to": "C004", "label": "SUPPORTS (0.88)", "color": {"color": "#10B981", "highlight": "#34D399"}, "width": 2.5, "arrows": "to"}, {"from": "paper_paper_001", "to": "C004", "label": "SUPPORTS (0.86)", "color": {"color": "#10B981", "highlight": "#34D399"}, "width": 2.5, "arrows": "to"}]);
+    const container = document.getElementById("network-container");
+    const data = { nodes: nodes, edges: edges };
+    const options = {
+      physics: {
+        stabilization: true,
+        barnesHut: {
+          gravitationalConstant: -3500,
+          centralGravity: 0.35,
+          springLength: 120,
+          springConstant: 0.04
+        }
+      },
+      interaction: {
+        hover: true,
+        tooltipDelay: 150,
+        navigationButtons: true,
+        keyboard: true
+      }
+    };
+    const network = new vis.Network(container, data, options);
+  </script>
+</body>
+</html>

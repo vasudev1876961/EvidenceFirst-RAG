@@ -159,6 +159,65 @@ class ArxivPaperMetadata(BaseModel):
     extracted_methods: List[str] = Field(default_factory=list)
 
 
+class VerificationStep(BaseModel):
+    step_number: int
+    claim_id: str
+    target_statement: str
+    query_generated: str
+    retrieved_chunks_count: int
+    initial_status: str
+    updated_status: str
+    confidence_delta: float
+    reasoning: str
+
+
+class VerificationTrajectory(BaseModel):
+    iterations_performed: int
+    steps: List[VerificationStep] = Field(default_factory=list)
+    claims_resolved: int = 0
+    trajectory_summary: str = ""
+
+
+class ScientificHypothesis(BaseModel):
+    hypothesis_id: str
+    title: str
+    statement: str
+    tension_addressed: str
+    rationale: str
+    proposed_methodology: str
+    testable_predictions: List[str] = Field(default_factory=list)
+    falsification_criteria: str
+    feasibility_tier: Literal["High", "Medium", "Exploratory"] = "High"
+    novelty_impact_tier: Literal["Breakthrough", "High", "Incremental"] = "High"
+    estimated_impact_score: float = 0.85
+
+
+class MethodologyAssessment(BaseModel):
+    paper_id: str
+    paper_title: str
+    year: int
+    methodology_type: Literal[
+        "Large-Scale Empirical Benchmark",
+        "Controlled Ablation Study",
+        "Theoretical / Algorithmic Proof",
+        "Observational / Case Study",
+        "Qualitative / Conceptual Review"
+    ]
+    rigor_score: float  # 0.0 to 1.0
+    evidence_weight_multiplier: float  # 0.80 to 1.25
+    sample_size_or_datasets_count: int
+    strengths: List[str] = Field(default_factory=list)
+    limitations: List[str] = Field(default_factory=list)
+
+
+class MethodologyRigorReport(BaseModel):
+    overall_corpus_rigor: float
+    high_rigor_paper_ratio: float
+    methodology_distribution: Dict[str, int] = Field(default_factory=dict)
+    assessments: List[MethodologyAssessment] = Field(default_factory=list)
+    recommendations: List[str] = Field(default_factory=list)
+
+
 class SynthesisReport(BaseModel):
     query: str
     decomposed_subqueries: List[str] = Field(default_factory=list)
@@ -175,4 +234,9 @@ class SynthesisReport(BaseModel):
     robustness: Optional[RobustnessReport] = None
     latex_code: Optional[str] = None
     bibtex_code: Optional[str] = None
+    verification_trajectory: Optional[VerificationTrajectory] = None
+    hypotheses: List[ScientificHypothesis] = Field(default_factory=list)
+    rigor_report: Optional[MethodologyRigorReport] = None
+    sankey_data: Optional[Dict[str, Any]] = None
+
 
