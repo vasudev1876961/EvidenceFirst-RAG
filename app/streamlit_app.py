@@ -211,22 +211,27 @@ with m6:
 st.markdown("---")
 
 # Navigation Tabs
-tab_syn, tab_claims, tab_conflicts, tab_hypo, tab_trajectory, tab_rigor, tab_sankey, tab_graph, tab_empirical, tab_robustness, tab_arxiv, tab_latex, tab_audit, tab_ablation = st.tabs([
+tab_syn, tab_claims, tab_conflicts, tab_council, tab_peer_review, tab_hypo, tab_trajectory, tab_rigor, tab_biblio, tab_sankey, tab_graph, tab_empirical, tab_robustness, tab_slides, tab_arxiv, tab_latex, tab_audit, tab_ablation = st.tabs([
     "📑 Executive Synthesis",
     "🔍 Claim-Level Evidence",
     "⚡ Contradiction Attribution",
+    "🏛️ Debate Council",
+    "🎓 Peer Review Audit",
     "💡 Scientific Hypotheses",
     "🧬 Agentic Trajectory",
     "⚖️ Methodological Rigor",
+    "🌐 Bibliometrics & Co-Citation",
     "🔀 Sankey Flow",
     "🕸️ Knowledge Graph",
     "📊 Empirical Meta-Analysis",
     "🛡️ Robustness & Counterfactuals",
+    "🖥️ Presentation Deck",
     "🌐 Live ArXiv Ingestion",
     "📄 LaTeX & BibTeX Export",
     "🛡️ Citation Audit",
     "📈 Ablation Benchmarks"
 ])
+
 
 
 # ----------------- TAB 1: EXECUTIVE SYNTHESIS -----------------
@@ -332,8 +337,114 @@ with tab_conflicts:
         st.success("No active scientific contradictions detected for the extracted claims in this query.")
 
 
+# ----------------- TAB: MULTI-AGENT SCIENTIFIC DEBATE COUNCIL -----------------
+with tab_council:
+    st.subheader("🏛️ Multi-Agent Scientific Consensus Council Deliberation")
+    st.caption("Three specialized scientific agents cross-examine unresolved contradictions to ratify a unified empirical boundary rule.")
+
+    if report.consensus_council:
+        cc = report.consensus_council
+        st.info(f"**Council Inquiry Topic**: {cc.council_topic}")
+
+        # Verdict Header Banner
+        v = cc.verdict
+        v_col1, v_col2 = st.columns([3, 1])
+        with v_col1:
+            st.markdown(f"### 🏆 Ratified Verdict: `{v.verdict_type}`")
+            st.markdown(f"**📜 Golden Synthesis Principle**:\n\n> *\"{v.golden_synthesis_principle}\"*")
+            st.markdown(f"**⚙️ Concrete Operational Boundary Rule**:\n\n```python\n{v.concrete_boundary_rule}\n```")
+        with v_col2:
+            st.metric("Council Confidence", f"{v.confidence * 100:.0f}%", delta="Unanimous" if v.unanimous_vote else "Majority")
+            st.metric("Debate Rounds", len(cc.debate_rounds))
+
+        st.markdown("---")
+
+        # Council Agent Personas
+        st.markdown("### 👥 Participating Council Agents")
+        ag_cols = st.columns(len(cc.participating_agents))
+        for idx, ag in enumerate(cc.participating_agents):
+            with ag_cols[idx]:
+                st.markdown(f"**{ag['name']}**")
+                st.caption(f"🎓 *{ag['title']}*")
+                st.write(f"**Analytical Lens**: {ag['focus']}")
+
+        st.markdown("---")
+
+        # Debate Rounds Transcript
+        st.markdown("### 🎙️ Formal Deliberation Transcript")
+        for r in cc.debate_rounds:
+            with st.expander(f"Round {r.round_number}: {r.round_theme}", expanded=(r.round_number == 3)):
+                for t in r.turns:
+                    badge_color = "#3B82F6" if "Skeptic" in t.persona_title else ("#8B5CF6" if "Purist" in t.persona_title else "#10B981")
+                    st.markdown(f"<div style='border-left: 3px solid {badge_color}; padding-left: 12px; margin-bottom: 12px;'>"
+                                f"<strong>{t.speaker_name}</strong> <span style='color: #94A3B8;'>({t.persona_title} - <em>{t.turn_type}</em>)</span>"
+                                f"<p style='margin-top: 6px; color: #E2E8F0;'>{t.content}</p>"
+                                f"<small style='color: #64748B;'>Referenced Papers: {', '.join(t.cited_papers) if t.cited_papers else 'General Theory'}</small>"
+                                f"</div>", unsafe_allow_html=True)
+    else:
+        st.info("Consensus council deliberation data is not available.")
+
+
+# ----------------- TAB: CONFERENCE PEER REVIEW AUDIT -----------------
+with tab_peer_review:
+    st.subheader("🎓 Conference Peer Review & Soundness Audit (NeurIPS / ICLR Style)")
+    st.caption("Rigorous meta-review evaluating empirical soundness, presentation fidelity, baseline completeness, and reproducibility.")
+
+    if report.peer_review:
+        pr = report.peer_review
+        sc = pr.score_card
+
+        # Scorecard Row
+        sc1, sc2, sc3, sc4, sc5 = st.columns(5)
+        sc1.metric("Soundness", f"{sc.soundness_score} / 5", help="Empirical grounding & entailment validity")
+        sc2.metric("Presentation", f"{sc.presentation_score} / 5", help="Clarity & structure")
+        sc3.metric("Contribution", f"{sc.contribution_score} / 5", help="Novelty & contradiction attribution")
+        sc4.metric("Recommendation", f"{sc.overall_recommendation} / 10", delta=sc.recommendation_label)
+        sc5.metric("Reviewer Confidence", f"{sc.confidence_score} / 5", help="Evidence thoroughness")
+
+        st.info(f"**Review Executive Summary**: {pr.literature_summary}")
+
+        # Strengths & Weaknesses
+        c_str, c_weak = st.columns(2)
+        with c_str:
+            st.markdown("### ✅ Verified Strengths")
+            for s in pr.strengths:
+                st.markdown(f"- 🟢 {s}")
+
+        with c_weak:
+            st.markdown("### ⚠️ Methodological Limitations & Weaknesses")
+            for w in pr.weaknesses:
+                st.markdown(f"- 🟡 {w}")
+
+        st.markdown("---")
+
+        # Questions for Authors & Missing Baselines
+        c_q, c_base = st.columns(2)
+        with c_q:
+            st.markdown("### ❓ Targeted Questions for Authors")
+            for q in pr.questions_for_authors:
+                st.markdown(f"- 💬 {q}")
+
+        with c_base:
+            st.markdown("### 🔍 Benchmark Baseline Checklist")
+            if pr.missing_baselines:
+                st.warning("Missing or under-evaluated baseline architectures:")
+                for b in pr.missing_baselines:
+                    st.markdown(f"- ❌ `{b}`")
+            else:
+                st.success("All gold-standard scientific baselines benchmarked.")
+
+        # Reproducibility & Ethics
+        st.markdown("### 🛡️ Reproducibility Checklist & Societal Implications")
+        st.json(pr.reproducibility_audit)
+        st.warning(f"**Ethical & Safety Implications**:\n{pr.ethical_and_societal_implications}")
+    else:
+        st.info("Peer review evaluation not available.")
+
+
 # ----------------- TAB 4: SCIENTIFIC HYPOTHESES & PROTOCOLS -----------------
 with tab_hypo:
+
     st.subheader("💡 Automated Scientific Hypotheses & Proposed Experimental Protocols")
     st.caption("AI-synthesized falsifiable research hypotheses designed to resolve literature tensions and empirical contradictions.")
 
@@ -445,8 +556,55 @@ with tab_rigor:
         st.info("Methodological rigor assessment not available.")
 
 
+# ----------------- TAB: BIBLIOMETRICS & CO-CITATION NETWORK -----------------
+with tab_biblio:
+    st.subheader("🌐 Bibliometric Co-Citation Network & PageRank Influence")
+    st.caption("Network analysis quantifying literature centrality, citation authority, and co-citation communities across the corpus.")
+
+    if report.bibliometrics:
+        bm = report.bibliometrics
+        b1, b2, b3, b4 = st.columns(4)
+        b1.metric("Papers Analyzed", bm.total_papers_analyzed)
+        b2.metric("Network Density", f"{bm.graph_density:.3f}", help="Connectivity ratio of bibliometric graph")
+        b3.metric("Foundational Anchors", len(bm.foundational_anchors), help="Core seminal literature")
+        b4.metric("Methodological Bridges", len(bm.methodological_bridges), help="Works linking diverse sub-disciplines")
+
+        st.markdown("### 🏆 Literature Authority & Impact Tiers")
+        df_bm = pd.DataFrame([m.model_dump() for m in bm.paper_metrics])
+
+        fig_pr = px.scatter(
+            df_bm,
+            x="pagerank_centrality",
+            y="citation_degree",
+            size="co_citation_strength",
+            color="impact_tier",
+            hover_name="paper_title",
+            text="paper_id",
+            title="PageRank Influence vs Citation Degree Centrality",
+            labels={"pagerank_centrality": "PageRank Centrality", "citation_degree": "Degree Centrality"},
+            color_discrete_map={
+                "Foundational Anchor": "#10B981",
+                "Methodological Bridge": "#3B82F6",
+                "Specialized Frontier": "#F59E0B",
+            }
+        )
+        fig_pr.update_traces(textposition="top center")
+        fig_pr.update_layout(paper_bgcolor="rgba(15, 23, 42, 0.8)", plot_bgcolor="rgba(15, 23, 42, 0.8)", font=dict(color="#E2E8F0"))
+        st.plotly_chart(fig_pr, use_container_width=True)
+
+        st.markdown("### 📋 Bibliometric Authority Leaderboard")
+        st.dataframe(df_bm[["paper_id", "year", "impact_tier", "pagerank_centrality", "citation_degree", "inbound_claim_links", "paper_title"]], use_container_width=True)
+
+        st.markdown("### 🔬 Co-Citation Sub-Discipline Clusters")
+        for cl_name, cl_papers in bm.co_citation_clusters.items():
+            st.markdown(f"- **{cl_name}**: `{', '.join(cl_papers)}`")
+    else:
+        st.info("Bibliometric network analysis not available.")
+
+
 # ----------------- TAB 7: SANKEY EVIDENCE FLOW -----------------
 with tab_sankey:
+
     st.subheader("🔀 Multi-Stage Literature Verification Flow (Sankey)")
     st.caption("Traceability flow: Research Query ➔ Extracted Claims ➔ Supporting/Contradicting Papers ➔ Final Verification Consensus.")
 
@@ -569,7 +727,51 @@ with tab_robustness:
         st.info("Robustness analysis not available.")
 
 
+# ----------------- TAB: ACADEMIC PRESENTATION SLIDE DECK -----------------
+with tab_slides:
+    st.subheader("🖥️ Academic Presentation Slide Deck Studio")
+    st.caption("Auto-generated, publication-grade academic slide deck in interactive HTML and Marp Markdown formats.")
+
+    if report.slide_deck:
+        sd = report.slide_deck
+        st.info(f"**Presentation Title**: {sd.deck_title} ({sd.total_slides} Slides Generated)")
+
+        col_s_down1, col_s_down2, _ = st.columns([1, 1, 2])
+        with col_s_down1:
+            st.download_button(
+                label="⬇️ Download Interactive HTML Slides",
+                data=sd.html_deck,
+                file_name="presentation_slides.html",
+                mime="text/html",
+                use_container_width=True,
+            )
+        with col_s_down2:
+            st.download_button(
+                label="⬇️ Download Marp Markdown Slides",
+                data=sd.marp_markdown,
+                file_name="presentation_slides.marp.md",
+                mime="text/markdown",
+                use_container_width=True,
+            )
+
+        st.markdown("### 🎴 Slide Index & Outline Preview")
+        for s in sd.slides:
+            with st.expander(f"Slide {s.slide_id}: {s.title} ({s.accent_badge or s.layout_type})"):
+                if s.subtitle:
+                    st.caption(f"*{s.subtitle}*")
+                for b in s.bullets:
+                    st.markdown(f"- {b}")
+                if s.highlight_metric:
+                    st.metric(s.highlight_metric.get("label", ""), s.highlight_metric.get("value", ""))
+
+        st.markdown("### 🌐 Live Interactive Slide Deck Embed")
+        st.components.v1.html(sd.html_deck, height=580, scrolling=True)
+    else:
+        st.info("Slide deck generation not available.")
+
+
 # ----------------- TAB 7: LIVE ARXIV INGESTION -----------------
+
 with tab_arxiv:
     st.subheader("🌐 Live ArXiv Scientific Retrieval & On-the-Fly Ingestion")
     st.caption("Search recent research from ArXiv and index papers into the active retrieval pipeline with one click.")

@@ -2,6 +2,14 @@ from src.claims.extractor import ClaimExtractor
 from src.claims.normalizer import ClaimNormalizer
 from src.claims.claim_graph import EvidenceGraphBuilder
 from src.claims.graph_visualizer import EvidenceGraphVisualizer
+from src.claims.citation_network import BibliometricNetworkAnalyzer
 
-__all__ = ["ClaimExtractor", "ClaimNormalizer", "EvidenceGraphBuilder", "EvidenceGraphVisualizer"]
+__all__ = [
+    "ClaimExtractor",
+    "ClaimNormalizer",
+    "EvidenceGraphBuilder",
+    "EvidenceGraphVisualizer",
+    "BibliometricNetworkAnalyzer",
+]
+
 

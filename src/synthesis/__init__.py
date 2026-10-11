@@ -4,6 +4,8 @@ from src.synthesis.report_generator import ReportGenerator
 from src.synthesis.meta_analysis import EmpiricalMetaAnalysisEngine
 from src.synthesis.latex_exporter import LatexExporter
 from src.synthesis.hypothesis_generator import ScientificHypothesisGenerator
+from src.synthesis.peer_review import ScientificPeerReviewer
+from src.synthesis.slide_generator import SlideDeckGenerator
 
 __all__ = [
     "EvidenceSynthesizer",
@@ -12,6 +14,9 @@ __all__ = [
     "EmpiricalMetaAnalysisEngine",
     "LatexExporter",
     "ScientificHypothesisGenerator",
+    "ScientificPeerReviewer",
+    "SlideDeckGenerator",
 ]
+
 
 

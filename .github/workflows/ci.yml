@@ -37,6 +37,7 @@ jobs:
         python main.py --benchmark
         python main.py --benchmark-ir
 
-    - name: Validate LaTeX & HTML Publication Export
+    - name: Validate LaTeX, HTML & Slide Deck Publication Export
       run: |
-        python main.py --query "What are the limitations of Vision Transformers for low-light object detection?" --iterative --hypotheses --rigor --export-latex --export-html --export-sankey
+        python main.py --query "What are the limitations of Vision Transformers for low-light object detection?" --iterative --hypotheses --rigor --peer-review --debate-council --bibliometrics --export-latex --export-html --export-sankey --export-slides
+

@@ -47,8 +47,8 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(
     title="EvidenceFirst-RAG API",
-    description="RESTful API for Claim-Level Evidence Verification, Contradiction Attribution, and Empirical Synthesis",
-    version="0.2.0",
+    description="RESTful API for Claim-Level Evidence Verification, Contradiction Attribution, Multi-Agent Deliberation, and Conference Meta-Review",
+    version="0.3.0",
     lifespan=lifespan,
 )
 
@@ -79,7 +79,7 @@ def health_check():
     return {
         "status": "healthy",
         "service": "EvidenceFirst-RAG",
-        "version": "0.2.0",
+        "version": "0.3.0",
         "indexed_papers_count": len(pipeline_instance.indexed_papers),
         "indexed_chunks_count": len(pipeline_instance.indexed_chunks),
     }
@@ -96,7 +96,6 @@ def analyze_query(req: QueryRequest):
 
     pipeline_instance.hybrid.alpha = req.alpha
     report = pipeline_instance.run(req.query)
-
 
     return {
         "query": report.query,
@@ -138,7 +137,12 @@ def analyze_query(req: QueryRequest):
         "hypotheses": [h.model_dump() for h in report.hypotheses],
         "verification_trajectory": report.verification_trajectory.model_dump() if report.verification_trajectory else None,
         "rigor_report": report.rigor_report.model_dump() if report.rigor_report else None,
+        "peer_review": report.peer_review.model_dump() if report.peer_review else None,
+        "consensus_council": report.consensus_council.model_dump() if report.consensus_council else None,
+        "bibliometrics": report.bibliometrics.model_dump() if report.bibliometrics else None,
+        "slide_deck": report.slide_deck.model_dump() if report.slide_deck else None,
     }
+
 
 
 
@@ -389,5 +393,98 @@ def export_network_visualization(req: QueryRequest):
         "edges_count": len(report.evidence_graph.edges),
         "html_code": html_code,
     }
+
+
+@app.post("/api/v1/review/peer-review", tags=["Peer Review"])
+def run_peer_review(req: QueryRequest):
+    """Conduct formal NeurIPS / ICLR conference-grade peer review and soundness audit."""
+    if not pipeline_instance:
+        raise HTTPException(status_code=503, detail="Pipeline not initialized")
+
+    if req.domain:
+        pipeline_instance.filter_by_domain(req.domain)
+
+    report = pipeline_instance.run(req.query)
+    review = pipeline_instance.peer_reviewer.review_synthesis(report, pipeline_instance.indexed_papers)
+    return {
+        "query": req.query,
+        "conference_venue": review.conference_venue,
+        "score_card": review.score_card.model_dump(),
+        "literature_summary": review.literature_summary,
+        "strengths": review.strengths,
+        "weaknesses": review.weaknesses,
+        "questions_for_authors": review.questions_for_authors,
+        "missing_baselines": review.missing_baselines,
+        "reproducibility_audit": review.reproducibility_audit,
+        "ethical_and_societal_implications": review.ethical_and_societal_implications,
+    }
+
+
+@app.post("/api/v1/council/deliberate", tags=["Consensus Council"])
+def deliberate_consensus_council(req: QueryRequest):
+    """Convene 3-agent scientific debate council (Empirical Skeptic, Methodological Purist, Theoretical Synthesizer) to resolve contradictions."""
+    if not pipeline_instance:
+        raise HTTPException(status_code=503, detail="Pipeline not initialized")
+
+    if req.domain:
+        pipeline_instance.filter_by_domain(req.domain)
+
+    report = pipeline_instance.run(req.query)
+    council = pipeline_instance.consensus_council.deliberate(
+        query=req.query,
+        conflicts=report.conflicting_findings,
+        claims=report.claims,
+    )
+    return {
+        "query": req.query,
+        "council_topic": council.council_topic,
+        "participating_agents": council.participating_agents,
+        "debate_rounds": [r.model_dump() for r in council.debate_rounds],
+        "verdict": council.verdict.model_dump(),
+        "council_summary": council.council_summary,
+    }
+
+
+@app.get("/api/v1/network/bibliometrics", tags=["Bibliometrics"])
+@app.post("/api/v1/network/bibliometrics", tags=["Bibliometrics"])
+def get_bibliometrics_network(req: Optional[QueryRequest] = None):
+    """Compute PageRank centrality, impact tiers, and co-citation clusters across the indexed corpus."""
+    if not pipeline_instance:
+        raise HTTPException(status_code=503, detail="Pipeline not initialized")
+
+    claims = []
+    if req and req.query:
+        if req.domain:
+            pipeline_instance.filter_by_domain(req.domain)
+        report = pipeline_instance.run(req.query)
+        claims = report.claims
+
+    biblio = pipeline_instance.bibliometric_analyzer.analyze_network(
+        papers=pipeline_instance.indexed_papers,
+        claims=claims,
+    )
+    return biblio.model_dump()
+
+
+@app.post("/api/v1/export/slides", tags=["Export"])
+def export_slide_deck(req: QueryRequest):
+    """Generate academic slide deck in interactive HTML and Marp Markdown formats."""
+    if not pipeline_instance:
+        raise HTTPException(status_code=503, detail="Pipeline not initialized")
+
+    if req.domain:
+        pipeline_instance.filter_by_domain(req.domain)
+
+    report = pipeline_instance.run(req.query)
+    deck = pipeline_instance.slide_generator.build_slide_deck(report)
+    return {
+        "query": req.query,
+        "deck_title": deck.deck_title,
+        "total_slides": deck.total_slides,
+        "slides": [s.model_dump() for s in deck.slides],
+        "html_deck": deck.html_deck,
+        "marp_markdown": deck.marp_markdown,
+    }
+
 
 

@@ -66,6 +66,25 @@ Generates publication-grade standalone interactive visualizers:
 - **Plotly Sankey Flow**: Traces literature flow from Query $\to$ Extracted Claims $\to$ Evidence Studies $\to$ Final Verification Consensus.
 - **Vis.js Physics Network**: Interactive force-directed topology highlighting entailment (green) and academic contradiction (red dashed) edges.
 
+### 15. Conference Peer Review & Soundness Audit (NeurIPS / ICLR Style)
+Automated conference-grade meta-review engine scoring technical soundness (1-5), presentation fidelity (1-5), novelty/contribution (1-5), and overall conference recommendation (1-10: *Strong Accept (Oral)* to *Reject*). Formulates explicit strengths, weaknesses, targeted questions for authors, missing baseline architectures, and reproducibility checklist audits.
+
+### 16. Multi-Agent Scientific Consensus Council (Debate Deliberation)
+When academic contradictions arise, a 3-agent scientific council convenes:
+- **Dr. Sophia Vance (Empirical Skeptic)**: Scrutinizes sensor shot noise, dataset lux disparity, and sample size.
+- **Prof. Julian Hayes (Methodological Purist)**: Audits metric protocol distortions (mAP@0.5 vs strict mAP@0.5:0.95) and hyperparameter fairness.
+- **Dr. Marcus Sterling (Theoretical Synthesizer)**: Reconciles empirical tensions into unified regime boundaries.
+The Council engages in 3 rounds of structured debate and issues a signed, ratified **Consensus Resolution Verdict** with concrete operational boundary rules.
+
+### 17. Bibliometric Co-Citation Network & PageRank Influence
+Constructs NetworkX-powered citation and co-citation graph over active literature, computing PageRank centrality, degree metrics, and clustering papers into distinct impact tiers: *Foundational Anchors*, *Methodological Bridges*, and *Specialized Frontiers*.
+
+### 18. Publication Slide Deck Generator (Interactive HTML & Marp Markdown)
+Automatically transforms synthesized claims, contradictions, and council verdicts into publication-ready presentation decks:
+- **Interactive Glassmorphism HTML Deck**: Standalone presentation with keyboard controls, slide progress bar, fullscreen toggle, and print-to-PDF styles.
+- **Marp Markdown Deck**: Standardized academic slide format ready for VS Code / CLI slide compilation.
+
+
 ---
 
 
@@ -204,8 +223,21 @@ python main.py --query "What are the limitations of Vision Transformers for low-
   --export-network
 ```
 
-### 10. Launch Interactive Research Dashboard
-Launch the Streamlit Research Analysis Dashboard with **14 interactive tabs**:
+### 10. Peer Review, Multi-Agent Debate Council, Bibliometrics & Slide Deck Export (v3.0)
+Execute conference-grade peer review, 3-agent scientific consensus debate, co-citation bibliometric analysis, and generate interactive presentation slides:
+```bash
+python main.py --query "What are the limitations of Vision Transformers for low-light object detection?" \
+  --peer-review \
+  --debate-council \
+  --bibliometrics \
+  --export-slides
+```
+Outputs:
+- Interactive HTML Presentation Deck: `data/presentation_slides.html`
+- Academic Marp Markdown Slides: `data/presentation_slides.marp.md`
+
+### 11. Launch Interactive Research Dashboard
+Launch the Streamlit Research Analysis Dashboard with **18 interactive tabs**:
 ```bash
 streamlit run app/streamlit_app.py
 ```
@@ -213,17 +245,22 @@ Tabs include:
 1. 📑 Executive Literature Synthesis
 2. 🔍 Claim-Level Evidence Inspector
 3. ⚡ Contradiction Attribution Engine
-4. 💡 Automated Scientific Hypotheses & Protocols
-5. 🧬 Agentic Multi-Hop Verification Trajectory
-6. ⚖️ Methodological Rigor & Evidence Hierarchy
-7. 🔀 Multi-Stage Literature Sankey Flow
-8. 🕸️ Scientific Knowledge Graph (Plotly)
-9. 📊 Cross-Paper Empirical Meta-Analysis Matrix
-10. 🛡️ Robustness & Counterfactuals (ERI)
-11. 🌐 Live ArXiv Ingestion Engine
-12. 📄 Publication LaTeX & BibTeX Exporter
-13. 🛡️ Citation Faithfulness & Reliability Audit
-14. 📈 Architecture Ablation & IR Benchmarks
+4. 🏛️ Multi-Agent Debate Council
+5. 🎓 Conference Peer Review & Soundness Audit
+6. 💡 Automated Scientific Hypotheses & Protocols
+7. 🧬 Agentic Multi-Hop Verification Trajectory
+8. ⚖️ Methodological Rigor & Evidence Hierarchy
+9. 🌐 Bibliometrics & Co-Citation Network
+10. 🔀 Multi-Stage Literature Sankey Flow
+11. 🕸️ Scientific Knowledge Graph (Plotly)
+12. 📊 Cross-Paper Empirical Meta-Analysis Matrix
+13. 🛡️ Robustness & Counterfactuals (ERI)
+14. 🖥️ Academic Presentation Slide Deck
+15. 🌐 Live ArXiv Ingestion Engine
+16. 📄 Publication LaTeX & BibTeX Exporter
+17. 🛡️ Citation Faithfulness & Reliability Audit
+18. 📈 Architecture Ablation & IR Benchmarks
+
 
 ---
 
@@ -268,6 +305,8 @@ EvidenceFirst-RAG/
 │   ├── sample_papers/       # Multi-domain seed corpus (CV, NLP, Biomedical)
 │   ├── synthesis_paper.tex  # Exported LaTeX paper draft
 │   ├── references.bib       # Exported BibTeX citations
+│   ├── presentation_slides.html # Standalone interactive HTML presentation deck
+│   ├── presentation_slides.marp.md # Academic Marp Markdown presentation slides
 │   ├── synthesis_sankey.html# Standalone interactive Sankey diagram
 │   └── synthesis_network.html# Standalone interactive Physics Network Graph
 │
@@ -284,14 +323,18 @@ EvidenceFirst-RAG/
 │   ├── retrieval/           # BM25, Dense embeddings, Hybrid fusion, Cross-Encoder
 │   ├── claims/              # Atomic claim extractor, normalizer, NetworkX graph
 │   │   ├── claim_graph.py   # Multi-hop graph with community clustering
-│   │   └── graph_visualizer.py # Sankey & Vis.js network visualizers
+│   │   ├── graph_visualizer.py # Sankey & Vis.js network visualizers
+│   │   └── citation_network.py # Bibliometric co-citation & PageRank analyzer
 │   ├── verification/        # NLI entailment, contradiction engine, citation audit
+│   │   ├── consensus_council.py # Multi-agent scientific debate council
 │   │   ├── agentic_verifier.py # Iterative multi-hop counter-query verifier
 │   │   ├── rigor_analyzer.py# Methodological rigor & evidence hierarchy
 │   │   ├── robustness.py    # Counterfactual & leave-one-out robustness (ERI)
 │   │   ├── contradiction.py # Contradiction attribution engine
 │   │   └── citation_checker.py # ECS & CIS audit
 │   ├── synthesis/           # Evidence-grounded synthesizer, conflict attribution
+│   │   ├── peer_review.py   # Conference peer review & soundness auditor
+│   │   ├── slide_generator.py# Interactive HTML & Marp slide deck generator
 │   │   ├── hypothesis_generator.py # Automated scientific hypothesis synthesis
 │   │   ├── meta_analysis.py # Cross-paper empirical benchmark matrix
 │   │   ├── latex_exporter.py# LaTeX & BibTeX publication exporter
@@ -302,9 +345,10 @@ EvidenceFirst-RAG/
 │
 ├── app/
 │   ├── api.py               # FastAPI REST API server (Swagger /docs)
-│   └── streamlit_app.py     # 14-Tab Interactive Research Dashboard
+│   └── streamlit_app.py     # 18-Tab Interactive Research Dashboard
 │
-├── tests/                   # Pytest test suite (22 passing tests)
+├── tests/                   # Pytest test suite (28 passing tests)
+│   ├── test_v3_advanced.py  # Peer review, debate council, bibliometrics & slides
 │   ├── test_v2_advanced.py  # Agentic verification, hypotheses, rigor & visualizers
 │   ├── test_advanced.py     # ArXiv, Meta-Analysis, ERI, LaTeX & API tests
 │   ├── test_domain_corpus.py# Multi-domain & IR benchmark tests
@@ -314,7 +358,7 @@ EvidenceFirst-RAG/
 │   └── test_verification.py # Contradiction & citation auditor tests
 │
 ├── requirements.txt         # Dependencies
-└── main.py                  # CLI runner with v2.0 flags & exporters
+└── main.py                  # CLI runner with v3.0 flags & exporters
 ```
 
 

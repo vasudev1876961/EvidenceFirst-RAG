@@ -38,8 +38,13 @@ from src.synthesis.latex_exporter import LatexExporter
 from src.synthesis.hypothesis_generator import ScientificHypothesisGenerator
 from src.claims.graph_visualizer import EvidenceGraphVisualizer
 from src.ingestion.arxiv_fetcher import ArxivFetcher
+from src.synthesis.peer_review import ScientificPeerReviewer
+from src.verification.consensus_council import ScientificConsensusCouncil
+from src.claims.citation_network import BibliometricNetworkAnalyzer
+from src.synthesis.slide_generator import SlideDeckGenerator
 
 logger = logging.getLogger(__name__)
+
 
 
 class EvidenceFirstPipeline:
@@ -133,8 +138,13 @@ class EvidenceFirstPipeline:
         self.rigor_analyzer = MethodologyRigorAnalyzer()
         self.hypothesis_generator = ScientificHypothesisGenerator(llm_client=self.llm)
         self.graph_visualizer = EvidenceGraphVisualizer()
+        self.peer_reviewer = ScientificPeerReviewer(llm_client=self.llm)
+        self.consensus_council = ScientificConsensusCouncil(llm_client=self.llm)
+        self.bibliometric_analyzer = BibliometricNetworkAnalyzer()
+        self.slide_generator = SlideDeckGenerator()
 
         # State
+
         self.indexed_papers: List[Paper] = []
         self.indexed_chunks: List[SemanticChunk] = []
 
@@ -329,6 +339,25 @@ class EvidenceFirstPipeline:
         # Step 17: Interactive Sankey Diagram Data
         report.sankey_data = self.graph_visualizer.build_sankey_data(report)
 
+        # Step 18: Bibliometric Co-Citation & PageRank Network
+        report.bibliometrics = self.bibliometric_analyzer.analyze_network(
+            papers=self.indexed_papers, claims=claims
+        )
+
+        # Step 19: Multi-Agent Scientific Consensus Council Deliberation
+        report.consensus_council = self.consensus_council.deliberate(
+            query=query, conflicts=conflicts, claims=claims
+        )
+
+        # Step 20: Conference Peer Review & Soundness Audit (NeurIPS / ICLR Style)
+        report.peer_review = self.peer_reviewer.review_synthesis(
+            report=report, papers=self.indexed_papers
+        )
+
+        # Step 21: Academic Presentation Slide Deck (Interactive HTML & Marp)
+        report.slide_deck = self.slide_generator.build_slide_deck(report)
+
         return report
+
 
 

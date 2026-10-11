@@ -115,12 +115,33 @@ def main():
         help="Export interactive Physics Network Graph to standalone HTML file",
     )
     parser.add_argument(
+        "--peer-review",
+        action="store_true",
+        help="Conduct formal NeurIPS / ICLR conference-grade peer review and soundness audit",
+    )
+    parser.add_argument(
+        "--debate-council",
+        action="store_true",
+        help="Convene 3-agent scientific consensus council to debate and resolve literature contradictions",
+    )
+    parser.add_argument(
+        "--bibliometrics",
+        action="store_true",
+        help="Compute PageRank centrality, impact tiers, and co-citation network metrics",
+    )
+    parser.add_argument(
+        "--export-slides",
+        action="store_true",
+        help="Export academic slide presentation to standalone HTML and Marp Markdown files",
+    )
+    parser.add_argument(
         "--serve-api",
         action="store_true",
         help="Launch the EvidenceFirst-RAG FastAPI REST server on port 8000",
     )
 
     args = parser.parse_args()
+
 
 
     # Serve API Mode
@@ -297,8 +318,78 @@ def main():
             f.write(network_html)
         print(f"🌐 Interactive Physics Network Graph exported to: {network_path}\n")
 
+    # Conference Peer Review & Soundness Audit
+    if args.peer_review and report.peer_review:
+        pr = report.peer_review
+        sc = pr.score_card
+        print("\n" + "=" * 80)
+        print(f"  🎓 Conference Peer Review & Soundness Audit ({pr.conference_venue})")
+        print("=" * 80)
+        print(f"Recommendation: {sc.recommendation_label} ({sc.overall_recommendation}/10) | Confidence: {sc.confidence_score}/5")
+        print(f"Scores: Soundness: {sc.soundness_score}/5 | Presentation: {sc.presentation_score}/5 | Contribution: {sc.contribution_score}/5\n")
+        print("✅ Core Strengths:")
+        for s in pr.strengths:
+            print(f"   • {s}")
+        print("\n⚠️ Identified Limitations & Weaknesses:")
+        for w in pr.weaknesses:
+            print(f"   • {w}")
+        print("\n❓ Targeted Questions for Authors:")
+        for q in pr.questions_for_authors:
+            print(f"   • {q}")
+        print("\n🔍 Missing Baseline Benchmarks:")
+        for b in pr.missing_baselines:
+            print(f"   • {b}")
+        print(f"\n🛡️ Ethical & Societal Implications:\n   {pr.ethical_and_societal_implications}")
+        print("=" * 80 + "\n")
+
+    # Multi-Agent Consensus Council
+    if args.debate_council and report.consensus_council:
+        cc = report.consensus_council
+        print("\n" + "=" * 80)
+        print("  🏛️ Multi-Agent Scientific Consensus Council Deliberation")
+        print("=" * 80)
+        print(f"Topic: {cc.council_topic}\n")
+        for r in cc.debate_rounds:
+            print(f"--- Round {r.round_number}: {r.round_theme} ---")
+            for t in r.turns:
+                print(f"[{t.speaker_name} - {t.persona_title}]:")
+                print(f"   {t.content}\n")
+        print("=" * 80)
+        print(f"🏆 COUNCIL VERDICT: {cc.verdict.verdict_type} (Confidence: {cc.verdict.confidence * 100:.0f}%)")
+        print(f"📜 Golden Synthesis Principle:\n   \"{cc.verdict.golden_synthesis_principle}\"")
+        print(f"⚙️ Operational Boundary Rule:\n   \"{cc.verdict.concrete_boundary_rule}\"")
+        print("=" * 80 + "\n")
+
+    # Bibliometrics & Co-Citation Network
+    if args.bibliometrics and report.bibliometrics:
+        bm = report.bibliometrics
+        print("\n" + "=" * 80)
+        print("  🌐 Bibliometric Co-Citation & PageRank Network Analysis")
+        print("=" * 80)
+        print(f"Papers Analyzed: {bm.total_papers_analyzed} | Graph Density: {bm.graph_density:.4f}")
+        print(f"Foundational Anchors:   {', '.join(bm.foundational_anchors)}")
+        print(f"Methodological Bridges: {', '.join(bm.methodological_bridges)}\n")
+        print(f"{'Paper ID':<12} | {'PageRank':<10} | {'Degree':<8} | {'Impact Tier':<22} | {'Title'}")
+        print("-" * 88)
+        for pm in bm.paper_metrics:
+            print(f"{pm.paper_id:<12} | {pm.pagerank_centrality:<10.4f} | {pm.citation_degree:<8} | {pm.impact_tier:<22} | {pm.paper_title[:32]}...")
+        print("=" * 80 + "\n")
+
+    # Academic Slide Deck Export Flag
+    if args.export_slides and report.slide_deck:
+        sd = report.slide_deck
+        html_slide_path = "data/presentation_slides.html"
+        marp_slide_path = "data/presentation_slides.marp.md"
+        with open(html_slide_path, "w", encoding="utf-8") as f:
+            f.write(sd.html_deck)
+        with open(marp_slide_path, "w", encoding="utf-8") as f:
+            f.write(sd.marp_markdown)
+        print(f"🖥️ Interactive HTML Presentation Deck exported to: {html_slide_path}")
+        print(f"📑 Marp Academic Markdown Slides exported to:    {marp_slide_path}\n")
+
 
 
 if __name__ == "__main__":
     main()
+
 

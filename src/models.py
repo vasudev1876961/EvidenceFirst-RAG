@@ -238,5 +238,113 @@ class SynthesisReport(BaseModel):
     hypotheses: List[ScientificHypothesis] = Field(default_factory=list)
     rigor_report: Optional[MethodologyRigorReport] = None
     sankey_data: Optional[Dict[str, Any]] = None
+    peer_review: Optional[PeerReviewReport] = None
+    consensus_council: Optional[ConsensusCouncilReport] = None
+    bibliometrics: Optional[BibliometricNetworkReport] = None
+    slide_deck: Optional[SlideDeckReport] = None
+
+
+# --- v3.0 Advanced Research Intelligence Schemas ---
+
+class PeerReviewScoreCard(BaseModel):
+    soundness_score: int = Field(default=4, ge=1, le=5, description="Technical soundness and empirical validity (1-5)")
+    presentation_score: int = Field(default=5, ge=1, le=5, description="Clarity, structure and rigor of exposition (1-5)")
+    contribution_score: int = Field(default=4, ge=1, le=5, description="Novelty and significance of scientific contributions (1-5)")
+    overall_recommendation: int = Field(default=8, ge=1, le=10, description="Overall conference recommendation (1-10: Strong Reject to Strong Accept)")
+    confidence_score: int = Field(default=5, ge=1, le=5, description="Reviewer confidence (1-5)")
+    recommendation_label: str = "Accept (Poster / Spotlight)"
+
+
+class PeerReviewReport(BaseModel):
+    conference_venue: str = "NeurIPS / ICLR Academic Review Track"
+    score_card: PeerReviewScoreCard = Field(default_factory=PeerReviewScoreCard)
+    literature_summary: str = ""
+    strengths: List[str] = Field(default_factory=list)
+    weaknesses: List[str] = Field(default_factory=list)
+    questions_for_authors: List[str] = Field(default_factory=list)
+    missing_baselines: List[str] = Field(default_factory=list)
+    reproducibility_audit: Dict[str, Any] = Field(default_factory=dict)
+    ethical_and_societal_implications: str = ""
+
+
+class DebateTurn(BaseModel):
+    speaker_id: str
+    speaker_name: str
+    persona_title: str
+    turn_type: Literal["opening", "critique", "counter_evidence", "synthesis"] = "opening"
+    content: str
+    cited_papers: List[str] = Field(default_factory=list)
+
+
+class DebateRound(BaseModel):
+    round_number: int
+    round_theme: str
+    turns: List[DebateTurn] = Field(default_factory=list)
+
+
+class ConsensusResolutionVerdict(BaseModel):
+    claim_id: str
+    target_statement: str
+    verdict_type: Literal[
+        "Conditional Consensus",
+        "Irreconcilable Empirical Discrepancy",
+        "Methodological Artifact",
+        "Distribution Shift Confirmed",
+        "Unsubstantiated Premise"
+    ] = "Conditional Consensus"
+    confidence: float = 0.90
+    golden_synthesis_principle: str = ""
+    concrete_boundary_rule: str = ""
+    unanimous_vote: bool = True
+    dissenting_opinions: List[str] = Field(default_factory=list)
+
+
+class ConsensusCouncilReport(BaseModel):
+    council_topic: str
+    active_claim_id: Optional[str] = None
+    participating_agents: List[Dict[str, str]] = Field(default_factory=list)
+    debate_rounds: List[DebateRound] = Field(default_factory=list)
+    verdict: ConsensusResolutionVerdict
+    council_summary: str = ""
+
+
+class BibliometricPaperMetric(BaseModel):
+    paper_id: str
+    paper_title: str
+    year: int
+    pagerank_centrality: float = 0.0
+    citation_degree: int = 0
+    co_citation_strength: float = 0.0
+    impact_tier: Literal["Foundational Anchor", "Methodological Bridge", "Specialized Frontier"] = "Foundational Anchor"
+    inbound_claim_links: int = 0
+    outbound_citation_links: int = 0
+
+
+class BibliometricNetworkReport(BaseModel):
+    total_papers_analyzed: int = 0
+    graph_density: float = 0.0
+    foundational_anchors: List[str] = Field(default_factory=list)
+    methodological_bridges: List[str] = Field(default_factory=list)
+    paper_metrics: List[BibliometricPaperMetric] = Field(default_factory=list)
+    co_citation_clusters: Dict[str, List[str]] = Field(default_factory=dict)
+
+
+class SlideItem(BaseModel):
+    slide_id: int
+    title: str
+    subtitle: Optional[str] = None
+    layout_type: Literal["title", "split", "metrics", "verdict", "table", "conclusion"] = "split"
+    bullets: List[str] = Field(default_factory=list)
+    highlight_metric: Optional[Dict[str, str]] = None
+    accent_badge: Optional[str] = None
+
+
+class SlideDeckReport(BaseModel):
+    deck_title: str
+    total_slides: int = 0
+    slides: List[SlideItem] = Field(default_factory=list)
+    html_deck: str = ""
+    marp_markdown: str = ""
+
 
 
