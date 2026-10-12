@@ -242,6 +242,10 @@ class SynthesisReport(BaseModel):
     consensus_council: Optional[ConsensusCouncilReport] = None
     bibliometrics: Optional[BibliometricNetworkReport] = None
     slide_deck: Optional[SlideDeckReport] = None
+    causal_dag: Optional[CausalDAGReport] = None
+    reproducibility: Optional[CorpusReproducibilityReport] = None
+    temporal_roadmap: Optional[TemporalRoadmapReport] = None
+    dossier: Optional[AutonomousResearchDossier] = None
 
 
 # --- v3.0 Advanced Research Intelligence Schemas ---
@@ -345,6 +349,116 @@ class SlideDeckReport(BaseModel):
     slides: List[SlideItem] = Field(default_factory=list)
     html_deck: str = ""
     marp_markdown: str = ""
+
+
+# --- v4.0 Autonomous Meta-Scientist & Research Frontier Schemas ---
+
+class CausalNode(BaseModel):
+    id: str
+    name: str
+    variable_type: Literal["treatment", "outcome", "mediator", "confounder", "moderator"] = "treatment"
+    description: str = ""
+    domain_entity: Optional[str] = None
+    observed_mean_impact: float = 0.0
+
+
+class CausalEdge(BaseModel):
+    source: str
+    target: str
+    relation_type: Literal["CAUSES", "MEDIATES", "CONFOUNDS", "MODERATES", "INHIBITS"] = "CAUSES"
+    effect_direction: Literal["POSITIVE", "NEGATIVE", "NON_LINEAR", "AMBIGUOUS"] = "POSITIVE"
+    causal_confidence: float = 0.85
+    do_intervention_effect: float = 0.75  # P(Y | do(X)) intervention effect
+    confounding_variables: List[str] = Field(default_factory=list)
+    supporting_papers: List[str] = Field(default_factory=list)
+    empirical_evidence_snippet: str = ""
+
+
+class CausalDAGReport(BaseModel):
+    target_query: str
+    nodes: List[CausalNode] = Field(default_factory=list)
+    edges: List[CausalEdge] = Field(default_factory=list)
+    overall_causal_soundness_score: float = 0.85
+    confounding_vulnerability_index: float = 0.25
+    spurious_correlations_detected: List[Dict[str, str]] = Field(default_factory=list)
+    interventional_insights: List[str] = Field(default_factory=list)
+    mermaid_diagram: str = ""
+
+
+class PaperReproducibilityAudit(BaseModel):
+    paper_id: str
+    paper_title: str
+    year: int
+    open_code_available: bool = True
+    open_code_url: Optional[str] = None
+    open_weights_available: bool = True
+    open_data_available: bool = True
+    hardware_documented: bool = True
+    gpu_tpu_footprint_hours: Optional[float] = None
+    random_seeds_reported: bool = True
+    error_bars_present: bool = True
+    statistical_significance_tested: bool = True
+    reproducibility_risk_score: float = 0.15  # 0.0 (perfect) to 1.0 (unreplicable)
+    open_science_grade: Literal["A", "B", "C", "D", "F"] = "A"
+    audit_notes: List[str] = Field(default_factory=list)
+
+
+class CorpusReproducibilityReport(BaseModel):
+    corpus_size: int = 0
+    mean_reproducibility_risk_index: float = 0.25  # 0.0 to 1.0
+    open_code_ratio: float = 0.80
+    open_data_ratio: float = 0.75
+    statistical_rigor_ratio: float = 0.70
+    overall_open_science_grade: Literal["A+", "A", "B", "C", "D", "F"] = "A"
+    paper_audits: List[PaperReproducibilityAudit] = Field(default_factory=list)
+    critical_reproducibility_bottlenecks: List[str] = Field(default_factory=list)
+    remediation_patch_protocol: List[str] = Field(default_factory=list)
+
+
+class TemporalTrendItem(BaseModel):
+    technology_or_paradigm: str
+    temporal_status: Literal["ACCELERATING_FRONTIER", "MATURE_CONSOLIDATING", "DECAYING_PARADIGM", "EMERGING_CHALLENGER"]
+    start_year: int
+    peak_or_current_year: int
+    velocity_score: float = 0.85  # rate of publication/claim acceleration
+    empirical_support_trend: str
+    key_contributing_papers: List[str] = Field(default_factory=list)
+
+
+class ResearchHorizonMilestone(BaseModel):
+    milestone_id: str
+    target_timeframe: Literal["0-6 Months (Near-Term)", "6-12 Months (Mid-Term)", "12-24 Months (Long-Term Frontier)"]
+    milestone_title: str
+    technical_objective: str
+    success_metric: str
+    strategic_grant_or_patent_relevance: str
+    recommended_methods: List[str] = Field(default_factory=list)
+
+
+class TemporalRoadmapReport(BaseModel):
+    analysis_domain: str
+    timespan_analyzed: str
+    paradigm_trends: List[TemporalTrendItem] = Field(default_factory=list)
+    decaying_approaches: List[str] = Field(default_factory=list)
+    emerging_frontiers: List[str] = Field(default_factory=list)
+    projected_milestones: List[ResearchHorizonMilestone] = Field(default_factory=list)
+    strategic_takeaways: List[str] = Field(default_factory=list)
+
+
+class AutonomousResearchDossier(BaseModel):
+    dossier_title: str
+    dossier_id: str
+    generated_timestamp: str
+    target_inquiry: str
+    executive_lead_summary: str
+    layman_public_briefing: str
+    technical_breakthrough_table: List[Dict[str, Any]] = Field(default_factory=list)
+    scientific_myths_debunked: List[Dict[str, str]] = Field(default_factory=list)
+    causal_and_reproducibility_verdict: str
+    two_year_actionable_mandate: List[str] = Field(default_factory=list)
+    html_dossier: str = ""
+    markdown_dossier: str = ""
+
 
 
 

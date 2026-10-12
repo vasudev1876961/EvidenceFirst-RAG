@@ -211,9 +211,13 @@ with m6:
 st.markdown("---")
 
 # Navigation Tabs
-tab_syn, tab_claims, tab_conflicts, tab_council, tab_peer_review, tab_hypo, tab_trajectory, tab_rigor, tab_biblio, tab_sankey, tab_graph, tab_empirical, tab_robustness, tab_slides, tab_arxiv, tab_latex, tab_audit, tab_ablation = st.tabs([
+tab_syn, tab_claims, tab_causal, tab_repro, tab_roadmap, tab_dossier, tab_conflicts, tab_council, tab_peer_review, tab_hypo, tab_trajectory, tab_rigor, tab_biblio, tab_sankey, tab_graph, tab_empirical, tab_robustness, tab_slides, tab_arxiv, tab_latex, tab_audit, tab_ablation = st.tabs([
     "📑 Executive Synthesis",
     "🔍 Claim-Level Evidence",
+    "🔮 Causal DAG Reasoning",
+    "🧪 Reproducibility & Open Science",
+    "⏳ Living Research Roadmap",
+    "📰 Research Dossier",
     "⚡ Contradiction Attribution",
     "🏛️ Debate Council",
     "🎓 Peer Review Audit",
@@ -300,6 +304,213 @@ with tab_claims:
                         st.json(ev.extracted_attributes)
         else:
             st.caption("No contradictory passages detected.")
+
+
+# ----------------- TAB: CAUSAL DAG & COUNTERFACTUAL REASONING -----------------
+with tab_causal:
+    st.subheader("🔮 Causal Directed Acyclic Graph (DAG) & Counterfactual Reasoning Engine")
+    st.caption("Distinguishing empirical causation from spurious correlation using Pearl's Do-Calculus.")
+
+    if report.causal_dag:
+        cd = report.causal_dag
+        c_m1, c_m2, c_m3, c_m4 = st.columns(4)
+        with c_m1:
+            st.metric("Causal Soundness", f"{cd.overall_causal_soundness_score * 100:.1f}%", help="Degree to which observed effects hold after controlling for confounders")
+        with c_m2:
+            st.metric("Confounding Vulnerability", f"{cd.confounding_vulnerability_index * 100:.1f}%", help="Sensitivity of literature claims to unadjusted environmental variables")
+        with c_m3:
+            st.metric("Causal Variables", len(cd.nodes))
+        with c_m4:
+            st.metric("Causal Directed Edges", len(cd.edges))
+
+        col_dag_left, col_dag_right = st.columns(2)
+        with col_dag_left:
+            st.markdown("#### 🏷️ Causal Variables & Nodes")
+            df_nodes = pd.DataFrame([{
+                "ID": n.id,
+                "Variable Name": n.name,
+                "Type": n.variable_type.upper(),
+                "Description": n.description,
+                "Impact": f"{n.observed_mean_impact:.2f}"
+            } for n in cd.nodes])
+            st.dataframe(df_nodes, use_container_width=True)
+
+        with col_dag_right:
+            st.markdown("#### 🎯 Do-Calculus Interventions $P(Y | do(X))$")
+            df_edges = pd.DataFrame([{
+                "Source (Cause)": e.source,
+                "Target (Effect)": e.target,
+                "Relation": e.relation_type,
+                "Direction": e.effect_direction,
+                "Intervention P(Y|do(X))": f"{e.do_intervention_effect:+.2f}",
+                "Confounders": ", ".join(e.confounding_variables) if e.confounding_variables else "Controlled"
+            } for e in cd.edges])
+            st.dataframe(df_edges, use_container_width=True)
+
+        if cd.spurious_correlations_detected:
+            st.markdown("#### ⚠️ Debunked Spurious Correlations")
+            for sp in cd.spurious_correlations_detected:
+                st.warning(f"**Apparent Correlation**: {sp['apparent_correlation']}\n\n**Causal Reality**: {sp['causal_reality']}\n\n*Confounder Identified*: `{sp['confounder_identified']}`")
+
+        st.markdown("#### 💡 Pearl's Do-Calculus Interventional Insights")
+        for ins in cd.interventional_insights:
+            st.markdown(f"- 🔬 {ins}")
+
+        with st.expander("Mermaid Causal DAG Source"):
+            st.code(cd.mermaid_diagram, language="mermaid")
+    else:
+        st.info("Causal DAG analysis not available for this query.")
+
+
+# ----------------- TAB: REPRODUCIBILITY & OPEN SCIENCE AUDIT -----------------
+with tab_repro:
+    st.subheader("🧪 Autonomous Open Science & Reproducibility Protocol Audit")
+    st.caption("Rigorous inspection of code artifacts, model weights, open benchmarks, seeds, and compute footprints.")
+
+    if report.reproducibility:
+        rp = report.reproducibility
+        r_col1, r_col2, r_col3, r_col4, r_col5 = st.columns(5)
+        with r_col1:
+            st.metric("Open Science Grade", rp.overall_open_science_grade)
+        with r_col2:
+            st.metric("Mean Risk Index (RRI)", f"{rp.mean_reproducibility_risk_index * 100:.1f}%")
+        with r_col3:
+            st.metric("Open Code Ratio", f"{rp.open_code_ratio * 100:.0f}%")
+        with r_col4:
+            st.metric("Open Data Ratio", f"{rp.open_data_ratio * 100:.0f}%")
+        with r_col5:
+            st.metric("Statistical Rigor", f"{rp.statistical_rigor_ratio * 100:.0f}%")
+
+        st.markdown("#### 📋 Paper-by-Paper Open Science Scorecard")
+        df_audits = pd.DataFrame([{
+            "Paper ID": pa.paper_id,
+            "Year": pa.year,
+            "Grade": pa.open_science_grade,
+            "Risk (RRI)": f"{pa.reproducibility_risk_score * 100:.0f}%",
+            "Open Code": "✅ Yes" if pa.open_code_available else "❌ No",
+            "Open Weights": "✅ Yes" if pa.open_weights_available else "❌ No",
+            "Open Data": "✅ Yes" if pa.open_data_available else "❌ No",
+            "GPU Hours": f"~{pa.gpu_tpu_footprint_hours:.0f}h" if pa.gpu_tpu_footprint_hours else "N/A",
+            "Seeds / Error": "✅ Yes" if pa.random_seeds_reported or pa.error_bars_present else "❌ Single Run",
+        } for pa in rp.paper_audits])
+        st.dataframe(df_audits, use_container_width=True)
+
+        col_bot, col_patch = st.columns(2)
+        with col_bot:
+            st.markdown("#### ⚠️ Identified Replicability Bottlenecks")
+            for b in rp.critical_reproducibility_bottlenecks:
+                st.markdown(f"- 🛑 {b}")
+        with col_patch:
+            st.markdown("#### 🛠️ Actionable Remediation Protocol Patches")
+            for pt in rp.remediation_patch_protocol:
+                st.markdown(f"- 🩹 {pt}")
+    else:
+        st.info("Reproducibility report not generated for this corpus.")
+
+
+# ----------------- TAB: LIVING RESEARCH ROADMAP & HORIZONS -----------------
+with tab_roadmap:
+    st.subheader("⏳ Living Research Roadmap & Temporal Horizons")
+    st.caption("Tracking multi-year paradigm velocity and forecasting 2-year experimental milestones.")
+
+    if report.temporal_roadmap:
+        rm = report.temporal_roadmap
+        st.info(f"Analyzed Literature Horizon: **{rm.timespan_analyzed}** across {len(report.references)} empirical studies.")
+
+        st.markdown("#### 🚀 Technology Paradigm Velocity & Acceleration")
+        df_trends = pd.DataFrame([{
+            "Paradigm / Technology": tr.technology_or_paradigm,
+            "Temporal Status": tr.temporal_status,
+            "Velocity": tr.velocity_score,
+            "Span": f"{tr.start_year}-{tr.peak_or_current_year}",
+            "Trend Trajectory": tr.empirical_support_trend
+        } for tr in rm.paradigm_trends])
+
+        fig_vel = px.bar(
+            df_trends,
+            x="Paradigm / Technology",
+            y="Velocity",
+            color="Temporal Status",
+            title="Scientific Paradigm Velocity Index (0.0 to 1.0)",
+            color_discrete_map={
+                "ACCELERATING_FRONTIER": "#10B981",
+                "MATURE_CONSOLIDATING": "#3B82F6",
+                "EMERGING_CHALLENGER": "#8B5CF6",
+                "DECAYING_PARADIGM": "#EF4444"
+            }
+        )
+        fig_vel.update_layout(paper_bgcolor="rgba(15, 23, 42, 0.8)", plot_bgcolor="rgba(15, 23, 42, 0.8)", font=dict(color="#E2E8F0"))
+        st.plotly_chart(fig_vel, use_container_width=True)
+
+        col_dec, col_fro = st.columns(2)
+        with col_dec:
+            st.markdown("#### 📉 Decaying Paradigms & Obsolete Approaches")
+            for d in rm.decaying_approaches:
+                st.markdown(f"- ❌ {d}")
+        with col_fro:
+            st.markdown("#### 📈 Accelerating Frontiers & Breakthrough Paradigms")
+            for f in rm.emerging_frontiers:
+                st.markdown(f"- 🚀 {f}")
+
+        st.markdown("#### 🗓️ Projected 2-Year Experimental Horizon Milestones")
+        for ms in rm.projected_milestones:
+            with st.expander(f"🎯 [{ms.milestone_id}] {ms.milestone_title} — {ms.target_timeframe}"):
+                st.write(f"**Technical Objective**: {ms.technical_objective}")
+                st.write(f"**Measurable Success Metric**: `{ms.success_metric}`")
+                st.write(f"**Strategic Grant / Patent Impact**: {ms.strategic_grant_or_patent_relevance}")
+                st.write(f"**Recommended Methodologies**: {', '.join(ms.recommended_methods)}")
+    else:
+        st.info("Temporal roadmap report not generated.")
+
+
+# ----------------- TAB: AUTONOMOUS RESEARCH DOSSIER -----------------
+with tab_dossier:
+    st.subheader("📰 Official Autonomous Research Dossier & Press Briefing")
+    st.caption("Publication-grade executive briefing, layman translation, and strategic policy mandates.")
+
+    if report.dossier:
+        ds = report.dossier
+        d_col1, d_col2 = st.columns([3, 1])
+        with d_col1:
+            st.markdown(f"### {ds.dossier_title}")
+            st.caption(f"ID: `{ds.dossier_id}` | Generated: {ds.generated_timestamp}")
+        with d_col2:
+            st.download_button(
+                "📥 Download HTML Dossier",
+                data=ds.html_dossier,
+                file_name="research_dossier.html",
+                mime="text/html",
+                use_container_width=True
+            )
+            st.download_button(
+                "📄 Download Markdown Dossier",
+                data=ds.markdown_dossier,
+                file_name="research_dossier.md",
+                mime="text/markdown",
+                use_container_width=True
+            )
+
+        st.markdown("#### 📑 1. Executive Summary")
+        st.info(ds.executive_lead_summary)
+
+        st.markdown("#### 📢 2. Plain-Language Public & Policy Briefing")
+        st.write(ds.layman_public_briefing)
+
+        st.markdown("#### 🔬 3. Verified Technical Breakthroughs")
+        st.table(pd.DataFrame(ds.technical_breakthrough_table))
+
+        st.markdown("#### ⚡ 4. Scientific Misconceptions Debunked")
+        for m in ds.scientific_myths_debunked:
+            st.markdown(f"- ❌ **Myth**: *\"{m['myth']}\"*\n  - ✅ **Empirical Reality**: {m['reality']}")
+
+        st.markdown("#### 🚀 5. Two-Year Strategic Action Mandates")
+        for idx, mand in enumerate(ds.two_year_actionable_mandate):
+            st.markdown(f"**{idx+1}.** {mand}")
+
+        with st.expander("👁️ Preview Full Standalone HTML Dossier"):
+            st.components.v1.html(ds.html_dossier, height=600, scrolling=True)
+    else:
+        st.info("Dossier not yet compiled.")
 
 
 # ----------------- TAB 3: CONTRADICTION & CONFLICT ATTRIBUTION -----------------

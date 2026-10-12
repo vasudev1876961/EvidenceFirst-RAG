@@ -6,6 +6,8 @@ from src.synthesis.latex_exporter import LatexExporter
 from src.synthesis.hypothesis_generator import ScientificHypothesisGenerator
 from src.synthesis.peer_review import ScientificPeerReviewer
 from src.synthesis.slide_generator import SlideDeckGenerator
+from src.synthesis.temporal_roadmap import TemporalRoadmapEngine
+from src.synthesis.dossier_generator import DossierGenerator
 
 __all__ = [
     "EvidenceSynthesizer",
@@ -16,7 +18,10 @@ __all__ = [
     "ScientificHypothesisGenerator",
     "ScientificPeerReviewer",
     "SlideDeckGenerator",
+    "TemporalRoadmapEngine",
+    "DossierGenerator",
 ]
+
 
 
 

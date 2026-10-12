@@ -47,8 +47,8 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(
     title="EvidenceFirst-RAG API",
-    description="RESTful API for Claim-Level Evidence Verification, Contradiction Attribution, Multi-Agent Deliberation, and Conference Meta-Review",
-    version="0.3.0",
+    description="RESTful API for Claim-Level Evidence Verification, Causal DAG Reasoning, Reproducibility Auditing, Temporal Roadmaps, Multi-Agent Deliberation, and Research Dossiers",
+    version="0.4.0",
     lifespan=lifespan,
 )
 
@@ -485,6 +485,67 @@ def export_slide_deck(req: QueryRequest):
         "html_deck": deck.html_deck,
         "marp_markdown": deck.marp_markdown,
     }
+
+
+# --- v4.0 Autonomous Meta-Scientist Endpoints ---
+
+@app.post("/api/v1/causal/dag", tags=["Causal Reasoning"])
+def get_causal_dag(req: QueryRequest):
+    """Construct Causal Directed Acyclic Graph (DAG) with Do-Calculus interventional scoring."""
+    if not pipeline_instance:
+        raise HTTPException(status_code=503, detail="Pipeline not initialized")
+
+    if req.domain:
+        pipeline_instance.filter_by_domain(req.domain)
+
+    report = pipeline_instance.run(req.query)
+    return report.causal_dag.model_dump() if report.causal_dag else {}
+
+
+@app.get("/api/v1/audit/reproducibility", tags=["Reproducibility"])
+@app.post("/api/v1/audit/reproducibility", tags=["Reproducibility"])
+def audit_reproducibility(req: Optional[QueryRequest] = None):
+    """Conduct comprehensive Open Science and Statistical Reproducibility Audit across active corpus."""
+    if not pipeline_instance:
+        raise HTTPException(status_code=503, detail="Pipeline not initialized")
+
+    if req and req.domain:
+        pipeline_instance.filter_by_domain(req.domain)
+
+    repro_report = pipeline_instance.reproducibility_verifier.audit_corpus(
+        papers=pipeline_instance.indexed_papers
+    )
+    return repro_report.model_dump()
+
+
+@app.get("/api/v1/roadmap/temporal", tags=["Research Roadmap"])
+@app.post("/api/v1/roadmap/temporal", tags=["Research Roadmap"])
+def get_temporal_roadmap(req: Optional[QueryRequest] = None):
+    """Forecast living research milestones, paradigm decay, and frontier velocity."""
+    if not pipeline_instance:
+        raise HTTPException(status_code=503, detail="Pipeline not initialized")
+
+    query = req.query if req else "Vision Transformers for low-light object detection"
+    if req and req.domain:
+        pipeline_instance.filter_by_domain(req.domain)
+
+    report = pipeline_instance.run(query)
+    return report.temporal_roadmap.model_dump() if report.temporal_roadmap else {}
+
+
+@app.post("/api/v1/export/dossier", tags=["Export"])
+def export_research_dossier(req: QueryRequest):
+    """Generate official Autonomous Research Dossier & Press Briefing in HTML and Markdown formats."""
+    if not pipeline_instance:
+        raise HTTPException(status_code=503, detail="Pipeline not initialized")
+
+    if req.domain:
+        pipeline_instance.filter_by_domain(req.domain)
+
+    report = pipeline_instance.run(req.query)
+    dossier = pipeline_instance.dossier_generator.build_dossier(report)
+    return dossier.model_dump()
+
 
 
 

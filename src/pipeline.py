@@ -42,6 +42,10 @@ from src.synthesis.peer_review import ScientificPeerReviewer
 from src.verification.consensus_council import ScientificConsensusCouncil
 from src.claims.citation_network import BibliometricNetworkAnalyzer
 from src.synthesis.slide_generator import SlideDeckGenerator
+from src.claims.causal_graph import CausalGraphEngine
+from src.verification.reproducibility import ReproducibilityVerifier
+from src.synthesis.temporal_roadmap import TemporalRoadmapEngine
+from src.synthesis.dossier_generator import DossierGenerator
 
 logger = logging.getLogger(__name__)
 
@@ -142,6 +146,10 @@ class EvidenceFirstPipeline:
         self.consensus_council = ScientificConsensusCouncil(llm_client=self.llm)
         self.bibliometric_analyzer = BibliometricNetworkAnalyzer()
         self.slide_generator = SlideDeckGenerator()
+        self.causal_engine = CausalGraphEngine(llm_client=self.llm)
+        self.reproducibility_verifier = ReproducibilityVerifier()
+        self.temporal_roadmap_engine = TemporalRoadmapEngine()
+        self.dossier_generator = DossierGenerator()
 
         # State
 
@@ -356,6 +364,24 @@ class EvidenceFirstPipeline:
 
         # Step 21: Academic Presentation Slide Deck (Interactive HTML & Marp)
         report.slide_deck = self.slide_generator.build_slide_deck(report)
+
+        # Step 22: Causal Directed Acyclic Graph (DAG) & Do-Calculus Counterfactual Reasoning
+        report.causal_dag = self.causal_engine.build_causal_dag(
+            query=query, claims=claims, conflicts=conflicts, papers=self.indexed_papers
+        )
+
+        # Step 23: Autonomous Reproducibility & Open Science Protocol Audit
+        report.reproducibility = self.reproducibility_verifier.audit_corpus(
+            papers=self.indexed_papers
+        )
+
+        # Step 24: Temporal Knowledge Horizon & Living Research Roadmap
+        report.temporal_roadmap = self.temporal_roadmap_engine.build_roadmap(
+            query=query, papers=self.indexed_papers, claims=claims
+        )
+
+        # Step 25: Autonomous Research Dossier & Executive Press Briefing
+        report.dossier = self.dossier_generator.build_dossier(report)
 
         return report
 

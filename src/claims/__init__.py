@@ -3,6 +3,7 @@ from src.claims.normalizer import ClaimNormalizer
 from src.claims.claim_graph import EvidenceGraphBuilder
 from src.claims.graph_visualizer import EvidenceGraphVisualizer
 from src.claims.citation_network import BibliometricNetworkAnalyzer
+from src.claims.causal_graph import CausalGraphEngine
 
 __all__ = [
     "ClaimExtractor",
@@ -10,6 +11,8 @@ __all__ = [
     "EvidenceGraphBuilder",
     "EvidenceGraphVisualizer",
     "BibliometricNetworkAnalyzer",
+    "CausalGraphEngine",
 ]
+
 
 

@@ -84,6 +84,31 @@ Automatically transforms synthesized claims, contradictions, and council verdict
 - **Interactive Glassmorphism HTML Deck**: Standalone presentation with keyboard controls, slide progress bar, fullscreen toggle, and print-to-PDF styles.
 - **Marp Markdown Deck**: Standardized academic slide format ready for VS Code / CLI slide compilation.
 
+### 19. Causal Directed Acyclic Graph (DAG) & Counterfactual Do-Calculus Reasoning
+Distinguishes genuine empirical causality from spurious correlation in scientific claims:
+- **Pearl's Do-Calculus Interventional Scoring**: Computes $P(\text{Outcome} \mid do(\text{Treatment}))$ across observed confounding variables (e.g. sensor shot noise, dataset illuminance, hardware compute).
+- **Confounding Vulnerability Index**: Flags claims susceptible to environmental distribution shift.
+- **Spurious Correlation Debunker**: Uncovers hidden confounders explaining empirical discrepancies between published papers.
+- **Interactive Mermaid Causal Topology**: Renders directed causal networks separating treatments, mediators, outcomes, and confounders.
+
+### 20. Autonomous Open Science & Reproducibility Protocol Verifier
+Comprehensive inspection of literature artifacts and empirical replicability:
+- **Artifact Availability Audit**: Detects open GitHub source code, pre-trained weights (HuggingFace / PyTorch), and open dataset releases.
+- **Hardware & Carbon Footprint Transparency**: Estimates GPU/TPU hours consumed and training compute overhead.
+- **Statistical Rigor Checklist**: Verifies multi-seed testing ($N \ge 3$ seeds), variance / standard error bounds ($\pm \sigma$), and hypothesis significance tests ($p < 0.05$).
+- **Reproducibility Risk Index (RRI)**: Quantitative risk metric (0.0 to 1.0) and letter grades (A+ to F) with author-directed **Remediation Protocol Patches**.
+
+### 21. Temporal Knowledge Horizon & Living Research Roadmap
+Forecasts multi-year scientific trajectories ($2020 \to 2026+$):
+- **Paradigm Velocity Index**: Classifies technologies into *Accelerating Frontiers*, *Mature / Consolidating*, *Decaying Paradigms*, and *Emerging Challengers*.
+- **Decaying Paradigm Isolation**: Identifies obsolete research practices proven suboptimal on standardized benchmarks.
+- **2-Year Living Research Horizon**: Generates chronologically sequenced experimental milestones ($0-6\text{mo}$, $6-12\text{mo}$, $12-24\text{mo}$) with technical objectives, measurable success metrics, and strategic grant / patent relevance.
+
+### 22. Autonomous Research Dossier & Public Press Briefing Generator
+Synthesizes comprehensive meta-science findings into publication-ready executive documents:
+- **Interactive Glassmorphic HTML Dossier**: Responsive, standalone briefing with executive headlines, layman public translations, debunked myths, and policy mandates.
+- **Publication Markdown Dossier**: Ready for institutional press offices, research lab directors, and grant review committees.
+
 
 ---
 
@@ -236,30 +261,47 @@ Outputs:
 - Interactive HTML Presentation Deck: `data/presentation_slides.html`
 - Academic Marp Markdown Slides: `data/presentation_slides.marp.md`
 
-### 11. Launch Interactive Research Dashboard
-Launch the Streamlit Research Analysis Dashboard with **18 interactive tabs**:
+### 11. Causal DAG, Reproducibility Audit, Living Roadmap & Research Dossier (v4.0)
+Execute Pearl's Do-Calculus causal reasoning, open science reproducibility audit, 2-year living research horizon, and export official executive research dossiers:
+```bash
+python main.py --query "What are the limitations of Vision Transformers for low-light object detection?" \
+  --causal-dag \
+  --reproducibility \
+  --roadmap \
+  --export-dossier
+```
+Outputs:
+- Standalone Glassmorphic HTML Research Dossier: `data/research_dossier.html`
+- Publication Markdown Research Dossier: `data/research_dossier.md`
+
+### 12. Launch Interactive Research Dashboard
+Launch the Streamlit Research Analysis Dashboard with **22 interactive tabs**:
 ```bash
 streamlit run app/streamlit_app.py
 ```
 Tabs include:
 1. 📑 Executive Literature Synthesis
 2. 🔍 Claim-Level Evidence Inspector
-3. ⚡ Contradiction Attribution Engine
-4. 🏛️ Multi-Agent Debate Council
-5. 🎓 Conference Peer Review & Soundness Audit
-6. 💡 Automated Scientific Hypotheses & Protocols
-7. 🧬 Agentic Multi-Hop Verification Trajectory
-8. ⚖️ Methodological Rigor & Evidence Hierarchy
-9. 🌐 Bibliometrics & Co-Citation Network
-10. 🔀 Multi-Stage Literature Sankey Flow
-11. 🕸️ Scientific Knowledge Graph (Plotly)
-12. 📊 Cross-Paper Empirical Meta-Analysis Matrix
-13. 🛡️ Robustness & Counterfactuals (ERI)
-14. 🖥️ Academic Presentation Slide Deck
-15. 🌐 Live ArXiv Ingestion Engine
-16. 📄 Publication LaTeX & BibTeX Exporter
-17. 🛡️ Citation Faithfulness & Reliability Audit
-18. 📈 Architecture Ablation & IR Benchmarks
+3. 🔮 Causal DAG & Counterfactual Reasoning (v4.0)
+4. 🧪 Autonomous Reproducibility & Open Science Audit (v4.0)
+5. ⏳ Living Research Roadmap & Horizons (v4.0)
+6. 📰 Autonomous Research Dossier & Press Briefing (v4.0)
+7. ⚡ Contradiction Attribution Engine
+8. 🏛️ Multi-Agent Scientific Debate Council
+9. 🎓 Conference Peer Review & Soundness Audit
+10. 💡 Automated Scientific Hypotheses & Protocols
+11. 🧬 Agentic Multi-Hop Verification Trajectory
+12. ⚖️ Methodological Rigor & Evidence Hierarchy
+13. 🌐 Bibliometrics & Co-Citation Network
+14. 🔀 Multi-Stage Literature Sankey Flow
+15. 🕸️ Scientific Knowledge Graph (Plotly)
+16. 📊 Cross-Paper Empirical Meta-Analysis Matrix
+17. 🛡️ Robustness & Counterfactuals (ERI)
+18. 🖥️ Academic Presentation Slide Deck
+19. 🌐 Live ArXiv Ingestion Engine
+20. 📄 Publication LaTeX & BibTeX Exporter
+21. 🛡️ Citation Faithfulness & Reliability Audit
+22. 📈 Architecture Ablation & IR Benchmarks
 
 
 ---
@@ -303,6 +345,8 @@ EvidenceFirst-RAG/
 │   ├── raw/                 # Incoming PDF papers
 │   ├── processed/           # Parsed paper catalog
 │   ├── sample_papers/       # Multi-domain seed corpus (CV, NLP, Biomedical)
+│   ├── research_dossier.html # Official standalone glassmorphic research dossier
+│   ├── research_dossier.md  # Executive press release briefing in Markdown
 │   ├── synthesis_paper.tex  # Exported LaTeX paper draft
 │   ├── references.bib       # Exported BibTeX citations
 │   ├── presentation_slides.html # Standalone interactive HTML presentation deck
@@ -322,10 +366,12 @@ EvidenceFirst-RAG/
 │   ├── query/               # Query decomposer & BM25 keyword expander
 │   ├── retrieval/           # BM25, Dense embeddings, Hybrid fusion, Cross-Encoder
 │   ├── claims/              # Atomic claim extractor, normalizer, NetworkX graph
+│   │   ├── causal_graph.py  # Causal DAG & Pearl's Do-Calculus reasoning engine (v4.0)
 │   │   ├── claim_graph.py   # Multi-hop graph with community clustering
 │   │   ├── graph_visualizer.py # Sankey & Vis.js network visualizers
 │   │   └── citation_network.py # Bibliometric co-citation & PageRank analyzer
 │   ├── verification/        # NLI entailment, contradiction engine, citation audit
+│   │   ├── reproducibility.py # Open Science & Reproducibility Protocol Verifier (v4.0)
 │   │   ├── consensus_council.py # Multi-agent scientific debate council
 │   │   ├── agentic_verifier.py # Iterative multi-hop counter-query verifier
 │   │   ├── rigor_analyzer.py# Methodological rigor & evidence hierarchy
@@ -333,6 +379,8 @@ EvidenceFirst-RAG/
 │   │   ├── contradiction.py # Contradiction attribution engine
 │   │   └── citation_checker.py # ECS & CIS audit
 │   ├── synthesis/           # Evidence-grounded synthesizer, conflict attribution
+│   │   ├── temporal_roadmap.py # Temporal knowledge horizon & living roadmap (v4.0)
+│   │   ├── dossier_generator.py # Autonomous research dossier & press brief (v4.0)
 │   │   ├── peer_review.py   # Conference peer review & soundness auditor
 │   │   ├── slide_generator.py# Interactive HTML & Marp slide deck generator
 │   │   ├── hypothesis_generator.py # Automated scientific hypothesis synthesis
@@ -344,10 +392,11 @@ EvidenceFirst-RAG/
 │   └── pipeline.py          # Master orchestrator
 │
 ├── app/
-│   ├── api.py               # FastAPI REST API server (Swagger /docs)
-│   └── streamlit_app.py     # 18-Tab Interactive Research Dashboard
+│   ├── api.py               # FastAPI REST API server v0.4.0 (Swagger /docs)
+│   └── streamlit_app.py     # 22-Tab Interactive Research Dashboard
 │
-├── tests/                   # Pytest test suite (28 passing tests)
+├── tests/                   # Pytest test suite (35 passing tests)
+│   ├── test_v4_advanced.py  # Causal DAG, reproducibility, living roadmap & dossier
 │   ├── test_v3_advanced.py  # Peer review, debate council, bibliometrics & slides
 │   ├── test_v2_advanced.py  # Agentic verification, hypotheses, rigor & visualizers
 │   ├── test_advanced.py     # ArXiv, Meta-Analysis, ERI, LaTeX & API tests
@@ -358,7 +407,7 @@ EvidenceFirst-RAG/
 │   └── test_verification.py # Contradiction & citation auditor tests
 │
 ├── requirements.txt         # Dependencies
-└── main.py                  # CLI runner with v3.0 flags & exporters
+└── main.py                  # CLI runner with v4.0 flags & exporters
 ```
 
 

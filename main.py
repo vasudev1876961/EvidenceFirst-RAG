@@ -135,6 +135,26 @@ def main():
         help="Export academic slide presentation to standalone HTML and Marp Markdown files",
     )
     parser.add_argument(
+        "--causal-dag",
+        action="store_true",
+        help="Display Causal DAG nodes, confounding factors, and Do-Calculus intervention scores",
+    )
+    parser.add_argument(
+        "--reproducibility",
+        action="store_true",
+        help="Conduct comprehensive Open Science and Statistical Reproducibility Audit (RRI)",
+    )
+    parser.add_argument(
+        "--roadmap",
+        action="store_true",
+        help="Display Living Research Roadmap, paradigm decay, and 2-year projected milestones",
+    )
+    parser.add_argument(
+        "--export-dossier",
+        action="store_true",
+        help="Export Autonomous Research Dossier & Press Briefing to standalone HTML and Markdown",
+    )
+    parser.add_argument(
         "--serve-api",
         action="store_true",
         help="Launch the EvidenceFirst-RAG FastAPI REST server on port 8000",
@@ -386,6 +406,74 @@ def main():
             f.write(sd.marp_markdown)
         print(f"🖥️ Interactive HTML Presentation Deck exported to: {html_slide_path}")
         print(f"📑 Marp Academic Markdown Slides exported to:    {marp_slide_path}\n")
+
+    # Causal DAG Flag
+    if args.causal_dag and report.causal_dag:
+        cd = report.causal_dag
+        print("\n" + "=" * 80)
+        print("  🔮 Causal Directed Acyclic Graph (DAG) & Counterfactual Reasoning")
+        print("=" * 80)
+        print(f"Target Inquiry: {cd.target_query}")
+        print(f"Causal Soundness: {cd.overall_causal_soundness_score * 100:.1f}% | Confounding Vulnerability: {cd.confounding_vulnerability_index * 100:.1f}%\n")
+        print("Nodes Identified:")
+        for n in cd.nodes:
+            print(f"  • [{n.id}] {n.name} ({n.variable_type.upper()}) - {n.description}")
+        print("\nCausal Relationships & Do-Calculus Interventions:")
+        for e in cd.edges:
+            print(f"  • {e.source} --({e.relation_type} | {e.effect_direction})--> {e.target} [P(Y|do(X)): {e.do_intervention_effect:+.2f}]")
+        if cd.spurious_correlations_detected:
+            print("\n⚠️ Spurious Correlations Debunked:")
+            for sp in cd.spurious_correlations_detected:
+                print(f"  ❌ Apparent: {sp['apparent_correlation']}")
+                print(f"  ✅ Reality:  {sp['causal_reality']}\n")
+        print("=" * 80 + "\n")
+
+    # Reproducibility Audit Flag
+    if args.reproducibility and report.reproducibility:
+        rp = report.reproducibility
+        print("\n" + "=" * 80)
+        print("  🧪 Autonomous Open Science & Reproducibility Audit")
+        print("=" * 80)
+        print(f"Corpus Size: {rp.corpus_size} | Open Science Grade: {rp.overall_open_science_grade} | Mean Risk (RRI): {rp.mean_reproducibility_risk_index * 100:.1f}%")
+        print(f"Open Code Ratio: {rp.open_code_ratio * 100:.1f}% | Open Data Ratio: {rp.open_data_ratio * 100:.1f}% | Statistical Rigor: {rp.statistical_rigor_ratio * 100:.1f}%\n")
+        print(f"{'Paper ID':<12} | {'Grade':<6} | {'Risk (RRI)':<10} | {'Code':<6} | {'Data':<6} | {'Seeds/Error'}")
+        print("-" * 88)
+        for pa in rp.paper_audits:
+            print(f"{pa.paper_id:<12} | {pa.open_science_grade:<6} | {pa.reproducibility_risk_score * 100:>5.1f}%     | {'YES' if pa.open_code_available else 'NO':<6} | {'YES' if pa.open_data_available else 'NO':<6} | {'YES' if pa.random_seeds_reported or pa.error_bars_present else 'NO'}")
+        print("\nRemediation Protocol Patches:")
+        for pt in rp.remediation_patch_protocol:
+            print(f"  • {pt}")
+        print("=" * 80 + "\n")
+
+    # Living Research Roadmap Flag
+    if args.roadmap and report.temporal_roadmap:
+        rm = report.temporal_roadmap
+        print("\n" + "=" * 80)
+        print(f"  ⏳ Living Research Roadmap & Temporal Horizons ({rm.timespan_analyzed})")
+        print("=" * 80)
+        print("Paradigm Acceleration & Velocity:")
+        for tr in rm.paradigm_trends:
+            print(f"  • [{tr.temporal_status}] {tr.technology_or_paradigm} (Velocity: {tr.velocity_score * 100:.0f}%)")
+            print(f"    Trend: {tr.empirical_support_trend}")
+        print("\nProjected 2-Year Experimental Milestones:")
+        for ms in rm.projected_milestones:
+            print(f"  🚀 [{ms.milestone_id}] {ms.milestone_title} ({ms.target_timeframe})")
+            print(f"     Target:  {ms.technical_objective}")
+            print(f"     Metric:  {ms.success_metric}")
+        print("=" * 80 + "\n")
+
+    # Autonomous Research Dossier Export Flag
+    if args.export_dossier and report.dossier:
+        ds = report.dossier
+        html_dossier_path = "data/research_dossier.html"
+        md_dossier_path = "data/research_dossier.md"
+        with open(html_dossier_path, "w", encoding="utf-8") as f:
+            f.write(ds.html_dossier)
+        with open(md_dossier_path, "w", encoding="utf-8") as f:
+            f.write(ds.markdown_dossier)
+        print(f"📰 Autonomous Research Dossier HTML exported to: {html_dossier_path}")
+        print(f"📑 Autonomous Research Dossier MD exported to:   {md_dossier_path}\n")
+
 
 
 
