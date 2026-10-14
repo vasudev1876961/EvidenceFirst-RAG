@@ -155,6 +155,26 @@ def main():
         help="Export Autonomous Research Dossier & Press Briefing to standalone HTML and Markdown",
     )
     parser.add_argument(
+        "--in-silico-sim",
+        action="store_true",
+        help="Run In Silico Laboratory Experiment Simulator & Monte Carlo statistical power analysis",
+    )
+    parser.add_argument(
+        "--cross-domain",
+        action="store_true",
+        help="Discover isomorphic cross-domain analogies and architectural transfer blueprints",
+    )
+    parser.add_argument(
+        "--novelty-sentinel",
+        action="store_true",
+        help="Conduct Academic Novelty, Prior Art Collision, and Terminology Semantic Drift Audit",
+    )
+    parser.add_argument(
+        "--export-sim-lab",
+        action="store_true",
+        help="Export standalone interactive HTML In Silico Laboratory Simulator",
+    )
+    parser.add_argument(
         "--serve-api",
         action="store_true",
         help="Launch the EvidenceFirst-RAG FastAPI REST server on port 8000",
@@ -473,6 +493,68 @@ def main():
             f.write(ds.markdown_dossier)
         print(f"📰 Autonomous Research Dossier HTML exported to: {html_dossier_path}")
         print(f"📑 Autonomous Research Dossier MD exported to:   {md_dossier_path}\n")
+
+    # In Silico Simulator Flag
+    if args.in_silico_sim and report.in_silico_simulation:
+        sim = report.in_silico_simulation
+        print("\n" + "=" * 80)
+        print(f"  🧪 In Silico Laboratory Experiment Simulation [{sim.simulation_id}]")
+        print("=" * 80)
+        print(f"Target Hypothesis: {sim.target_hypothesis_title}")
+        print(f"Monte Carlo Trials: {sim.trials_count} | Projected Gain: +{sim.projected_net_gain_pct:.1f}%")
+        print(f"Baseline μ: {sim.mean_baseline_performance:.1f} mAP | Proposed μ: {sim.mean_simulated_performance:.1f} mAP (95% CI: [{sim.confidence_interval_95[0]} - {sim.confidence_interval_95[1]}])")
+        print(f"Statistical Power: {sim.power_analysis.statistical_power_achieved * 100:.1f}% (α = 0.05) | Cohen's d: {sim.power_analysis.cohens_d_effect_size:.2f} | Critical N: {sim.power_analysis.critical_sample_size_required}")
+        print("\nMulti-Hardware Scaling Estimates:")
+        for hw in sim.hardware_projections:
+            print(f"  • {hw.target_hardware:<30} | {hw.vram_required_gb:>4.1f} GB VRAM | {hw.throughput_samples_sec:>5.1f} samp/s | {hw.training_time_hours:>4.1f} hrs | ${hw.estimated_cost_usd:>5.2f}")
+        print("=" * 80 + "\n")
+
+    # Cross-Domain Analogy Flag
+    if args.cross_domain and report.cross_domain_transfer:
+        tr = report.cross_domain_transfer
+        print("\n" + "=" * 80)
+        print(f"  🌐 Interdisciplinary Cross-Domain Analogies ({tr.primary_domain})")
+        print("=" * 80)
+        print(f"Isomorphism Density Score: {tr.isomorphism_density_score * 100:.0f}%")
+        for ana in tr.analogies:
+            print(f"\n  ⚡ [{ana.analogy_id}] {ana.source_domain} → {ana.target_domain}")
+            print(f"     Isomorphic Challenge:   {ana.isomorphic_challenge}")
+            print(f"     Mathematical Form:      {ana.shared_mathematical_form}")
+            print(f"     Hybrid Architecture:    {ana.proposed_hybrid_architecture}")
+            print(f"     Novelty: {ana.novelty_score * 100:.0f}% | Feasibility: {ana.feasibility_score * 100:.0f}% | Projected Gain: {ana.expected_empirical_gain}")
+        print("=" * 80 + "\n")
+
+    # Novelty Sentinel Flag
+    if args.novelty_sentinel and report.novelty_sentinel:
+        ns = report.novelty_sentinel
+        print("\n" + "=" * 80)
+        print("  🛡️ Academic Novelty, Prior Art & Semantic Drift Sentinel")
+        print("=" * 80)
+        print(f"Novelty Index (NI): {ns.mean_novelty_index * 100:.0f}% | Verdict: {ns.overall_sentinel_verdict}\n")
+        print("Novelty Quadrant Distribution:")
+        for quad, count in ns.novelty_quadrant_distribution.items():
+            print(f"  • {quad:<55}: {count} items")
+        print("\nPrior Art Collision Defense:")
+        for col in ns.prior_art_collisions:
+            print(f"  • [{col.collision_id}] vs '{col.overlapping_paper_title}' (Similarity: {col.similarity_score * 100:.0f}%, Risk: {col.infringement_or_redundancy_risk})")
+            print(f"    Defense: {col.differentiation_argument}")
+        print("\nTerminology Semantic Drift Audit:")
+        for dr in ns.semantic_drift_records:
+            print(f"  • '{dr.term}': {dr.verdict} (Dilution Score: {dr.dilution_score * 100:.0f}%)")
+            print(f"    Recommendation: {dr.audit_recommendation}")
+        print("=" * 80 + "\n")
+
+    # Export In Silico Simulation Lab HTML Flag
+    if args.export_sim_lab and report.in_silico_simulation:
+        sim = report.in_silico_simulation
+        out_html = "data/in_silico_simulation_lab.html"
+        out_py = "data/in_silico_benchmark.py"
+        with open(out_html, "w", encoding="utf-8") as f:
+            f.write(sim.interactive_lab_html)
+        with open(out_py, "w", encoding="utf-8") as f:
+            f.write(sim.executable_python_benchmark)
+        print(f"🧪 In Silico Simulation Lab HTML exported to: {out_html}")
+        print(f"🐍 Standalone PyTorch Benchmark Harness saved to: {out_py}\n")
 
 
 

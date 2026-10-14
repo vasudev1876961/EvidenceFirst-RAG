@@ -47,8 +47,8 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(
     title="EvidenceFirst-RAG API",
-    description="RESTful API for Claim-Level Evidence Verification, Causal DAG Reasoning, Reproducibility Auditing, Temporal Roadmaps, Multi-Agent Deliberation, and Research Dossiers",
-    version="0.4.0",
+    description="RESTful API for Claim-Level Evidence Verification, In Silico Laboratory Experiment Simulation, Cross-Domain Analogy Transfer, Novelty & Semantic Drift Sentinel, Causal DAG Reasoning, Reproducibility Auditing, and Research Dossiers",
+    version="0.5.0",
     lifespan=lifespan,
 )
 
@@ -545,6 +545,105 @@ def export_research_dossier(req: QueryRequest):
     report = pipeline_instance.run(req.query)
     dossier = pipeline_instance.dossier_generator.build_dossier(report)
     return dossier.model_dump()
+
+
+# --- v5.0 Frontier Scientific Intelligence Endpoints ---
+
+class InSilicoSimulationRequest(BaseModel):
+    query: str = Field("Vision Transformers in low-light object detection", description="Target research query")
+    trials_count: int = Field(1000, ge=10, le=5000, description="Monte Carlo trials count")
+    domain: Optional[str] = Field(None, description="Domain filter")
+
+
+@app.post("/api/v1/simulation/in-silico", tags=["In Silico Laboratory Simulator"])
+def run_in_silico_simulation(req: InSilicoSimulationRequest):
+    """Execute prospective in silico empirical experiment simulation, Monte Carlo trials, and statistical power analysis."""
+    if not pipeline_instance:
+        raise HTTPException(status_code=503, detail="Pipeline not initialized")
+
+    if req.domain:
+        pipeline_instance.filter_by_domain(req.domain)
+
+    report = pipeline_instance.run(req.query)
+    top_hyp = report.hypotheses[0] if report.hypotheses else None
+
+    sim_report = pipeline_instance.in_silico_simulator.simulate(
+        query=req.query,
+        hypothesis=top_hyp,
+        claims=report.claims,
+        meta_analysis=report.meta_analysis,
+        trials_count=req.trials_count,
+    )
+    return sim_report.model_dump()
+
+
+@app.get("/api/v1/simulation/harness", tags=["In Silico Laboratory Simulator"])
+def get_simulation_harness():
+    """Download executable PyTorch benchmark simulation reproduction script."""
+    if not pipeline_instance:
+        raise HTTPException(status_code=503, detail="Pipeline not initialized")
+
+    sim_report = pipeline_instance.in_silico_simulator.simulate(
+        query="Vision Transformers in low-light object detection",
+        trials_count=100,
+    )
+    return {
+        "filename": "in_silico_benchmark.py",
+        "code": sim_report.executable_python_benchmark,
+    }
+
+
+@app.get("/api/v1/export/simulation-lab", tags=["Export"])
+def export_simulation_lab(query: str = "Vision Transformers in low-light object detection"):
+    """Export standalone interactive HTML In Silico Laboratory Simulator."""
+    if not pipeline_instance:
+        raise HTTPException(status_code=503, detail="Pipeline not initialized")
+
+    sim_report = pipeline_instance.in_silico_simulator.simulate(
+        query=query,
+        trials_count=1000,
+    )
+    return {
+        "query": query,
+        "interactive_lab_html": sim_report.interactive_lab_html,
+    }
+
+
+@app.post("/api/v1/transfer/cross-domain", tags=["Cross-Domain Analogies"])
+def discover_cross_domain_transfer(req: QueryRequest):
+    """Discover isomorphic structural patterns and interdisciplinary architectural transfer blueprints."""
+    if not pipeline_instance:
+        raise HTTPException(status_code=503, detail="Pipeline not initialized")
+
+    if req.domain:
+        pipeline_instance.filter_by_domain(req.domain)
+
+    report = pipeline_instance.run(req.query)
+    transfer_report = pipeline_instance.analogy_engine.discover_analogies(
+        query=req.query,
+        claims=report.claims,
+        hypotheses=report.hypotheses,
+    )
+    return transfer_report.model_dump()
+
+
+@app.post("/api/v1/audit/novelty", tags=["Novelty & Semantic Drift Sentinel"])
+def audit_novelty_and_drift(req: QueryRequest):
+    """Run academic novelty index, prior art collision detection, and terminology semantic drift audit."""
+    if not pipeline_instance:
+        raise HTTPException(status_code=503, detail="Pipeline not initialized")
+
+    if req.domain:
+        pipeline_instance.filter_by_domain(req.domain)
+
+    report = pipeline_instance.run(req.query)
+    sentinel_report = pipeline_instance.novelty_sentinel.audit_novelty(
+        query=req.query,
+        claims=report.claims,
+        hypotheses=report.hypotheses,
+        papers=pipeline_instance.indexed_papers,
+    )
+    return sentinel_report.model_dump()
 
 
 

@@ -1,6 +1,6 @@
 """EvidenceFirst-RAG: Claim-Level Evidence Verification and Contradiction-Aware RAG for Scientific Literature."""
 
-__version__ = "0.4.0"
+__version__ = "0.5.0"
 
 from src.pipeline import EvidenceFirstPipeline
 from src.models import (
@@ -15,6 +15,9 @@ from src.models import (
     CorpusReproducibilityReport,
     TemporalRoadmapReport,
     AutonomousResearchDossier,
+    InSilicoExperimentReport,
+    InterdisciplinaryTransferReport,
+    NoveltySentinelReport,
 )
 
 __all__ = [
@@ -30,4 +33,7 @@ __all__ = [
     "CorpusReproducibilityReport",
     "TemporalRoadmapReport",
     "AutonomousResearchDossier",
+    "InSilicoExperimentReport",
+    "InterdisciplinaryTransferReport",
+    "NoveltySentinelReport",
 ]

@@ -211,9 +211,12 @@ with m6:
 st.markdown("---")
 
 # Navigation Tabs
-tab_syn, tab_claims, tab_causal, tab_repro, tab_roadmap, tab_dossier, tab_conflicts, tab_council, tab_peer_review, tab_hypo, tab_trajectory, tab_rigor, tab_biblio, tab_sankey, tab_graph, tab_empirical, tab_robustness, tab_slides, tab_arxiv, tab_latex, tab_audit, tab_ablation = st.tabs([
+tab_syn, tab_claims, tab_sim, tab_transfer, tab_sentinel, tab_causal, tab_repro, tab_roadmap, tab_dossier, tab_conflicts, tab_council, tab_peer_review, tab_hypo, tab_trajectory, tab_rigor, tab_biblio, tab_sankey, tab_graph, tab_empirical, tab_robustness, tab_slides, tab_arxiv, tab_latex, tab_audit, tab_ablation = st.tabs([
     "📑 Executive Synthesis",
     "🔍 Claim-Level Evidence",
+    "🧪 In Silico Simulator",
+    "🌐 Cross-Domain Analogies",
+    "🛡️ Novelty & Drift Sentinel",
     "🔮 Causal DAG Reasoning",
     "🧪 Reproducibility & Open Science",
     "⏳ Living Research Roadmap",
@@ -304,6 +307,134 @@ with tab_claims:
                         st.json(ev.extracted_attributes)
         else:
             st.caption("No contradictory passages detected.")
+
+
+# ----------------- TAB: IN SILICO SIMULATOR -----------------
+with tab_sim:
+    st.subheader("🧪 In Silico Laboratory Experiment Simulator & Monte Carlo Benchmarking")
+    st.caption("Prospective empirical simulation under calibrated noise, photon starvation, and parameter distributions. Evaluates statistical power (1 - β) and hardware requirements prior to physical execution.")
+
+    if report.in_silico_simulation:
+        sim = report.in_silico_simulation
+        sim_col1, sim_col2, sim_col3, sim_col4 = st.columns(4)
+        sim_col1.metric("Simulated Net Gain", f"+{sim.projected_net_gain_pct:.1f}%", f"{sim.mean_baseline_performance:.1f} → {sim.mean_simulated_performance:.1f} mAP")
+        sim_col2.metric("Statistical Power (1 - β)", f"{sim.power_analysis.statistical_power_achieved * 100:.1f}%", "α = 0.05 (Two-Tailed)")
+        sim_col3.metric("Effect Size (Cohen's d)", f"{sim.power_analysis.cohens_d_effect_size:.2f}", f"Hedges' g: {sim.power_analysis.hedges_g_effect_size:.2f}")
+        sim_col4.metric("Critical Sample Size (N)", f"{sim.power_analysis.critical_sample_size_required}", f"Falsification Risk: {sim.power_analysis.hypothesis_falsification_risk * 100:.1f}%")
+
+        st.markdown(f"**Target Hypothesis**: `{sim.target_hypothesis_title}`")
+        st.markdown(f"**Monte Carlo Trials Executed**: `{sim.trials_count}` | **95% Confidence Interval**: `[{sim.confidence_interval_95[0]}, {sim.confidence_interval_95[1]}]` | **Std Dev**: `±{sim.std_dev:.2f}`")
+
+        # Parameter Sweeps Table
+        st.markdown("#### 🔬 Empirical Parameter Sensitivity Sweeps")
+        df_sweeps = pd.DataFrame([s.model_dump() for s in sim.parameter_sweeps])
+        st.dataframe(df_sweeps, use_container_width=True)
+
+        # Multi-Hardware Scaling Projections
+        st.markdown("#### ⚡ Multi-Hardware Compute & Scaling Projections")
+        df_hw = pd.DataFrame([h.model_dump() for h in sim.hardware_projections])
+        st.dataframe(df_hw, use_container_width=True)
+
+        # Standalone PyTorch Harness
+        with st.expander("🐍 View Executable PyTorch Benchmark Harness"):
+            st.code(sim.executable_python_benchmark, language="python")
+            st.download_button(
+                "📥 Download PyTorch Benchmark Harness (.py)",
+                data=sim.executable_python_benchmark,
+                file_name="in_silico_benchmark.py",
+                mime="text/x-python",
+            )
+            st.download_button(
+                "🌐 Download Interactive HTML Simulation Lab",
+                data=sim.interactive_lab_html,
+                file_name="in_silico_simulation_lab.html",
+                mime="text/html",
+            )
+
+
+# ----------------- TAB: CROSS-DOMAIN ANALOGIES -----------------
+with tab_transfer:
+    st.subheader("🌐 Cross-Domain Conceptual Transfer & Interdisciplinary Analogy Engine")
+    st.caption("Discovers structural isomorphisms and invariant mathematical formulations across scientific disciplines to formulate breakthrough hybrid architectures.")
+
+    if report.cross_domain_transfer:
+        tr = report.cross_domain_transfer
+        st.markdown(f"**Active Inquiry**: `{tr.active_inquiry}`")
+        st.markdown(f"**Primary Domain**: `{tr.primary_domain}` | **Isomorphism Density**: `{tr.isomorphism_density_score * 100:.0f}%`")
+        st.markdown(f"**Domains Scanned**: {', '.join(f'`{d}`' for d in tr.neighboring_domains_scanned)}")
+
+        for ana in tr.analogies:
+            with st.container():
+                st.markdown(f"""
+                <div style="background-color: #1E293B; border-left: 4px solid #8B5CF6; border-radius: 8px; padding: 16px; margin-bottom: 14px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                        <span style="font-size: 1.1rem; font-weight: 700; color: #A78BFA;">⚡ [{ana.analogy_id}] {ana.source_domain} ➔ {ana.target_domain}</span>
+                        <span style="background: rgba(139, 92, 246, 0.2); color: #C4B5FD; padding: 4px 10px; border-radius: 6px; font-size: 0.8rem; font-weight: 600;">Novelty: {ana.novelty_score * 100:.0f}% | Feasibility: {ana.feasibility_score * 100:.0f}%</span>
+                    </div>
+                    <p><strong>Isomorphic Challenge:</strong> {ana.isomorphic_challenge}</p>
+                    <p><strong>Shared Mathematical Form:</strong> <code style="color: #67E8F9;">{ana.shared_mathematical_form}</code></p>
+                    <p><strong>Source Solution Mechanism:</strong> {ana.source_solution_mechanism}</p>
+                    <p style="color: #34D399;"><strong>Proposed Hybrid Architecture:</strong> {ana.proposed_hybrid_architecture}</p>
+                    <p><strong>Expected Gain:</strong> <em>{ana.expected_empirical_gain}</em></p>
+                    <p style="font-size: 0.85rem; color: #94A3B8;"><strong>Validation Protocol:</strong> {ana.validation_protocol}</p>
+                </div>
+                """, unsafe_allow_html=True)
+
+        st.markdown("#### 💡 Strategic Interdisciplinary Takeaways")
+        for tw in tr.interdisciplinary_takeaways:
+            st.markdown(f"- 🚀 {tw}")
+
+
+# ----------------- TAB: NOVELTY & DRIFT SENTINEL -----------------
+with tab_sentinel:
+    st.subheader("🛡️ Academic Novelty, Prior Art Collision & Semantic Drift Sentinel")
+    st.caption("Quantifies scientific originality, detects overlapping prior art, and audits terminology dilution across published literature.")
+
+    if report.novelty_sentinel:
+        ns = report.novelty_sentinel
+        st.info(f"**Sentinel Verdict**: {ns.overall_sentinel_verdict}")
+
+        ns_col1, ns_col2, ns_col3, ns_col4 = st.columns(4)
+        ns_col1.metric("Novelty Index (NI)", f"{ns.mean_novelty_index * 100:.0f}%", "Semantic Distance")
+        ns_col2.metric("Frontier Breakthroughs", f"{len(ns.frontier_breakthroughs)}", "High Novelty, High Evidence")
+        ns_col3.metric("Prior Art Collisions", f"{len(ns.prior_art_collisions)}", "Defensively Resolved")
+        ns_col4.metric("Terms Audited", f"{len(ns.semantic_drift_records)}", "Terminology Dilution")
+
+        st.markdown("#### 🧭 Scientific Novelty Quadrant Distribution")
+        df_quad = pd.DataFrame([{"Quadrant": k, "Count": v} for k, v in ns.novelty_quadrant_distribution.items()])
+        fig_quad = px.bar(
+            df_quad,
+            x="Quadrant",
+            y="Count",
+            title="Scientific Novelty vs Empirical Evidence Distribution",
+            color="Quadrant",
+            color_discrete_sequence=["#10B981", "#F59E0B", "#3B82F6", "#EF4444"]
+        )
+        fig_quad.update_layout(paper_bgcolor="rgba(15, 23, 42, 0.8)", plot_bgcolor="rgba(15, 23, 42, 0.8)", font=dict(color="#E2E8F0"), showlegend=False)
+        st.plotly_chart(fig_quad, use_container_width=True)
+
+        st.markdown("#### ⚔️ Prior Art Collision Radar & Defense Arguments")
+        for col in ns.prior_art_collisions:
+            with st.expander(f"🚩 Collision [{col.collision_id}] vs {col.overlapping_paper_title} (Similarity: {col.similarity_score * 100:.0f}%)"):
+                st.markdown(f"**Overlapping Paper ID**: `{col.overlapping_paper_id}`")
+                st.markdown(f"**Infringement/Redundancy Risk**: `{col.infringement_or_redundancy_risk}`")
+                st.markdown(f"**Shared Mechanisms**: {', '.join(col.shared_mechanisms)}")
+                st.success(f"**Defensive Differentiation Argument**: {col.differentiation_argument}")
+
+        st.markdown("#### 📉 Terminology Semantic Drift & Buzzword Dilution Audit")
+        for dr in ns.semantic_drift_records:
+            badge_color = "#10B981" if "Rigorous" in dr.verdict else "#F59E0B" if "Moderate" in dr.verdict else "#EF4444"
+            st.markdown(f"""
+            <div style="background-color: #1E293B; border-left: 4px solid {badge_color}; border-radius: 8px; padding: 14px; margin-bottom: 10px;">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <strong style="font-size: 1.05rem; color: #F1F5F9;">Term: '{dr.term}'</strong>
+                    <span style="background: rgba(255,255,255,0.08); color: {badge_color}; padding: 3px 8px; border-radius: 4px; font-size: 0.8rem; font-weight: 600;">{dr.verdict} (Dilution: {dr.dilution_score * 100:.0f}%)</span>
+                </div>
+                <p style="margin-top: 6px; font-size: 0.88rem;"><strong>Formal Definition:</strong> {dr.original_formal_definition}</p>
+                <p style="font-size: 0.88rem;"><strong>Observed Usage:</strong> {dr.observed_literature_usage}</p>
+                <p style="font-size: 0.85rem; color: #94A3B8;"><strong>Audit Recommendation:</strong> {dr.audit_recommendation}</p>
+            </div>
+            """, unsafe_allow_html=True)
 
 
 # ----------------- TAB: CAUSAL DAG & COUNTERFACTUAL REASONING -----------------

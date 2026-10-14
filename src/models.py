@@ -246,6 +246,9 @@ class SynthesisReport(BaseModel):
     reproducibility: Optional[CorpusReproducibilityReport] = None
     temporal_roadmap: Optional[TemporalRoadmapReport] = None
     dossier: Optional[AutonomousResearchDossier] = None
+    in_silico_simulation: Optional[InSilicoExperimentReport] = None
+    cross_domain_transfer: Optional[InterdisciplinaryTransferReport] = None
+    novelty_sentinel: Optional[NoveltySentinelReport] = None
 
 
 # --- v3.0 Advanced Research Intelligence Schemas ---
@@ -458,6 +461,121 @@ class AutonomousResearchDossier(BaseModel):
     two_year_actionable_mandate: List[str] = Field(default_factory=list)
     html_dossier: str = ""
     markdown_dossier: str = ""
+
+
+# --- v5.0 Frontier Scientific Intelligence & In Silico Assistant Schemas ---
+
+class SimulationParamSweep(BaseModel):
+    parameter_name: str
+    unit: str
+    min_value: float
+    max_value: float
+    simulated_steps: int
+    optimal_operating_point: float
+    degradation_threshold: float
+
+
+class MonteCarloTrialResult(BaseModel):
+    trial_id: int
+    noise_sigma: float
+    lux_level: float
+    baseline_metric: float  # e.g., mAP baseline
+    proposed_metric: float  # e.g., mAP with proposed method
+    relative_gain_pct: float
+    latency_ms: float
+    converged: bool = True
+
+
+class HardwareScalingEstimate(BaseModel):
+    target_hardware: str  # e.g. "NVIDIA RTX 4090", "NVIDIA A100 (80GB)", "NVIDIA H100 SXM5", "Google TPU v5e"
+    vram_required_gb: float
+    throughput_samples_sec: float
+    training_time_hours: float
+    estimated_cost_usd: float
+    co2_kg_footprint: float
+
+
+class PowerAnalysisReport(BaseModel):
+    alpha: float = 0.05
+    statistical_power_achieved: float = 0.88  # 1 - beta
+    cohens_d_effect_size: float = 1.15
+    hedges_g_effect_size: float = 1.12
+    critical_sample_size_required: int = 42
+    hypothesis_falsification_risk: float = 0.12  # probability of failing to reject null
+
+
+class InSilicoExperimentReport(BaseModel):
+    simulation_id: str
+    hypothesis_id: str
+    target_hypothesis_title: str
+    simulated_domain: str
+    trials_count: int = 1000
+    mean_baseline_performance: float
+    mean_simulated_performance: float
+    projected_net_gain_pct: float
+    confidence_interval_95: List[float] = Field(default_factory=list)  # [lower, upper]
+    std_dev: float
+    power_analysis: PowerAnalysisReport
+    parameter_sweeps: List[SimulationParamSweep] = Field(default_factory=list)
+    sample_trials: List[MonteCarloTrialResult] = Field(default_factory=list)
+    hardware_projections: List[HardwareScalingEstimate] = Field(default_factory=list)
+    executable_python_benchmark: str = ""
+    interactive_lab_html: str = ""
+
+
+class CrossDomainAnalogy(BaseModel):
+    analogy_id: str
+    source_domain: str
+    target_domain: str
+    isomorphic_challenge: str
+    shared_mathematical_form: str
+    source_solution_mechanism: str
+    proposed_hybrid_architecture: str
+    feasibility_score: float = 0.85
+    novelty_score: float = 0.90
+    expected_empirical_gain: str
+    validation_protocol: str
+
+
+class InterdisciplinaryTransferReport(BaseModel):
+    active_inquiry: str
+    primary_domain: str
+    neighboring_domains_scanned: List[str] = Field(default_factory=list)
+    analogies: List[CrossDomainAnalogy] = Field(default_factory=list)
+    isomorphism_density_score: float = 0.78
+    top_recommended_transfer: Optional[CrossDomainAnalogy] = None
+    interdisciplinary_takeaways: List[str] = Field(default_factory=list)
+
+
+class SemanticDriftRecord(BaseModel):
+    term: str
+    original_formal_definition: str
+    observed_literature_usage: str
+    dilution_score: float  # 0.0 (rigorous) to 1.0 (buzzword inflation)
+    verdict: Literal["Mathematically Rigorous", "Moderate Drift", "Severe Dilution / Buzzword"]
+    audit_recommendation: str
+
+
+class PriorArtCollision(BaseModel):
+    collision_id: str
+    overlapping_paper_id: str
+    overlapping_paper_title: str
+    similarity_score: float
+    shared_mechanisms: List[str] = Field(default_factory=list)
+    differentiation_argument: str
+    infringement_or_redundancy_risk: Literal["Low", "Moderate", "High"] = "Low"
+
+
+class NoveltySentinelReport(BaseModel):
+    mean_novelty_index: float  # 0.0 to 1.0
+    novelty_quadrant_distribution: Dict[str, int] = Field(default_factory=dict)
+    frontier_breakthroughs: List[str] = Field(default_factory=list)
+    speculative_frontiers: List[str] = Field(default_factory=list)
+    established_consensuses: List[str] = Field(default_factory=list)
+    redundant_clutters: List[str] = Field(default_factory=list)
+    prior_art_collisions: List[PriorArtCollision] = Field(default_factory=list)
+    semantic_drift_records: List[SemanticDriftRecord] = Field(default_factory=list)
+    overall_sentinel_verdict: str
 
 
 

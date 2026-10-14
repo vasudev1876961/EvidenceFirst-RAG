@@ -7,6 +7,7 @@ from src.verification.agentic_verifier import AgenticVerifier
 from src.verification.rigor_analyzer import MethodologyRigorAnalyzer
 from src.verification.consensus_council import ScientificConsensusCouncil
 from src.verification.reproducibility import ReproducibilityVerifier
+from src.verification.novelty_sentinel import NoveltySentinel
 
 __all__ = [
     "NLIEntailmentChecker",
@@ -18,6 +19,7 @@ __all__ = [
     "MethodologyRigorAnalyzer",
     "ScientificConsensusCouncil",
     "ReproducibilityVerifier",
+    "NoveltySentinel",
 ]
 
 

@@ -46,6 +46,9 @@ from src.claims.causal_graph import CausalGraphEngine
 from src.verification.reproducibility import ReproducibilityVerifier
 from src.synthesis.temporal_roadmap import TemporalRoadmapEngine
 from src.synthesis.dossier_generator import DossierGenerator
+from src.synthesis.in_silico_simulator import InSilicoSimulator
+from src.claims.analogy_engine import CrossDomainAnalogyEngine
+from src.verification.novelty_sentinel import NoveltySentinel
 
 logger = logging.getLogger(__name__)
 
@@ -150,6 +153,9 @@ class EvidenceFirstPipeline:
         self.reproducibility_verifier = ReproducibilityVerifier()
         self.temporal_roadmap_engine = TemporalRoadmapEngine()
         self.dossier_generator = DossierGenerator()
+        self.in_silico_simulator = InSilicoSimulator()
+        self.analogy_engine = CrossDomainAnalogyEngine(llm_client=self.llm)
+        self.novelty_sentinel = NoveltySentinel(llm_client=self.llm)
 
         # State
 
@@ -382,6 +388,30 @@ class EvidenceFirstPipeline:
 
         # Step 25: Autonomous Research Dossier & Executive Press Briefing
         report.dossier = self.dossier_generator.build_dossier(report)
+
+        # Step 26: In Silico Laboratory Experiment Simulator & Monte Carlo Benchmarking
+        top_hyp = report.hypotheses[0] if report.hypotheses else None
+        report.in_silico_simulation = self.in_silico_simulator.simulate(
+            query=query,
+            hypothesis=top_hyp,
+            claims=claims,
+            meta_analysis=report.meta_analysis,
+        )
+
+        # Step 27: Cross-Domain Conceptual Transfer & Interdisciplinary Analogy Engine
+        report.cross_domain_transfer = self.analogy_engine.discover_analogies(
+            query=query,
+            claims=claims,
+            hypotheses=report.hypotheses,
+        )
+
+        # Step 28: Academic Novelty & Semantic Drift Sentinel
+        report.novelty_sentinel = self.novelty_sentinel.audit_novelty(
+            query=query,
+            claims=claims,
+            hypotheses=report.hypotheses,
+            papers=self.indexed_papers,
+        )
 
         return report
 

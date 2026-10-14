@@ -109,6 +109,27 @@ Synthesizes comprehensive meta-science findings into publication-ready executive
 - **Interactive Glassmorphic HTML Dossier**: Responsive, standalone briefing with executive headlines, layman public translations, debunked myths, and policy mandates.
 - **Publication Markdown Dossier**: Ready for institutional press offices, research lab directors, and grant review committees.
 
+### 23. In Silico Laboratory Experiment Simulator & Monte Carlo Benchmarking (v5.0)
+Validates prospective scientific interventions prior to wet-lab or high-compute GPU allocation:
+- **Calibrated Noise & Photon Starvation Models**: Simulates synthetic Poisson shot noise, Gaussian sensor readout noise, and non-linear illuminance degradation curves ($0.01$ to $50.0\text{ lux}$).
+- **Monte Carlo Empirical Trials ($N=1,000$)**: Evaluates stochastic distribution bounds, $95\%$ confidence intervals, and standard error bounds across simulated benchmark interventions.
+- **Statistical Power & Falsification Analysis**: Computes statistical power ($1 - \beta$, e.g. $99.9\%$), effect size (Cohen's $d$, Hedges' $g$), and critical sample size ($N_{\text{crit}}$) required to falsify the hypothesis at $\alpha = 0.05$.
+- **Multi-Hardware Compute Scaling Projections**: Estimates VRAM footprints, throughput (samples/sec), training time, cost, and $\text{kg CO}_2\text{eq}$ across NVIDIA RTX 4090, A100, H100 SXM5, and Google TPU v5e.
+- **Standalone PyTorch Benchmark Harness & Interactive HTML Lab**: Automatically generates executable reproduction scripts (`in_silico_benchmark.py`) and standalone interactive simulation labs with live SVG parameter sliders (`in_silico_simulation_lab.html`).
+
+### 24. Cross-Domain Conceptual Transfer & Interdisciplinary Analogy Engine (v5.0)
+Catalyzes scientific breakthroughs by discovering invariant mathematical symmetries across disparate scientific literature domains:
+- **Domain Isomorphism Detection**: Discovers structural symmetries connecting Computer Vision, Biomedical Low-Dose CT / fMRI, Far-Field Acoustics, Deep-Space Radio Astronomy, Low-Resource NLP, and Quantum Decoherence.
+- **Interdisciplinary Transfer Blueprints (`ANA-XXX`)**: Maps source problem mechanisms to target domain challenges (e.g., transferring Sinogram Wavelet Shrinkage from Low-Dose CT to resolve Poisson shot noise in Vision Transformers without pre-enhancement).
+- **Novelty & Feasibility Scoring**: Quantifies conceptual distance, theoretical plausibility, and projects quantitative empirical gains.
+
+### 25. Academic Novelty, Prior Art Collision & Semantic Drift Sentinel (v5.0)
+Protects against literature redundancy, prior art collisions, and buzzword inflation:
+- **Novelty Index (NI)**: Measures mean semantic vector distance and topological graph divergence from baseline literature.
+- **Scientific Novelty 4-Quadrant Matrix**: Categorizes claims into *Frontier Breakthroughs*, *Speculative Frontiers*, *Established Consensus*, and *Redundant Clutter*.
+- **Defensive Prior Art Collision Radar**: Formulates mathematically sound differentiation arguments against existing published baselines (e.g. Zero-DCE, EnlightenGAN, IAT).
+- **Terminology Semantic Drift & Dilution Index**: Quantifies buzzword dilution (0.0 to 1.0) on terms like *"Zero-Shot"*, *"Hallucination-Free"*, *"Self-Supervised"*, and *"Bio-Inspired"*.
+
 
 ---
 
@@ -274,34 +295,50 @@ Outputs:
 - Standalone Glassmorphic HTML Research Dossier: `data/research_dossier.html`
 - Publication Markdown Research Dossier: `data/research_dossier.md`
 
-### 12. Launch Interactive Research Dashboard
-Launch the Streamlit Research Analysis Dashboard with **22 interactive tabs**:
+### 12. In Silico Simulator, Cross-Domain Analogies & Novelty Sentinel (v5.0)
+Run in silico Monte Carlo experiment simulations, discover cross-domain architectural analogies, audit academic novelty, and export standalone interactive simulation labs:
+```bash
+python main.py --query "What are the limitations of Vision Transformers for low-light object detection?" \
+  --in-silico-sim \
+  --cross-domain \
+  --novelty-sentinel \
+  --export-sim-lab
+```
+Outputs:
+- Interactive HTML In Silico Simulation Lab: `data/in_silico_simulation_lab.html`
+- Executable PyTorch Benchmark Harness: `data/in_silico_benchmark.py`
+
+### 13. Launch Interactive Research Dashboard
+Launch the Streamlit Research Analysis Dashboard with **25 interactive tabs**:
 ```bash
 streamlit run app/streamlit_app.py
 ```
 Tabs include:
 1. 📑 Executive Literature Synthesis
 2. 🔍 Claim-Level Evidence Inspector
-3. 🔮 Causal DAG & Counterfactual Reasoning (v4.0)
-4. 🧪 Autonomous Reproducibility & Open Science Audit (v4.0)
-5. ⏳ Living Research Roadmap & Horizons (v4.0)
-6. 📰 Autonomous Research Dossier & Press Briefing (v4.0)
-7. ⚡ Contradiction Attribution Engine
-8. 🏛️ Multi-Agent Scientific Debate Council
-9. 🎓 Conference Peer Review & Soundness Audit
-10. 💡 Automated Scientific Hypotheses & Protocols
-11. 🧬 Agentic Multi-Hop Verification Trajectory
-12. ⚖️ Methodological Rigor & Evidence Hierarchy
-13. 🌐 Bibliometrics & Co-Citation Network
-14. 🔀 Multi-Stage Literature Sankey Flow
-15. 🕸️ Scientific Knowledge Graph (Plotly)
-16. 📊 Cross-Paper Empirical Meta-Analysis Matrix
-17. 🛡️ Robustness & Counterfactuals (ERI)
-18. 🖥️ Academic Presentation Slide Deck
-19. 🌐 Live ArXiv Ingestion Engine
-20. 📄 Publication LaTeX & BibTeX Exporter
-21. 🛡️ Citation Faithfulness & Reliability Audit
-22. 📈 Architecture Ablation & IR Benchmarks
+3. 🧪 In Silico Laboratory Experiment Simulator (v5.0)
+4. 🌐 Cross-Domain Conceptual Transfer & Analogies (v5.0)
+5. 🛡️ Academic Novelty, Prior Art & Semantic Drift Sentinel (v5.0)
+6. 🔮 Causal DAG & Counterfactual Reasoning (v4.0)
+7. 🧪 Autonomous Reproducibility & Open Science Audit (v4.0)
+8. ⏳ Living Research Roadmap & Horizons (v4.0)
+9. 📰 Autonomous Research Dossier & Press Briefing (v4.0)
+10. ⚡ Contradiction Attribution Engine
+11. 🏛️ Multi-Agent Scientific Debate Council
+12. 🎓 Conference Peer Review & Soundness Audit
+13. 💡 Automated Scientific Hypotheses & Protocols
+14. 🧬 Agentic Multi-Hop Verification Trajectory
+15. ⚖️ Methodological Rigor & Evidence Hierarchy
+16. 🌐 Bibliometrics & Co-Citation Network
+17. 🔀 Multi-Stage Literature Sankey Flow
+18. 🕸️ Scientific Knowledge Graph (Plotly)
+19. 📊 Cross-Paper Empirical Meta-Analysis Matrix
+20. 🛡️ Robustness & Counterfactuals (ERI)
+21. 🖥️ Academic Presentation Slide Deck
+22. 🌐 Live ArXiv Ingestion Engine
+23. 📄 Publication LaTeX & BibTeX Exporter
+24. 🛡️ Citation Faithfulness & Reliability Audit
+25. 📈 Architecture Ablation & IR Benchmarks
 
 
 ---
@@ -345,6 +382,8 @@ EvidenceFirst-RAG/
 │   ├── raw/                 # Incoming PDF papers
 │   ├── processed/           # Parsed paper catalog
 │   ├── sample_papers/       # Multi-domain seed corpus (CV, NLP, Biomedical)
+│   ├── in_silico_simulation_lab.html # Standalone interactive HTML simulation lab (v5.0)
+│   ├── in_silico_benchmark.py # Standalone executable PyTorch reproduction harness (v5.0)
 │   ├── research_dossier.html # Official standalone glassmorphic research dossier
 │   ├── research_dossier.md  # Executive press release briefing in Markdown
 │   ├── synthesis_paper.tex  # Exported LaTeX paper draft
@@ -366,11 +405,13 @@ EvidenceFirst-RAG/
 │   ├── query/               # Query decomposer & BM25 keyword expander
 │   ├── retrieval/           # BM25, Dense embeddings, Hybrid fusion, Cross-Encoder
 │   ├── claims/              # Atomic claim extractor, normalizer, NetworkX graph
+│   │   ├── analogy_engine.py # Cross-domain conceptual transfer & analogy engine (v5.0)
 │   │   ├── causal_graph.py  # Causal DAG & Pearl's Do-Calculus reasoning engine (v4.0)
 │   │   ├── claim_graph.py   # Multi-hop graph with community clustering
 │   │   ├── graph_visualizer.py # Sankey & Vis.js network visualizers
 │   │   └── citation_network.py # Bibliometric co-citation & PageRank analyzer
 │   ├── verification/        # NLI entailment, contradiction engine, citation audit
+│   │   ├── novelty_sentinel.py # Academic novelty, prior art & semantic drift sentinel (v5.0)
 │   │   ├── reproducibility.py # Open Science & Reproducibility Protocol Verifier (v4.0)
 │   │   ├── consensus_council.py # Multi-agent scientific debate council
 │   │   ├── agentic_verifier.py # Iterative multi-hop counter-query verifier
@@ -379,6 +420,7 @@ EvidenceFirst-RAG/
 │   │   ├── contradiction.py # Contradiction attribution engine
 │   │   └── citation_checker.py # ECS & CIS audit
 │   ├── synthesis/           # Evidence-grounded synthesizer, conflict attribution
+│   │   ├── in_silico_simulator.py # In Silico experiment simulator & Monte Carlo engine (v5.0)
 │   │   ├── temporal_roadmap.py # Temporal knowledge horizon & living roadmap (v4.0)
 │   │   ├── dossier_generator.py # Autonomous research dossier & press brief (v4.0)
 │   │   ├── peer_review.py   # Conference peer review & soundness auditor
@@ -392,10 +434,11 @@ EvidenceFirst-RAG/
 │   └── pipeline.py          # Master orchestrator
 │
 ├── app/
-│   ├── api.py               # FastAPI REST API server v0.4.0 (Swagger /docs)
-│   └── streamlit_app.py     # 22-Tab Interactive Research Dashboard
+│   ├── api.py               # FastAPI REST API server v0.5.0 (Swagger /docs)
+│   └── streamlit_app.py     # 25-Tab Interactive Research Dashboard (v5.0)
 │
-├── tests/                   # Pytest test suite (35 passing tests)
+├── tests/                   # Pytest test suite (41 passing tests)
+│   ├── test_v5_advanced.py  # In Silico simulator, analogy transfer & novelty sentinel (v5.0)
 │   ├── test_v4_advanced.py  # Causal DAG, reproducibility, living roadmap & dossier
 │   ├── test_v3_advanced.py  # Peer review, debate council, bibliometrics & slides
 │   ├── test_v2_advanced.py  # Agentic verification, hypotheses, rigor & visualizers
@@ -407,7 +450,7 @@ EvidenceFirst-RAG/
 │   └── test_verification.py # Contradiction & citation auditor tests
 │
 ├── requirements.txt         # Dependencies
-└── main.py                  # CLI runner with v4.0 flags & exporters
+└── main.py                  # CLI runner with v5.0 flags & exporters
 ```
 
 
