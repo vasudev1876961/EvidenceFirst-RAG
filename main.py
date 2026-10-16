@@ -175,6 +175,26 @@ def main():
         help="Export standalone interactive HTML In Silico Laboratory Simulator",
     )
     parser.add_argument(
+        "--symbolic",
+        action="store_true",
+        help="Run SymPy automated theorem prover, mathematical bound derivations, and formal proof certification",
+    )
+    parser.add_argument(
+        "--adversarial-test",
+        action="store_true",
+        help="Run Epistemic Red-Teaming against Simpson's paradox, cherry-picking, p-hacking, and citation poisoning",
+    )
+    parser.add_argument(
+        "--prisma",
+        action="store_true",
+        help="Generate PRISMA 2020 systematic review flow, Cochrane Risk of Bias 2.0 matrix, and random-effects meta-analysis",
+    )
+    parser.add_argument(
+        "--export-prisma",
+        action="store_true",
+        help="Export standalone interactive HTML PRISMA 2020 & Cochrane Forest Plot dashboard",
+    )
+    parser.add_argument(
         "--serve-api",
         action="store_true",
         help="Launch the EvidenceFirst-RAG FastAPI REST server on port 8000",
@@ -556,7 +576,69 @@ def main():
         print(f"🧪 In Silico Simulation Lab HTML exported to: {out_html}")
         print(f"🐍 Standalone PyTorch Benchmark Harness saved to: {out_py}\n")
 
+    # Symbolic Proof Verifier Flag (v6.0)
+    if args.symbolic and report.symbolic_proof_report:
+        pr = report.symbolic_proof_report
+        print("\n" + "=" * 80)
+        print(f"  📐 Automated Theorem & Symbolic Formal Proof Verifier [{pr.proof_system_id}]")
+        print("=" * 80)
+        print(f"Theorems Evaluated: {pr.theorems_evaluated} | Consistency Score: {pr.formal_consistency_score * 100:.0f}%\n")
+        for cert in pr.proof_certificates:
+            print(f"  • [{cert.proof_id}] {cert.target_claim_or_theorem}")
+            print(f"    Domain: {cert.domain_formalism} | Verdict: {cert.verdict}")
+            print(f"    Asymptotic Bound: {cert.asymptotic_bound} | Lipschitz: {cert.lipschitz_constant_or_gradient_bound}")
+            print(f"    SymPy: {cert.sympy_formulation}")
+            if cert.unstated_assumptions:
+                print(f"    Unstated Assumptions: {'; '.join(cert.unstated_assumptions)}")
+            print()
+        print("Critical Theoretical Breakdowns Identified:")
+        for bd in pr.critical_theoretical_breakdowns:
+            print(f"  ⚠ {bd}")
+        print("=" * 80 + "\n")
 
+    # Adversarial Red-Team Flag (v6.0)
+    if args.adversarial_test and report.adversarial_stress_report:
+        adv = report.adversarial_stress_report
+        print("\n" + "=" * 80)
+        print(f"  🎯 Epistemic Red-Teaming & Adversarial Hallucination Stress-Test [{adv.stress_test_id}]")
+        print("=" * 80)
+        print(f"Defense Rate: {adv.defense_rate_pct:.1f}% ({adv.attacks_successfully_defended}/{adv.total_attacks_simulated} Defended)")
+        print(f"Epistemic Vulnerability Index (EVI): {adv.epistemic_vulnerability_index:.3f} | Resilience: {adv.adversarial_resilience_verdict}\n")
+        print("Adversarial Attack Audits:")
+        for atk in adv.attack_vectors:
+            status = "✓ DEFENDED" if atk.pipeline_defended else "✗ FAILED"
+            print(f"  • [{atk.attack_id}] {atk.attack_category:<35} [{status}] (Severity: {atk.vulnerability_severity})")
+            print(f"    Target:  {atk.intended_deception_target}")
+            print(f"    Defense: {atk.observed_failure_or_defense}")
+            print(f"    Patch:   {atk.remediation_patch}\n")
+        print("Automated Epistemic Defense Rules:")
+        for r in adv.automated_defense_rules:
+            print(f"  🛡️ {r}")
+        print("=" * 80 + "\n")
+
+    # PRISMA Systematic Review Flag (v6.0)
+    if args.prisma and report.prisma_meta_analysis:
+        pma = report.prisma_meta_analysis
+        print("\n" + "=" * 80)
+        print(f"  📊 PRISMA 2020 Systematic Review & Cochrane Meta-Analysis [{pma.prisma_id}]")
+        print("=" * 80)
+        print(f"Domain: {pma.inquiry_domain} | Strength: {pma.overall_synthesis_strength}")
+        print(f"PRISMA Flow: Identified {pma.prisma_flow.identification_count} -> Screened {pma.prisma_flow.screening_count} -> Included {pma.prisma_flow.included_synthesis_count} Studies")
+        print(f"Pooled Effect Size (Random-Effects): {pma.pooled_random_effects_estimate:+.3f} (95% CI: [{pma.pooled_confidence_interval_95[0]}, {pma.pooled_confidence_interval_95[1]}])")
+        print(f"Heterogeneity I²: {pma.heterogeneity_i2_pct:.1f}% (Cochran's Q = {pma.cochran_q_statistic:.2f}, p = {pma.cochran_q_p_value:.4f}, τ² = {pma.tau_squared_variance})")
+        print(f"Publication Bias (Egger's Test): p = {pma.eggers_p_value:.2f} (Intercept β₀ = {pma.eggers_intercept_beta0:.2f}, Detected: {pma.publication_bias_detected})\n")
+        print("Cochrane Risk of Bias 2.0 (RoB 2) Summary:")
+        for rob in pma.cochrane_risk_of_bias:
+            print(f"  • {rob.study_id:<12}: Overall Risk = {rob.overall_risk_of_bias:<14} | Selection: {rob.domain_1_randomization_selection:<4} | Reporting: {rob.domain_5_selective_reporting}")
+        print("=" * 80 + "\n")
+
+    # Export PRISMA HTML Report Flag (v6.0)
+    if args.export_prisma and report.prisma_meta_analysis:
+        pma = report.prisma_meta_analysis
+        out_prisma_html = "data/prisma_meta_analysis_report.html"
+        with open(out_prisma_html, "w", encoding="utf-8") as f:
+            f.write(pma.interactive_forest_html)
+        print(f"📊 PRISMA 2020 & Cochrane Forest Plot HTML exported to: {out_prisma_html}\n")
 
 
 if __name__ == "__main__":

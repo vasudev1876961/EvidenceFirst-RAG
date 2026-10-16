@@ -243,4 +243,4 @@ def test_package_exports_v4():
     assert ExportRepro is not None
     assert ExportRoadmap is not None
     assert ExportDossier is not None
-    assert src.__version__ in ["0.4.0", "0.5.0"]
+    assert src.__version__ in ["0.4.0", "0.5.0", "0.6.0"]

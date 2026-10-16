@@ -207,4 +207,4 @@ def test_package_exports_v5():
     assert ExportSim is not None
     assert ExportAnalogy is not None
     assert ExportSentinel is not None
-    assert src.__version__ == "0.5.0"
+    assert src.__version__ in ["0.5.0", "0.6.0"]

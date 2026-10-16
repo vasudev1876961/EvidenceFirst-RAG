@@ -8,6 +8,8 @@ from src.verification.rigor_analyzer import MethodologyRigorAnalyzer
 from src.verification.consensus_council import ScientificConsensusCouncil
 from src.verification.reproducibility import ReproducibilityVerifier
 from src.verification.novelty_sentinel import NoveltySentinel
+from src.verification.symbolic_verifier import SymbolicProofEngine
+from src.verification.adversarial_tester import AdversarialStressTester
 
 __all__ = [
     "NLIEntailmentChecker",
@@ -20,6 +22,8 @@ __all__ = [
     "ScientificConsensusCouncil",
     "ReproducibilityVerifier",
     "NoveltySentinel",
+    "SymbolicProofEngine",
+    "AdversarialStressTester",
 ]
 
 

@@ -49,6 +49,9 @@ from src.synthesis.dossier_generator import DossierGenerator
 from src.synthesis.in_silico_simulator import InSilicoSimulator
 from src.claims.analogy_engine import CrossDomainAnalogyEngine
 from src.verification.novelty_sentinel import NoveltySentinel
+from src.verification.symbolic_verifier import SymbolicProofEngine
+from src.verification.adversarial_tester import AdversarialStressTester
+from src.synthesis.prisma_synthesizer import PrismaMetaAnalysisEngine
 
 logger = logging.getLogger(__name__)
 
@@ -156,6 +159,9 @@ class EvidenceFirstPipeline:
         self.in_silico_simulator = InSilicoSimulator()
         self.analogy_engine = CrossDomainAnalogyEngine(llm_client=self.llm)
         self.novelty_sentinel = NoveltySentinel(llm_client=self.llm)
+        self.symbolic_engine = SymbolicProofEngine()
+        self.adversarial_tester = AdversarialStressTester()
+        self.prisma_synthesizer = PrismaMetaAnalysisEngine()
 
         # State
 
@@ -410,6 +416,25 @@ class EvidenceFirstPipeline:
             query=query,
             claims=claims,
             hypotheses=report.hypotheses,
+            papers=self.indexed_papers,
+        )
+
+        # Step 29: Automated Theorem Proving & Symbolic Verification (v6.0)
+        report.symbolic_proof_report = self.symbolic_engine.verify_query_theorems(
+            query=query,
+            claims=claims,
+        )
+
+        # Step 30: Epistemic Red-Teaming & Adversarial Hallucination Stress-Test (v6.0)
+        report.adversarial_stress_report = self.adversarial_tester.run_stress_test(
+            query=query,
+            claims=claims,
+            synthesis_report=report,
+        )
+
+        # Step 31: Autonomous Systematic Review & PRISMA Meta-Analysis (v6.0)
+        report.prisma_meta_analysis = self.prisma_synthesizer.synthesize_systematic_review(
+            query=query,
             papers=self.indexed_papers,
         )
 

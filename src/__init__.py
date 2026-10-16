@@ -1,6 +1,6 @@
 """EvidenceFirst-RAG: Claim-Level Evidence Verification and Contradiction-Aware RAG for Scientific Literature."""
 
-__version__ = "0.5.0"
+__version__ = "0.6.0"
 
 from src.pipeline import EvidenceFirstPipeline
 from src.models import (
@@ -18,6 +18,14 @@ from src.models import (
     InSilicoExperimentReport,
     InterdisciplinaryTransferReport,
     NoveltySentinelReport,
+    SymbolicProofReport,
+    SymbolicProofCertificate,
+    AdversarialStressReport,
+    AdversarialAttackVector,
+    PrismaMetaAnalysisReport,
+    PrismaFlowRecord,
+    CochraneRiskOfBiasItem,
+    ForestPlotStudyRecord,
 )
 
 __all__ = [
@@ -36,4 +44,12 @@ __all__ = [
     "InSilicoExperimentReport",
     "InterdisciplinaryTransferReport",
     "NoveltySentinelReport",
+    "SymbolicProofReport",
+    "SymbolicProofCertificate",
+    "AdversarialStressReport",
+    "AdversarialAttackVector",
+    "PrismaMetaAnalysisReport",
+    "PrismaFlowRecord",
+    "CochraneRiskOfBiasItem",
+    "ForestPlotStudyRecord",
 ]

@@ -130,6 +130,30 @@ Protects against literature redundancy, prior art collisions, and buzzword infla
 - **Defensive Prior Art Collision Radar**: Formulates mathematically sound differentiation arguments against existing published baselines (e.g. Zero-DCE, EnlightenGAN, IAT).
 - **Terminology Semantic Drift & Dilution Index**: Quantifies buzzword dilution (0.0 to 1.0) on terms like *"Zero-Shot"*, *"Hallucination-Free"*, *"Self-Supervised"*, and *"Bio-Inspired"*.
 
+### 26. Automated Theorem & Symbolic Formal Proof Verifier (v6.0)
+Mathematically verifies theoretical claims, asymptotic complexity, and stability bounds using SymPy:
+- **Asymptotic Complexity Verification**: Symbolically derives and compares computational costs (e.g. proving Wavelet sparse attention $\mathcal{O}(N^{1.5} d)$ dominates dense self-attention $\mathcal{O}(N^2 d)$ as $N \to \infty$).
+- **Entropy Dissipation Theorem**: Proves the quadratic variance explosion $\mathcal{O}(1/\text{lux}^2)$ of Softmax attention logits under photon starvation, proving the mathematical necessity of pre-attention frequency gating.
+- **Lipschitz Stability Guarantee**: Proves non-expansive Lipschitz-1 continuity ($\|\mathcal{S}_\tau(Q) - \mathcal{S}_\tau(Q_0)\|_2 \le \|Q - Q_0\|_2$) for wavelet shrinkage operators.
+- **Sensor Pedestal Singularity Theorem**: Symbolically demonstrates infinite noise gain singularity $\lim_{I \to 0^+} \frac{d}{dI}(I^{0.4}) = +\infty$ when gamma enhancement omits dark current pedestal calibration.
+- **Machine-Audited Proof Certificates (`PRF-XXX`)**: Produces formal LaTeX proof blocks, isolated unstated assumptions, counterexample bounds, and downloadable executable SymPy scripts (`symbolic_proof_verification.py`).
+
+### 27. Epistemic Red-Teaming & Adversarial Hallucination Stress-Tester (v6.0)
+Systematically stress-tests literature claims and RAG synthesis pipelines against deceptive mathematical and statistical fallacies:
+- **Simpson's Paradox Debunker**: Uncovers deceptive aggregate benchmark gains (+3.5% overall) that mask catastrophic regressions (-8.4% on extreme darkness $<0.1\text{ lux}$) across sub-population cohorts.
+- **Metric Inversion & Cherry-Picking Radar**: Detects loose metric reporting (mAP@0.5) that conceals strict metric collapse (mAP@0.5:0.95 and false positive spikes).
+- **P-Hacking & Subgroup Dredging Defense**: Penalizes uncorrected post-hoc exploratory slices with small sample sizes ($N < 50$) and applies Benjamini-Hochberg False Discovery Rate corrections.
+- **Citation Poisoning & Hallucination Inoculation**: Audits pipeline resilience against inverted author citations and fabricated pseudo-scientific terms (e.g. "quantum-annealed cross-attention").
+- **Epistemic Vulnerability Index (EVI)**: Quantitative hardening metric ($0.0$ to $1.0$) and automated defensive heuristics.
+
+### 28. Autonomous Systematic Review & PRISMA 2020 Meta-Analysis Synthesizer (v6.0)
+Translates scientific literature corpora into Cochrane-grade gold-standard systematic reviews:
+- **PRISMA 2020 Flow Reporting**: Standardized 4-stage tracking (Identification $\to$ Screening $\to$ Eligibility $\to$ Synthesis) with explicit exclusion taxonomies.
+- **Cochrane Risk of Bias 2.0 (RoB 2) Matrix**: Audits 5 core bias domains (Randomization/Selection, Deviations from Intervention, Missing Data, Measurement, Selective Reporting) with traffic-light indicators.
+- **DerSimonian-Laird Random-Effects Pooling**: Calculates pooled effect size (Standardized Mean Difference / Hedges' $g$) and $95\%$ confidence bounds.
+- **Between-Study Heterogeneity Index**: Quantifies $I^2$ inconsistency, Cochran's $Q$ test statistic, $p$-value, and between-study variance $\tau^2$.
+- **Egger's Funnel Plot Regression**: Statistically audits literature publication bias (intercept $\beta_0$, $p$-value).
+- **Interactive Standalone Forest Plot Dashboard**: Publication-ready SVG/HTML visualizer (`prisma_meta_analysis_report.html`).
 
 ---
 
@@ -308,37 +332,53 @@ Outputs:
 - Interactive HTML In Silico Simulation Lab: `data/in_silico_simulation_lab.html`
 - Executable PyTorch Benchmark Harness: `data/in_silico_benchmark.py`
 
-### 13. Launch Interactive Research Dashboard
-Launch the Streamlit Research Analysis Dashboard with **25 interactive tabs**:
+### 13. Symbolic Proofs, Adversarial Red-Team & PRISMA Meta-Analysis (v6.0)
+Run SymPy automated theorem proving, epistemic red-team stress testing against Simpson's paradox, and synthesize PRISMA 2020 Cochrane meta-analyses:
+```bash
+python main.py --query "What are the limitations of Vision Transformers for low-light object detection?" \
+  --symbolic \
+  --adversarial-test \
+  --prisma \
+  --export-prisma
+```
+Outputs:
+- Interactive PRISMA 2020 & Cochrane Forest Plot HTML: `data/prisma_meta_analysis_report.html`
+- Executable SymPy Mathematical Proof Harness: `data/symbolic_proof_verification.py`
+
+### 14. Launch Interactive Research Dashboard (v6.0)
+Launch the Streamlit Research Analysis Dashboard with **28 interactive tabs**:
 ```bash
 streamlit run app/streamlit_app.py
 ```
 Tabs include:
 1. 📑 Executive Literature Synthesis
 2. 🔍 Claim-Level Evidence Inspector
-3. 🧪 In Silico Laboratory Experiment Simulator (v5.0)
-4. 🌐 Cross-Domain Conceptual Transfer & Analogies (v5.0)
-5. 🛡️ Academic Novelty, Prior Art & Semantic Drift Sentinel (v5.0)
-6. 🔮 Causal DAG & Counterfactual Reasoning (v4.0)
-7. 🧪 Autonomous Reproducibility & Open Science Audit (v4.0)
-8. ⏳ Living Research Roadmap & Horizons (v4.0)
-9. 📰 Autonomous Research Dossier & Press Briefing (v4.0)
-10. ⚡ Contradiction Attribution Engine
-11. 🏛️ Multi-Agent Scientific Debate Council
-12. 🎓 Conference Peer Review & Soundness Audit
-13. 💡 Automated Scientific Hypotheses & Protocols
-14. 🧬 Agentic Multi-Hop Verification Trajectory
-15. ⚖️ Methodological Rigor & Evidence Hierarchy
-16. 🌐 Bibliometrics & Co-Citation Network
-17. 🔀 Multi-Stage Literature Sankey Flow
-18. 🕸️ Scientific Knowledge Graph (Plotly)
-19. 📊 Cross-Paper Empirical Meta-Analysis Matrix
-20. 🛡️ Robustness & Counterfactuals (ERI)
-21. 🖥️ Academic Presentation Slide Deck
-22. 🌐 Live ArXiv Ingestion Engine
-23. 📄 Publication LaTeX & BibTeX Exporter
-24. 🛡️ Citation Faithfulness & Reliability Audit
-25. 📈 Architecture Ablation & IR Benchmarks
+3. 📐 Automated Theorem & Symbolic Proof Verifier (v6.0)
+4. 🎯 Epistemic Red-Team & Adversarial Stress-Test (v6.0)
+5. 📊 PRISMA 2020 Systematic Review & Cochrane Meta-Analysis (v6.0)
+6. 🧪 In Silico Laboratory Experiment Simulator (v5.0)
+7. 🌐 Cross-Domain Conceptual Transfer & Analogies (v5.0)
+8. 🛡️ Academic Novelty, Prior Art & Semantic Drift Sentinel (v5.0)
+9. 🔮 Causal DAG & Counterfactual Reasoning (v4.0)
+10. 🧪 Autonomous Reproducibility & Open Science Audit (v4.0)
+11. ⏳ Living Research Roadmap & Horizons (v4.0)
+12. 📰 Autonomous Research Dossier & Press Briefing (v4.0)
+13. ⚡ Contradiction Attribution Engine
+14. 🏛️ Multi-Agent Scientific Debate Council
+15. 🎓 Conference Peer Review & Soundness Audit
+16. 💡 Automated Scientific Hypotheses & Protocols
+17. 🧬 Agentic Multi-Hop Verification Trajectory
+18. ⚖️ Methodological Rigor & Evidence Hierarchy
+19. 🌐 Bibliometrics & Co-Citation Network
+20. 🔀 Multi-Stage Literature Sankey Flow
+21. 🕸️ Scientific Knowledge Graph (Plotly)
+22. 📊 Cross-Paper Empirical Meta-Analysis Matrix
+23. 🛡️ Robustness & Counterfactuals (ERI)
+24. 🖥️ Academic Presentation Slide Deck
+25. 🌐 Live ArXiv Ingestion Engine
+26. 📄 Publication LaTeX & BibTeX Exporter
+27. 🛡️ Citation Faithfulness & Reliability Audit
+28. 📈 Architecture Ablation & IR Benchmarks
 
 
 ---
@@ -382,6 +422,7 @@ EvidenceFirst-RAG/
 │   ├── raw/                 # Incoming PDF papers
 │   ├── processed/           # Parsed paper catalog
 │   ├── sample_papers/       # Multi-domain seed corpus (CV, NLP, Biomedical)
+│   ├── prisma_meta_analysis_report.html # Standalone interactive HTML PRISMA & Forest Plot (v6.0)
 │   ├── in_silico_simulation_lab.html # Standalone interactive HTML simulation lab (v5.0)
 │   ├── in_silico_benchmark.py # Standalone executable PyTorch reproduction harness (v5.0)
 │   ├── research_dossier.html # Official standalone glassmorphic research dossier
@@ -411,6 +452,8 @@ EvidenceFirst-RAG/
 │   │   ├── graph_visualizer.py # Sankey & Vis.js network visualizers
 │   │   └── citation_network.py # Bibliometric co-citation & PageRank analyzer
 │   ├── verification/        # NLI entailment, contradiction engine, citation audit
+│   │   ├── symbolic_verifier.py # Automated theorem & symbolic formal proof verifier (v6.0)
+│   │   ├── adversarial_tester.py # Epistemic red-teaming & hallucination stress-tester (v6.0)
 │   │   ├── novelty_sentinel.py # Academic novelty, prior art & semantic drift sentinel (v5.0)
 │   │   ├── reproducibility.py # Open Science & Reproducibility Protocol Verifier (v4.0)
 │   │   ├── consensus_council.py # Multi-agent scientific debate council
@@ -420,6 +463,7 @@ EvidenceFirst-RAG/
 │   │   ├── contradiction.py # Contradiction attribution engine
 │   │   └── citation_checker.py # ECS & CIS audit
 │   ├── synthesis/           # Evidence-grounded synthesizer, conflict attribution
+│   │   ├── prisma_synthesizer.py # PRISMA 2020 review & Cochrane meta-analysis (v6.0)
 │   │   ├── in_silico_simulator.py # In Silico experiment simulator & Monte Carlo engine (v5.0)
 │   │   ├── temporal_roadmap.py # Temporal knowledge horizon & living roadmap (v4.0)
 │   │   ├── dossier_generator.py # Autonomous research dossier & press brief (v4.0)
@@ -434,10 +478,11 @@ EvidenceFirst-RAG/
 │   └── pipeline.py          # Master orchestrator
 │
 ├── app/
-│   ├── api.py               # FastAPI REST API server v0.5.0 (Swagger /docs)
-│   └── streamlit_app.py     # 25-Tab Interactive Research Dashboard (v5.0)
+│   ├── api.py               # FastAPI REST API server v0.6.0 (Swagger /docs)
+│   └── streamlit_app.py     # 28-Tab Interactive Research Dashboard (v6.0)
 │
-├── tests/                   # Pytest test suite (41 passing tests)
+├── tests/                   # Pytest test suite (47 passing tests)
+│   ├── test_v6_advanced.py  # Symbolic theorem prover, adversarial stress-tester & PRISMA (v6.0)
 │   ├── test_v5_advanced.py  # In Silico simulator, analogy transfer & novelty sentinel (v5.0)
 │   ├── test_v4_advanced.py  # Causal DAG, reproducibility, living roadmap & dossier
 │   ├── test_v3_advanced.py  # Peer review, debate council, bibliometrics & slides
@@ -450,7 +495,7 @@ EvidenceFirst-RAG/
 │   └── test_verification.py # Contradiction & citation auditor tests
 │
 ├── requirements.txt         # Dependencies
-└── main.py                  # CLI runner with v5.0 flags & exporters
+└── main.py                  # CLI runner with v6.0 flags & exporters
 ```
 
 

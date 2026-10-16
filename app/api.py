@@ -646,5 +646,89 @@ def audit_novelty_and_drift(req: QueryRequest):
     return sentinel_report.model_dump()
 
 
+# --- v6.0 Frontier Scientific Intelligence Endpoints ---
+
+@app.post("/api/v1/verification/symbolic", tags=["Symbolic Proof Verifier"])
+def verify_symbolic_theorems(req: QueryRequest):
+    """Run SymPy automated theorem prover, mathematical bound derivations, and formal proof certification."""
+    if not pipeline_instance:
+        raise HTTPException(status_code=503, detail="Pipeline not initialized")
+
+    if req.domain:
+        pipeline_instance.filter_by_domain(req.domain)
+
+    report = pipeline_instance.run(req.query)
+    proof_report = pipeline_instance.symbolic_engine.verify_query_theorems(
+        query=req.query,
+        claims=report.claims,
+    )
+    return proof_report.model_dump()
+
+
+@app.get("/api/v1/verification/symbolic/script", tags=["Symbolic Proof Verifier"])
+def get_symbolic_verification_script():
+    """Download standalone executable SymPy mathematical verification script."""
+    if not pipeline_instance:
+        raise HTTPException(status_code=503, detail="Pipeline not initialized")
+
+    proof_report = pipeline_instance.symbolic_engine.verify_query_theorems(
+        query="Vision Transformers in low-light",
+    )
+    return {
+        "filename": "symbolic_proof_verification.py",
+        "script": proof_report.executable_sympy_script,
+    }
+
+
+@app.post("/api/v1/verification/adversarial-stress-test", tags=["Adversarial Red-Team"])
+def run_adversarial_stress_test(req: QueryRequest):
+    """Execute epistemic red-teaming against Simpson's paradox, cherry-picking, p-hacking, and citation poisoning."""
+    if not pipeline_instance:
+        raise HTTPException(status_code=503, detail="Pipeline not initialized")
+
+    if req.domain:
+        pipeline_instance.filter_by_domain(req.domain)
+
+    report = pipeline_instance.run(req.query)
+    stress_report = pipeline_instance.adversarial_tester.run_stress_test(
+        query=req.query,
+        claims=report.claims,
+        synthesis_report=report,
+    )
+    return stress_report.model_dump()
+
+
+@app.post("/api/v1/synthesis/prisma-review", tags=["PRISMA Systematic Review"])
+def synthesize_prisma_systematic_review(req: QueryRequest):
+    """Generate PRISMA 2020 systematic review flow, Cochrane Risk of Bias 2.0 matrix, and random-effects meta-analysis."""
+    if not pipeline_instance:
+        raise HTTPException(status_code=503, detail="Pipeline not initialized")
+
+    if req.domain:
+        pipeline_instance.filter_by_domain(req.domain)
+
+    prisma_report = pipeline_instance.prisma_synthesizer.synthesize_systematic_review(
+        query=req.query,
+        papers=pipeline_instance.indexed_papers,
+    )
+    return prisma_report.model_dump()
+
+
+@app.get("/api/v1/export/prisma-report", tags=["Export"])
+def export_prisma_html_report(query: str = "Vision Transformers for low-light object detection"):
+    """Export standalone interactive HTML PRISMA 2020 & Cochrane Forest Plot dashboard."""
+    if not pipeline_instance:
+        raise HTTPException(status_code=503, detail="Pipeline not initialized")
+
+    prisma_report = pipeline_instance.prisma_synthesizer.synthesize_systematic_review(
+        query=query,
+        papers=pipeline_instance.indexed_papers,
+    )
+    return {
+        "query": query,
+        "interactive_forest_html": prisma_report.interactive_forest_html,
+    }
+
+
 
 

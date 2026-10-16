@@ -9,6 +9,7 @@ from src.synthesis.slide_generator import SlideDeckGenerator
 from src.synthesis.temporal_roadmap import TemporalRoadmapEngine
 from src.synthesis.dossier_generator import DossierGenerator
 from src.synthesis.in_silico_simulator import InSilicoSimulator
+from src.synthesis.prisma_synthesizer import PrismaMetaAnalysisEngine
 
 __all__ = [
     "EvidenceSynthesizer",
@@ -22,6 +23,7 @@ __all__ = [
     "TemporalRoadmapEngine",
     "DossierGenerator",
     "InSilicoSimulator",
+    "PrismaMetaAnalysisEngine",
 ]
 
 

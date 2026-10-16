@@ -249,6 +249,9 @@ class SynthesisReport(BaseModel):
     in_silico_simulation: Optional[InSilicoExperimentReport] = None
     cross_domain_transfer: Optional[InterdisciplinaryTransferReport] = None
     novelty_sentinel: Optional[NoveltySentinelReport] = None
+    symbolic_proof_report: Optional[SymbolicProofReport] = None
+    adversarial_stress_report: Optional[AdversarialStressReport] = None
+    prisma_meta_analysis: Optional[PrismaMetaAnalysisReport] = None
 
 
 # --- v3.0 Advanced Research Intelligence Schemas ---
@@ -576,6 +579,126 @@ class NoveltySentinelReport(BaseModel):
     prior_art_collisions: List[PriorArtCollision] = Field(default_factory=list)
     semantic_drift_records: List[SemanticDriftRecord] = Field(default_factory=list)
     overall_sentinel_verdict: str
+
+
+# --- v6.0 Autonomous Meta-Science & Epistemic Synthesis Schemas ---
+
+class SymbolicProofCertificate(BaseModel):
+    proof_id: str
+    target_claim_or_theorem: str
+    domain_formalism: str  # e.g., "Poisson Shot Noise & Attention Degradation Bounds"
+    sympy_formulation: str
+    formal_derivation_steps: List[str] = Field(default_factory=list)
+    asymptotic_bound: str
+    lipschitz_constant_or_gradient_bound: Optional[str] = None
+    verdict: Literal["VERIFIED_THEOREM", "CONDITIONALLY_BOUNDED", "FALSIFIED_COUNTEREXAMPLE"] = "VERIFIED_THEOREM"
+    unstated_assumptions: List[str] = Field(default_factory=list)
+    counterexample_conditions: Optional[str] = None
+    latex_proof_render: str = ""
+
+
+class SymbolicProofReport(BaseModel):
+    proof_system_id: str
+    analyzed_query: str
+    theorems_evaluated: int
+    proof_certificates: List[SymbolicProofCertificate] = Field(default_factory=list)
+    formal_consistency_score: float  # 0.0 to 1.0
+    critical_theoretical_breakdowns: List[str] = Field(default_factory=list)
+    executable_sympy_script: str = ""
+
+
+class AdversarialAttackVector(BaseModel):
+    attack_id: str
+    attack_category: Literal[
+        "Simpsons_Paradox_Reversal",
+        "Metric_Cherry_Picking_Inversion",
+        "P_Hacking_Subgroup_Dredging",
+        "Adversarial_Citation_Poisoning",
+        "Semantic_Hallucination_Trap"
+    ]
+    attack_prompt_or_perturbation: str
+    intended_deception_target: str
+    pipeline_defended: bool = True
+    vulnerability_severity: Literal["Low", "Medium", "High", "Critical"] = "Low"
+    observed_failure_or_defense: str
+    remediation_patch: str
+
+
+class AdversarialStressReport(BaseModel):
+    stress_test_id: str
+    epistemic_vulnerability_index: float  # 0.0 (fully defended) to 1.0 (vulnerable)
+    total_attacks_simulated: int
+    attacks_successfully_defended: int
+    defense_rate_pct: float
+    attack_vectors: List[AdversarialAttackVector] = Field(default_factory=list)
+    simpsons_paradox_audit: Dict[str, Any] = Field(default_factory=dict)
+    metric_robustness_gap: float = 0.12
+    adversarial_resilience_verdict: Literal[
+        "Hardened Research Defense",
+        "Moderate Epistemic Armor",
+        "Vulnerable to Subtle Fallacies"
+    ] = "Hardened Research Defense"
+    automated_defense_rules: List[str] = Field(default_factory=list)
+
+
+class PrismaFlowRecord(BaseModel):
+    identification_count: int = 14
+    screening_count: int = 14
+    excluded_screening_count: int = 3
+    eligibility_assessed_count: int = 11
+    excluded_eligibility_count: int = 2
+    included_synthesis_count: int = 9
+    flow_exclusion_reasons: Dict[str, int] = Field(default_factory=dict)
+
+
+class CochraneRiskOfBiasItem(BaseModel):
+    study_id: str
+    study_title: str
+    domain_1_randomization_selection: Literal["Low", "Some Concerns", "High"] = "Low"
+    domain_2_deviations_interventions: Literal["Low", "Some Concerns", "High"] = "Low"
+    domain_3_missing_outcome_data: Literal["Low", "Some Concerns", "High"] = "Low"
+    domain_4_measurement_outcome: Literal["Low", "Some Concerns", "High"] = "Low"
+    domain_5_selective_reporting: Literal["Low", "Some Concerns", "High"] = "Low"
+    overall_risk_of_bias: Literal["Low Risk", "Some Concerns", "High Risk"] = "Low Risk"
+    rationale: str
+
+
+class ForestPlotStudyRecord(BaseModel):
+    study_id: str
+    study_label: str
+    year: int
+    sample_size: int
+    effect_size: float  # Standardized Mean Difference (Hedges' g)
+    confidence_interval_95: List[float] = Field(default_factory=list)  # [ci_lower, ci_upper]
+    weight_pct: float
+    favors_direction: Literal["Favors Proposed", "Favors Baseline", "Neutral"] = "Favors Proposed"
+
+
+class PrismaMetaAnalysisReport(BaseModel):
+    prisma_id: str
+    inquiry_domain: str
+    prisma_flow: PrismaFlowRecord
+    cochrane_risk_of_bias: List[CochraneRiskOfBiasItem] = Field(default_factory=list)
+    forest_plot_studies: List[ForestPlotStudyRecord] = Field(default_factory=list)
+    pooled_random_effects_estimate: float
+    pooled_confidence_interval_95: List[float] = Field(default_factory=list)
+    heterogeneity_i2_pct: float
+    cochran_q_statistic: float
+    cochran_q_p_value: float
+    tau_squared_variance: float
+    eggers_intercept_beta0: float
+    eggers_p_value: float
+    publication_bias_detected: bool
+    overall_synthesis_strength: Literal[
+        "High Certainty Evidence (Grade A)",
+        "Moderate Certainty Evidence (Grade B)",
+        "Low Certainty Evidence (Grade C)"
+    ] = "High Certainty Evidence (Grade A)"
+    interactive_forest_html: str = ""
+
+
+# Rebuild model for forward references
+SynthesisReport.model_rebuild()
 
 
 
