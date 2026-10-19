@@ -195,6 +195,31 @@ def main():
         help="Export standalone interactive HTML PRISMA 2020 & Cochrane Forest Plot dashboard",
     )
     parser.add_argument(
+        "--bayesian",
+        action="store_true",
+        help="Run Sequential Bayesian Belief Updating, Bayes Factor (BF10) calibration, and 95% HDI intervals",
+    )
+    parser.add_argument(
+        "--preregister",
+        action="store_true",
+        help="Synthesize formal OSF / AsPredicted confirmatory preregistration protocols with SHA-256 hashes",
+    )
+    parser.add_argument(
+        "--export-prereg",
+        action="store_true",
+        help="Export formal OSF Preregistration Dossier to standalone markdown document",
+    )
+    parser.add_argument(
+        "--quantum-epistemic",
+        action="store_true",
+        help="Calculate Hilbert-space quantum epistemic state vectors, von Neumann entropy, and inter-study interference",
+    )
+    parser.add_argument(
+        "--export-quantum",
+        action="store_true",
+        help="Export standalone interactive 3D HTML Quantum Epistemic Bloch Sphere Radar dashboard",
+    )
+    parser.add_argument(
         "--serve-api",
         action="store_true",
         help="Launch the EvidenceFirst-RAG FastAPI REST server on port 8000",
@@ -639,6 +664,87 @@ def main():
         with open(out_prisma_html, "w", encoding="utf-8") as f:
             f.write(pma.interactive_forest_html)
         print(f"📊 PRISMA 2020 & Cochrane Forest Plot HTML exported to: {out_prisma_html}\n")
+
+    # Bayesian Belief Updating Flag (v7.0)
+    if args.bayesian and report.bayesian_belief_report:
+        bayes = report.bayesian_belief_report
+        print("\n" + "=" * 80)
+        print(f"  🧠 Bayesian Epistemic Belief Updating & Bayes Factor Calibration [{bayes.report_id}]")
+        print("=" * 80)
+        print(f"Claims Evaluated: {bayes.claims_evaluated} | Consensus Convergence Rate: {bayes.consensus_convergence_rate * 100:.1f}%")
+        print(f"Epistemic Shannon Entropy: {bayes.overall_epistemic_entropy_prior:.3f} -> {bayes.overall_epistemic_entropy_posterior:.3f} nats (Info Gain: {bayes.mean_information_gain_nats:.3f} nats)")
+        print(f"Calibration Quality Score (Brier): {bayes.calibration_quality_score * 100:.1f}%\n")
+        print("Bayesian Claim Credence Shifts & Credible Intervals (95% HDI):")
+        for b in bayes.claim_beliefs:
+            print(f"  • [{b.claim_id}] {b.statement[:65]}...")
+            print(f"    Prior P(H): {b.prior_credence:.2f} -> Posterior P(H|E): {b.posterior_credence:.2f} (Shift: {b.belief_shift_magnitude:+.2f})")
+            print(f"    Aggregate BF10: {b.bayes_factor_aggregate_10:.2f} | Status: {b.epistemic_state_label}")
+            print(f"    95% Credible Interval (HDI): [{b.credible_interval_95_hdi[0]:.2f}, {b.credible_interval_95_hdi[1]:.2f}] | Info Gain: {b.epistemic_information_gain_nats:.3f} nats\n")
+        print("Epistemic Belief Insights:")
+        for ins in bayes.epistemic_insights:
+            print(f"  💡 {ins}")
+        print("=" * 80 + "\n")
+
+    # OSF Preregistration Flag (v7.0)
+    if args.preregister and report.preregistration_dossier:
+        dossier = report.preregistration_dossier
+        print("\n" + "=" * 80)
+        print(f"  📋 Open Science Framework (OSF) Confirmatory Preregistrations [{dossier.dossier_id}]")
+        print("=" * 80)
+        print(f"Total Protocols: {dossier.total_protocols_synthesized} | Open Science Compliance: {dossier.open_science_compliance_index * 100:.1f}%\n")
+        for proto in dossier.protocols:
+            print(f"  • [{proto.protocol_id}] {proto.title}")
+            print(f"    Type: {proto.study_type} | Status: {proto.osf_badge_audit.preregistration_status}")
+            print(f"    Cryptographic SHA-256 Hash: {proto.cryptographic_sha256_hash}")
+            print(f"    Power: 1-β = {proto.sample_size_determination.get('power_target', 0.90)}, α = {proto.sample_size_determination.get('alpha_level', 0.01)}, N = {proto.sample_size_determination.get('min_required_test_samples', 150)}")
+            print(f"    FDR Correction: {proto.fdr_correction_method}")
+            print()
+        print("Anti-P-Hacking Safeguards:")
+        for sg in dossier.anti_phacking_safeguards:
+            print(f"  🛡️ {sg}")
+        print("=" * 80 + "\n")
+
+    # Export OSF Preregistration Markdown Flag (v7.0)
+    if args.export_prereg and report.preregistration_dossier:
+        dossier = report.preregistration_dossier
+        out_prereg_md = "data/osf_preregistration_dossier.md"
+        with open(out_prereg_md, "w", encoding="utf-8") as f:
+            f.write(dossier.preregistration_markdown_document)
+        print(f"📋 OSF Preregistration Dossier Markdown exported to: {out_prereg_md}\n")
+
+    # Quantum Epistemic Engine Flag (v7.0)
+    if args.quantum_epistemic and report.quantum_epistemic_report:
+        q_rep = report.quantum_epistemic_report
+        print("\n" + "=" * 80)
+        print(f"  ⚛️ Quantum-Inspired Epistemic State & Hilbert Space Superposition [{q_rep.report_id}]")
+        print("=" * 80)
+        print(f"Mean von Neumann Entropy: {q_rep.mean_von_neumann_entropy:.3f} nats | Claims in Superposition: {q_rep.total_claims_in_superposition}")
+        print(f"Systemic Coherence Index: {q_rep.systemic_coherence_index:.3f}\n")
+        print("Bloch Sphere Epistemic Coordinates & Quantum Density Matrices:")
+        for qs in q_rep.quantum_states:
+            coord = qs.bloch_coordinates
+            print(f"  • [{qs.claim_id}] {qs.statement[:65]}...")
+            print(f"    Regime: {qs.epistemic_regime}")
+            print(f"    Amplitudes: |Support⟩={qs.support_amplitude_alpha:.2f}, |Contradict⟩={qs.contradiction_amplitude_beta:.2f}")
+            print(f"    Bloch Vector: (x={coord.x:.2f}, y={coord.y:.2f}, z={coord.z:.2f}) [Lat: {coord.latitude_deg:.1f}°, Lon: {coord.longitude_deg:.1f}°]")
+            print(f"    von Neumann S: {qs.von_neumann_entropy:.3f} | Coherence: {qs.quantum_coherence:.3f} | Purity: {qs.superposition_purity:.3f}")
+            if qs.interfering_pairs:
+                for pair in qs.interfering_pairs[:1]:
+                    print(f"    Interference ({pair.interference_type}): Mag={pair.interference_magnitude:+.3f}, Shift={pair.phase_shift_deg:.1f}°")
+            print()
+        print("Quantum Epistemic Phase Insights:")
+        for ins in q_rep.epistemic_phase_insights:
+            print(f"  ⚛️ {ins}")
+        print("=" * 80 + "\n")
+
+    # Export Quantum Bloch Sphere HTML Flag (v7.0)
+    if args.export_quantum and report.quantum_epistemic_report:
+        q_rep = report.quantum_epistemic_report
+        out_bloch_html = "data/quantum_epistemic_radar.html"
+        with open(out_bloch_html, "w", encoding="utf-8") as f:
+            f.write(q_rep.bloch_sphere_html)
+        print(f"⚛️ Quantum Epistemic Bloch Sphere Radar HTML exported to: {out_bloch_html}\n")
+
 
 
 if __name__ == "__main__":

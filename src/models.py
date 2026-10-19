@@ -252,6 +252,10 @@ class SynthesisReport(BaseModel):
     symbolic_proof_report: Optional[SymbolicProofReport] = None
     adversarial_stress_report: Optional[AdversarialStressReport] = None
     prisma_meta_analysis: Optional[PrismaMetaAnalysisReport] = None
+    bayesian_belief_report: Optional[BayesianBeliefReport] = None
+    preregistration_dossier: Optional[PreregistrationDossier] = None
+    quantum_epistemic_report: Optional[QuantumEpistemicReport] = None
+
 
 
 # --- v3.0 Advanced Research Intelligence Schemas ---
@@ -697,8 +701,168 @@ class PrismaMetaAnalysisReport(BaseModel):
     interactive_forest_html: str = ""
 
 
+
+# --- v7.0 Bayesian Epistemics, OSF Preregistration & Quantum Epistemic Schemas ---
+
+class BayesFactorRecord(BaseModel):
+    evidence_id: str
+    paper_id: str
+    paper_title: str
+    direction: Literal["SUPPORTS", "CONTRADICTS", "NEUTRAL"]
+    raw_bayes_factor_10: float  # BF10 = P(E | H1) / P(E | H0)
+    log10_bayes_factor: float
+    evidence_weight: float
+    sample_size: int
+    jeffreys_interpretation: Literal[
+        "Decisive Evidence for H1",
+        "Very Strong Evidence for H1",
+        "Strong Evidence for H1",
+        "Moderate Evidence for H1",
+        "Anecdotal Evidence for H1",
+        "Inconclusive / Neutral",
+        "Evidence Favors Null H0 (Contradictory)"
+    ]
+
+
+class BayesianTrajectoryPoint(BaseModel):
+    step_index: int
+    paper_id: str
+    paper_title: str
+    prior_prob: float
+    likelihood_ratio: float
+    posterior_prob: float
+    log_odds: float
+    information_gain_kl: float  # D_KL in nats
+
+
+class BayesianClaimBelief(BaseModel):
+    claim_id: str
+    statement: str
+    prior_credence: float = 0.50
+    posterior_credence: float = 0.50
+    bayes_factor_aggregate_10: float = 1.0
+    epistemic_information_gain_nats: float = 0.0
+    credible_interval_95_hdi: List[float] = Field(default_factory=lambda: [0.0, 1.0])
+    belief_shift_magnitude: float = 0.0
+    epistemic_state_label: Literal[
+        "Empirically Settled (High Credence)",
+        "Probable Consensus",
+        "High Epistemic Uncertainty",
+        "Substantially Debunked",
+        "Strongly Refuted (Low Credence)"
+    ] = "High Epistemic Uncertainty"
+    evidence_updates: List[BayesFactorRecord] = Field(default_factory=list)
+    trajectory: List[BayesianTrajectoryPoint] = Field(default_factory=list)
+
+
+class BayesianBeliefReport(BaseModel):
+    report_id: str
+    overall_epistemic_entropy_prior: float
+    overall_epistemic_entropy_posterior: float
+    mean_information_gain_nats: float
+    claims_evaluated: int
+    claim_beliefs: List[BayesianClaimBelief] = Field(default_factory=list)
+    consensus_convergence_rate: float
+    calibration_quality_score: float  # Brier-calibrated score 0.0 to 1.0
+    epistemic_insights: List[str] = Field(default_factory=list)
+
+
+class OSFBadgeAudit(BaseModel):
+    open_data_badge: bool = True
+    open_materials_badge: bool = True
+    preregistered_badge: bool = True
+    preregistration_status: Literal[
+        "Preregistered Confirmatory",
+        "Preregistered with Analysis Plan",
+        "Exploratory Unregistered"
+    ] = "Preregistered Confirmatory"
+    badge_criteria_met: List[str] = Field(default_factory=list)
+
+
+class PreregistrationProtocol(BaseModel):
+    protocol_id: str  # e.g. PRG-2026-VIT-001
+    title: str
+    target_tension_or_hypothesis: str
+    study_type: Literal[
+        "Confirmatory Benchmark Evaluation",
+        "Double-Blind Replication Study",
+        "Multi-Center Cross-Dataset Trial",
+        "Factorial Ablation Experiment"
+    ] = "Confirmatory Benchmark Evaluation"
+    primary_hypothesis_h1: str
+    secondary_hypotheses: List[str] = Field(default_factory=list)
+    null_hypothesis_h0: str
+    independent_variables: List[Dict[str, str]] = Field(default_factory=list)
+    dependent_variables: List[Dict[str, str]] = Field(default_factory=list)
+    sample_size_determination: Dict[str, Any] = Field(default_factory=dict)
+    data_exclusion_rules: List[str] = Field(default_factory=list)
+    prespecified_statistical_pipeline: List[str] = Field(default_factory=list)
+    fdr_correction_method: str = "Benjamini-Hochberg (q=0.05)"
+    cryptographic_sha256_hash: str
+    osf_badge_audit: OSFBadgeAudit = Field(default_factory=OSFBadgeAudit)
+    registration_timestamp: str = "2026-10-19T00:00:00Z"
+
+
+class PreregistrationDossier(BaseModel):
+    dossier_id: str
+    protocols: List[PreregistrationProtocol] = Field(default_factory=list)
+    total_protocols_synthesized: int
+    open_science_compliance_index: float  # 0.0 to 1.0
+    preregistration_markdown_document: str = ""
+    anti_phacking_safeguards: List[str] = Field(default_factory=list)
+
+
+class BlochSphereCoordinate(BaseModel):
+    theta_rad: float  # polar angle [0, pi]
+    phi_rad: float    # azimuthal angle [0, 2*pi]
+    x: float          # x = sin(theta)*cos(phi)
+    y: float          # y = sin(theta)*sin(phi)
+    z: float          # z = cos(theta)
+    latitude_deg: float
+    longitude_deg: float
+
+
+class QuantumInterferenceRecord(BaseModel):
+    pair_id: str
+    study_a_id: str
+    study_b_id: str
+    interference_type: Literal["Constructive Consensus", "Destructive Contradiction", "Orthogonal Decoupled"]
+    interference_magnitude: float  # 2 * Re( <Support|rho|Contradict> )
+    phase_shift_deg: float
+    qualitative_explanation: str
+
+
+class QuantumEpistemicState(BaseModel):
+    claim_id: str
+    statement: str
+    support_amplitude_alpha: float  # |alpha|^2 + |beta|^2 = 1
+    contradiction_amplitude_beta: float
+    superposition_purity: float     # Tr(rho^2), 0.5 to 1.0
+    von_neumann_entropy: float      # -Tr(rho ln rho), 0.0 to ln(2)=0.693
+    quantum_coherence: float        # 2 * |rho_01|, 0.0 to 1.0
+    bloch_coordinates: BlochSphereCoordinate
+    epistemic_regime: Literal[
+        "Pure Support Eigenstate",
+        "Pure Contradiction Eigenstate",
+        "Superposed Disagreement (Equatorial)",
+        "Decoherent Mixed Evidence"
+    ]
+    interfering_pairs: List[QuantumInterferenceRecord] = Field(default_factory=list)
+
+
+class QuantumEpistemicReport(BaseModel):
+    report_id: str
+    mean_von_neumann_entropy: float
+    total_claims_in_superposition: int
+    systemic_coherence_index: float
+    quantum_states: List[QuantumEpistemicState] = Field(default_factory=list)
+    bloch_sphere_html: str = ""
+    epistemic_phase_insights: List[str] = Field(default_factory=list)
+
+
 # Rebuild model for forward references
 SynthesisReport.model_rebuild()
+
 
 
 

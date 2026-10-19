@@ -10,6 +10,7 @@ from src.synthesis.temporal_roadmap import TemporalRoadmapEngine
 from src.synthesis.dossier_generator import DossierGenerator
 from src.synthesis.in_silico_simulator import InSilicoSimulator
 from src.synthesis.prisma_synthesizer import PrismaMetaAnalysisEngine
+from src.synthesis.preregistration_synthesizer import PreregistrationSynthesizer
 
 __all__ = [
     "EvidenceSynthesizer",
@@ -24,6 +25,7 @@ __all__ = [
     "DossierGenerator",
     "InSilicoSimulator",
     "PrismaMetaAnalysisEngine",
+    "PreregistrationSynthesizer",
 ]
 
 

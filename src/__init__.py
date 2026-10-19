@@ -1,6 +1,6 @@
 """EvidenceFirst-RAG: Claim-Level Evidence Verification and Contradiction-Aware RAG for Scientific Literature."""
 
-__version__ = "0.6.0"
+__version__ = "0.7.0"
 
 from src.pipeline import EvidenceFirstPipeline
 from src.models import (
@@ -26,6 +26,14 @@ from src.models import (
     PrismaFlowRecord,
     CochraneRiskOfBiasItem,
     ForestPlotStudyRecord,
+    BayesianBeliefReport,
+    BayesianClaimBelief,
+    BayesFactorRecord,
+    PreregistrationDossier,
+    PreregistrationProtocol,
+    QuantumEpistemicReport,
+    QuantumEpistemicState,
+    BlochSphereCoordinate,
 )
 
 __all__ = [
@@ -52,4 +60,13 @@ __all__ = [
     "PrismaFlowRecord",
     "CochraneRiskOfBiasItem",
     "ForestPlotStudyRecord",
+    "BayesianBeliefReport",
+    "BayesianClaimBelief",
+    "BayesFactorRecord",
+    "PreregistrationDossier",
+    "PreregistrationProtocol",
+    "QuantumEpistemicReport",
+    "QuantumEpistemicState",
+    "BlochSphereCoordinate",
 ]
+

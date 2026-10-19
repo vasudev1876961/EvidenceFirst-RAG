@@ -5,6 +5,7 @@ from src.claims.graph_visualizer import EvidenceGraphVisualizer
 from src.claims.citation_network import BibliometricNetworkAnalyzer
 from src.claims.causal_graph import CausalGraphEngine
 from src.claims.analogy_engine import CrossDomainAnalogyEngine
+from src.claims.quantum_epistemic import QuantumEpistemicEngine
 
 __all__ = [
     "ClaimExtractor",
@@ -14,6 +15,7 @@ __all__ = [
     "BibliometricNetworkAnalyzer",
     "CausalGraphEngine",
     "CrossDomainAnalogyEngine",
+    "QuantumEpistemicEngine",
 ]
 
 

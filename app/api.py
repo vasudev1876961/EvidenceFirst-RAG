@@ -141,7 +141,11 @@ def analyze_query(req: QueryRequest):
         "consensus_council": report.consensus_council.model_dump() if report.consensus_council else None,
         "bibliometrics": report.bibliometrics.model_dump() if report.bibliometrics else None,
         "slide_deck": report.slide_deck.model_dump() if report.slide_deck else None,
+        "bayesian_beliefs": report.bayesian_belief_report.model_dump() if report.bayesian_belief_report else None,
+        "preregistration": report.preregistration_dossier.model_dump() if report.preregistration_dossier else None,
+        "quantum_epistemic": report.quantum_epistemic_report.model_dump() if report.quantum_epistemic_report else None,
     }
+
 
 
 
@@ -728,6 +732,78 @@ def export_prisma_html_report(query: str = "Vision Transformers for low-light ob
         "query": query,
         "interactive_forest_html": prisma_report.interactive_forest_html,
     }
+
+
+@app.post("/api/v1/verification/bayesian-beliefs", tags=["Bayesian Epistemics"])
+def evaluate_bayesian_beliefs(req: QueryRequest):
+    """Execute sequential Bayesian belief updating, Bayes Factor calibration, and 95% credible intervals."""
+    if not pipeline_instance:
+        raise HTTPException(status_code=503, detail="Pipeline not initialized")
+
+    if req.domain:
+        pipeline_instance.filter_by_domain(req.domain)
+
+    report = pipeline_instance.run(req.query)
+    bayes_report = pipeline_instance.bayesian_updater.evaluate_beliefs(
+        claims=report.claims,
+        papers=pipeline_instance.indexed_papers,
+        rigor_report=report.rigor_report,
+    )
+    return bayes_report.model_dump()
+
+
+@app.post("/api/v1/synthesis/osf-preregistration", tags=["OSF Preregistration"])
+def synthesize_osf_preregistrations(req: QueryRequest):
+    """Synthesize formal OSF / AsPredicted confirmatory preregistrations with SHA-256 hashes."""
+    if not pipeline_instance:
+        raise HTTPException(status_code=503, detail="Pipeline not initialized")
+
+    if req.domain:
+        pipeline_instance.filter_by_domain(req.domain)
+
+    report = pipeline_instance.run(req.query)
+    dossier = pipeline_instance.preregistration_synthesizer.synthesize_dossier(
+        claims=report.claims,
+        conflicts=report.conflicting_findings,
+        hypotheses=report.hypotheses,
+        robustness=report.robustness,
+    )
+    return dossier.model_dump()
+
+
+@app.post("/api/v1/claims/quantum-epistemic", tags=["Quantum Epistemics"])
+def calculate_quantum_epistemic_states(req: QueryRequest):
+    """Calculate Hilbert-space quantum epistemic state vectors, density matrices, and von Neumann entropy."""
+    if not pipeline_instance:
+        raise HTTPException(status_code=503, detail="Pipeline not initialized")
+
+    if req.domain:
+        pipeline_instance.filter_by_domain(req.domain)
+
+    report = pipeline_instance.run(req.query)
+    q_report = pipeline_instance.quantum_epistemic_engine.evaluate_epistemic_states(
+        claims=report.claims,
+        conflicts=report.conflicting_findings,
+    )
+    return q_report.model_dump()
+
+
+@app.get("/api/v1/export/quantum-radar", tags=["Export"])
+def export_quantum_bloch_radar(query: str = "Vision Transformers for low-light object detection"):
+    """Export standalone interactive 3D HTML Quantum Epistemic Bloch Sphere Radar."""
+    if not pipeline_instance:
+        raise HTTPException(status_code=503, detail="Pipeline not initialized")
+
+    report = pipeline_instance.run(query)
+    q_report = pipeline_instance.quantum_epistemic_engine.evaluate_epistemic_states(
+        claims=report.claims,
+        conflicts=report.conflicting_findings,
+    )
+    return {
+        "query": query,
+        "bloch_sphere_html": q_report.bloch_sphere_html,
+    }
+
 
 
 

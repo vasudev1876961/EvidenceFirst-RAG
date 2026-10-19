@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Quantum Epistemic Bloch Sphere Radar</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #090d16; color: #f8fafc; margin: 0; padding: 24px; }
+        .card { background: rgba(15, 23, 42, 0.75); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 12px; padding: 24px; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4); }
+        .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 16px; margin-bottom: 20px; }
+        .badge { background: #3b82f622; color: #60a5fa; border: 1px solid #3b82f644; padding: 4px 12px; border-radius: 999px; font-size: 12px; font-weight: 600; }
+        .sphere-container { display: flex; gap: 24px; align-items: flex-start; }
+        .telemetry-panel { flex: 1; }
+        .svg-panel { width: 340px; height: 340px; background: radial-gradient(circle, #1e293b 0%, #0b0f19 100%); border-radius: 50%; border: 1px solid #334155; position: relative; display: flex; align-items: center; justify-content: center; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <div class="header">
+            <div>
+                <h1 style="margin:0; font-size: 22px; color: #38bdf8;">⚛️ Quantum Epistemic Bloch Sphere Radar</h1>
+                <p style="margin: 4px 0 0 0; color: #94a3b8; font-size: 13px;">Hilbert Space Superposition and von Neumann Entropy Mapping</p>
+            </div>
+            <span class="badge">v7.0 Epistemic Quantum Engine</span>
+        </div>
+        <div class="sphere-container">
+            <div class="svg-panel">
+                <svg width="320" height="320" viewBox="-160 -160 320 320">
+                    <!-- Unit circle outline -->
+                    <circle cx="0" cy="0" r="130" fill="none" stroke="#334155" stroke-width="1.5" stroke-dasharray="4 4" />
+                    <!-- Equator ellipse -->
+                    <ellipse cx="0" cy="0" rx="130" ry="40" fill="none" stroke="#475569" stroke-width="1.5" />
+                    <!-- Coordinate axes -->
+                    <line x1="0" y1="-145" x2="0" y2="145" stroke="#64748b" stroke-width="1.5" />
+                    <line x1="-145" y1="0" x2="145" y2="0" stroke="#64748b" stroke-width="1.5" />
+                    <!-- Pole labels -->
+                    <text x="5" y="-135" fill="#10b981" font-size="11" font-weight="bold">|Support⟩ (|0⟩)</text>
+                    <text x="5" y="145" fill="#ef4444" font-size="11" font-weight="bold">|Contradict⟩ (|1⟩)</text>
+                    <text x="100" y="-10" fill="#94a3b8" font-size="10">+X</text>
+                    <text x="-135" y="-10" fill="#94a3b8" font-size="10">-X</text>
+                    <!-- Claim vector markers -->
+                    <circle cx="-1" cy="-120" r="6" fill="#10b981" stroke="#ffffff" stroke-width="1.5"><title>C001: (z=1.00, S=0.00)</title></circle><circle cx="-1" cy="-120" r="6" fill="#10b981" stroke="#ffffff" stroke-width="1.5"><title>C002: (z=1.00, S=0.00)</title></circle><circle cx="0" cy="-120" r="6" fill="#10b981" stroke="#ffffff" stroke-width="1.5"><title>C003: (z=1.00, S=0.00)</title></circle><circle cx="0" cy="-120" r="6" fill="#10b981" stroke="#ffffff" stroke-width="1.5"><title>C004: (z=1.00, S=0.00)</title></circle>
+                </svg>
+            </div>
+            <div class="telemetry-panel">
+                <h3 style="margin-top:0; color:#e2e8f0; font-size:16px;">Epistemic State Coordinates & Entropy</h3>
+                
+            <div style="background: rgba(255,255,255,0.03); border-left: 4px solid #10b981; padding: 12px; margin-bottom: 10px; border-radius: 4px;">
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <strong style="color: #f1f5f9;">C001: Vision Transformers require substantially more training data than...</strong>
+                    <span style="background:#10b98122; color:#10b981; padding:3px 8px; border-radius:12px; font-size:11px; font-weight:600;">Pure Support Eigenstate</span>
+                </div>
+                <div style="display:grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 8px; font-size:12px; color:#94a3b8;">
+                    <div>Bloch: (x=-0.01, y=-0.00, z=1.00)</div>
+                    <div>von Neumann S: <strong>0.000</strong></div>
+                    <div>Coherence: <strong>0.009</strong></div>
+                    <div>Purity: <strong>1.000</strong></div>
+                </div>
+            </div>
+            
+            <div style="background: rgba(255,255,255,0.03); border-left: 4px solid #10b981; padding: 12px; margin-bottom: 10px; border-radius: 4px;">
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <strong style="color: #f1f5f9;">C002: Vision Transformers incur higher computational overhead and slowe...</strong>
+                    <span style="background:#10b98122; color:#10b981; padding:3px 8px; border-radius:12px; font-size:11px; font-weight:600;">Pure Support Eigenstate</span>
+                </div>
+                <div style="display:grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 8px; font-size:12px; color:#94a3b8;">
+                    <div>Bloch: (x=-0.01, y=0.00, z=1.00)</div>
+                    <div>von Neumann S: <strong>0.000</strong></div>
+                    <div>Coherence: <strong>0.009</strong></div>
+                    <div>Purity: <strong>1.000</strong></div>
+                </div>
+            </div>
+            
+            <div style="background: rgba(255,255,255,0.03); border-left: 4px solid #10b981; padding: 12px; margin-bottom: 10px; border-radius: 4px;">
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <strong style="color: #f1f5f9;">C003: Vision Transformers outperform CNNs in low-light object detection...</strong>
+                    <span style="background:#10b98122; color:#10b981; padding:3px 8px; border-radius:12px; font-size:11px; font-weight:600;">Pure Support Eigenstate</span>
+                </div>
+                <div style="display:grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 8px; font-size:12px; color:#94a3b8;">
+                    <div>Bloch: (x=0.00, y=0.01, z=1.00)</div>
+                    <div>von Neumann S: <strong>0.000</strong></div>
+                    <div>Coherence: <strong>0.009</strong></div>
+                    <div>Purity: <strong>1.000</strong></div>
+                </div>
+            </div>
+            
+            <div style="background: rgba(255,255,255,0.03); border-left: 4px solid #10b981; padding: 12px; margin-bottom: 10px; border-radius: 4px;">
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <strong style="color: #f1f5f9;">C004: Local texture degradation in low-light imagery hampers ViT patch ...</strong>
+                    <span style="background:#10b98122; color:#10b981; padding:3px 8px; border-radius:12px; font-size:11px; font-weight:600;">Pure Support Eigenstate</span>
+                </div>
+                <div style="display:grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 8px; font-size:12px; color:#94a3b8;">
+                    <div>Bloch: (x=-0.00, y=-0.01, z=1.00)</div>
+                    <div>von Neumann S: <strong>0.000</strong></div>
+                    <div>Coherence: <strong>0.009</strong></div>
+                    <div>Purity: <strong>1.000</strong></div>
+                </div>
+            </div>
+            
+            </div>
+        </div>
+    </div>
+</body>
+</html>

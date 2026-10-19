@@ -10,6 +10,7 @@ from src.verification.reproducibility import ReproducibilityVerifier
 from src.verification.novelty_sentinel import NoveltySentinel
 from src.verification.symbolic_verifier import SymbolicProofEngine
 from src.verification.adversarial_tester import AdversarialStressTester
+from src.verification.bayesian_updater import BayesianBeliefUpdater
 
 __all__ = [
     "NLIEntailmentChecker",
@@ -24,6 +25,7 @@ __all__ = [
     "NoveltySentinel",
     "SymbolicProofEngine",
     "AdversarialStressTester",
+    "BayesianBeliefUpdater",
 ]
 
 

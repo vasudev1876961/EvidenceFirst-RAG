@@ -211,9 +211,12 @@ with m6:
 st.markdown("---")
 
 # Navigation Tabs
-tab_syn, tab_claims, tab_symbolic, tab_adversarial, tab_prisma, tab_sim, tab_transfer, tab_sentinel, tab_causal, tab_repro, tab_roadmap, tab_dossier, tab_conflicts, tab_council, tab_peer_review, tab_hypo, tab_trajectory, tab_rigor, tab_biblio, tab_sankey, tab_graph, tab_empirical, tab_robustness, tab_slides, tab_arxiv, tab_latex, tab_audit, tab_ablation = st.tabs([
+tab_syn, tab_claims, tab_bayesian, tab_prereg, tab_quantum, tab_symbolic, tab_adversarial, tab_prisma, tab_sim, tab_transfer, tab_sentinel, tab_causal, tab_repro, tab_roadmap, tab_dossier, tab_conflicts, tab_council, tab_peer_review, tab_hypo, tab_trajectory, tab_rigor, tab_biblio, tab_sankey, tab_graph, tab_empirical, tab_robustness, tab_slides, tab_arxiv, tab_latex, tab_audit, tab_ablation = st.tabs([
     "📑 Executive Synthesis",
     "🔍 Claim-Level Evidence",
+    "🧠 Bayesian Beliefs",
+    "📋 OSF Preregistration",
+    "⚛️ Quantum Bloch Radar",
     "📐 Symbolic Proofs",
     "🎯 Adversarial Red-Team",
     "📊 PRISMA Systematic Review",
@@ -241,6 +244,7 @@ tab_syn, tab_claims, tab_symbolic, tab_adversarial, tab_prisma, tab_sim, tab_tra
     "🛡️ Citation Audit",
     "📈 Ablation Benchmarks"
 ])
+
 
 
 
@@ -312,8 +316,164 @@ with tab_claims:
             st.caption("No contradictory passages detected.")
 
 
+# ----------------- TAB: BAYESIAN EPISTEMIC BELIEFS (v7.0) -----------------
+with tab_bayesian:
+    st.subheader("🧠 Sequential Bayesian Epistemic Belief Updating & Bayes Factor Calibration")
+    st.caption("Tracks how scientific credences evolve dynamically as empirical evidence accumulates, computing Bayes Factors (BF10), log-odds trajectories, and 95% Bayesian Credible Intervals (HDI).")
+
+    if report.bayesian_belief_report:
+        bayes = report.bayesian_belief_report
+        b_c1, b_c2, b_c3, b_c4 = st.columns(4)
+        b_c1.metric("Convergence Rate", f"{bayes.consensus_convergence_rate * 100:.1f}%", "Consensus Settled")
+        b_c2.metric("Mean Info Gain", f"{bayes.mean_information_gain_nats:.3f} nats", "Kullback-Leibler D_KL")
+        b_c3.metric("Epistemic Entropy Shift", f"{bayes.overall_epistemic_entropy_prior:.2f} → {bayes.overall_epistemic_entropy_posterior:.2f}", f"Δ {bayes.overall_epistemic_entropy_posterior - bayes.overall_epistemic_entropy_prior:+.2f} nats")
+        b_c4.metric("Calibration Quality", f"{bayes.calibration_quality_score * 100:.0f}%", "Brier Reliability")
+
+        st.markdown("#### 📈 Bayesian Credence Trajectory Over Literature Evidence")
+        traj_data = []
+        for b in bayes.claim_beliefs:
+            for pt in b.trajectory:
+                traj_data.append({
+                    "Claim": b.claim_id,
+                    "Step": pt.step_index,
+                    "Source": pt.paper_id,
+                    "Credence": pt.posterior_prob,
+                    "InfoGain": pt.information_gain_kl,
+                })
+        if traj_data:
+            df_traj = pd.DataFrame(traj_data)
+            fig_bayes = px.line(
+                df_traj,
+                x="Step",
+                y="Credence",
+                color="Claim",
+                markers=True,
+                hover_data=["Source", "InfoGain"],
+                title="Sequential Posterior Probability P(H | E_1..k) Progression",
+                labels={"Credence": "Posterior Credence P(H|E)", "Step": "Evidence Ingestion Step"},
+                template="plotly_dark",
+            )
+            fig_bayes.add_hline(y=0.5, line_dash="dash", line_color="#94A3B8", annotation_text="Uninformative Prior P=0.50")
+            fig_bayes.update_layout(yaxis_range=[0.0, 1.0], height=400)
+            st.plotly_chart(fig_bayes, use_container_width=True)
+
+        st.markdown("#### 🎯 Claim Credence Shifts & Jeffreys Bayes Factor Audits")
+        for b in bayes.claim_beliefs:
+            color = "#10B981" if "Settled" in b.epistemic_state_label else ("#EF4444" if "Refuted" in b.epistemic_state_label or "Debunked" in b.epistemic_state_label else "#F59E0B")
+            with st.expander(f"[{b.claim_id}] {b.statement[:70]}... — P(H|E) = {b.posterior_credence:.2f} ({b.epistemic_state_label})"):
+                st.markdown(f"**Full Proposition**: *\"{b.statement}\"*")
+                col_b1, col_b2, col_b3 = st.columns(3)
+                col_b1.write(f"**Prior Credence**: `{b.prior_credence:.2f}` → **Posterior**: `{b.posterior_credence:.2f}`")
+                col_b2.write(f"**Aggregate BF10**: `{b.bayes_factor_aggregate_10:.2f}` (Shift: `{b.belief_shift_magnitude:+.2f}`)")
+                col_b3.write(f"**95% Credible Interval (HDI)**: `[{b.credible_interval_95_hdi[0]:.2f}, {b.credible_interval_95_hdi[1]:.2f}]`")
+
+                if b.evidence_updates:
+                    st.markdown("**Evidence Bayes Factor Updates**:")
+                    bf_table = [
+                        {
+                            "Evidence": r.evidence_id,
+                            "Paper": r.paper_id,
+                            "Direction": r.direction,
+                            "BF10": r.raw_bayes_factor_10,
+                            "log10(BF)": r.log10_bayes_factor,
+                            "Rigor Weight": r.evidence_weight,
+                            "Interpretation": r.jeffreys_interpretation,
+                        }
+                        for r in b.evidence_updates
+                    ]
+                    st.dataframe(pd.DataFrame(bf_table), use_container_width=True)
+
+        st.markdown("#### 💡 Epistemic Insights")
+        for ins in bayes.epistemic_insights:
+            st.info(f"💡 {ins}")
+
+
+# ----------------- TAB: OSF PREREGISTRATION (v7.0) -----------------
+with tab_prereg:
+    st.subheader("📋 Automated Open Science Framework (OSF) Confirmatory Preregistrations")
+    st.caption("Transforms academic contradictions into formal, publication-grade preregistration protocols with cryptographic SHA-256 fingerprint hashes, power-calibrated sample sizes, and anti-p-hacking safeguards.")
+
+    if report.preregistration_dossier:
+        dossier = report.preregistration_dossier
+        p_c1, p_c2, p_c3 = st.columns(3)
+        p_c1.metric("Protocols Synthesized", dossier.total_protocols_synthesized)
+        p_c2.metric("Open Science Compliance", f"{dossier.open_science_compliance_index * 100:.0f}%", "OSF Gold Tier")
+        p_c3.metric("Badges Awarded", "Open Data | Materials | Preregistered", "3/3 Badges Met")
+
+        st.markdown("#### 📜 Confirmatory Study Preregistration Protocols")
+        for proto in dossier.protocols:
+            with st.container():
+                st.markdown(f"""
+                <div style="background-color: #1E293B; border-left: 4px solid #10B981; border-radius: 8px; padding: 16px; margin-bottom: 14px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                        <span style="font-size: 1.1rem; font-weight: 700; color: #34D399;">[{proto.protocol_id}] {proto.title}</span>
+                        <span style="background: rgba(16, 185, 129, 0.2); color: #34D399; padding: 3px 10px; border-radius: 6px; font-size: 0.8rem; font-weight: 700;">{proto.study_type}</span>
+                    </div>
+                    <p style="color: #94A3B8; font-size: 0.9rem;"><strong>Target Tension:</strong> {proto.target_tension_or_hypothesis}</p>
+                    <p><strong>Primary Hypothesis (H1):</strong> <em>{proto.primary_hypothesis_h1}</em></p>
+                    <p><strong>Null Hypothesis (H0):</strong> <code>{proto.null_hypothesis_h0}</code></p>
+                    <p style="font-size: 0.85rem; color: #38BDF8;"><strong>Cryptographic SHA-256 Hash:</strong> <code>{proto.cryptographic_sha256_hash}</code></p>
+                    <div style="display: flex; gap: 16px; font-size: 0.85rem; color: #E2E8F0; margin-top: 8px;">
+                        <span>Target Power: <strong>{proto.sample_size_determination.get('power_target', 0.90)}</strong></span>
+                        <span>Alpha: <strong>{proto.sample_size_determination.get('alpha_level', 0.01)}</strong></span>
+                        <span>Min Samples (N): <strong>{proto.sample_size_determination.get('min_required_test_samples', 150)}</strong></span>
+                        <span>FDR Correction: <strong>{proto.fdr_correction_method}</strong></span>
+                    </div>
+                </div>
+                """, unsafe_allow_html=True)
+
+        st.markdown("#### 🛡️ Anti-P-Hacking Rigor Safeguards")
+        for sg in dossier.anti_phacking_safeguards:
+            st.success(f"🛡️ {sg}")
+
+        st.download_button(
+            "📥 Download Formal OSF Preregistration Dossier (.md)",
+            data=dossier.preregistration_markdown_document,
+            file_name="osf_preregistration_dossier.md",
+            mime="text/markdown",
+        )
+
+
+# ----------------- TAB: QUANTUM BLOCH RADAR (v7.0) -----------------
+with tab_quantum:
+    st.subheader("⚛️ Quantum-Inspired Epistemic State & Bloch Sphere Superposition Radar")
+    st.caption("Models contradictory scientific findings in a 2D complex Hilbert space C^2, computing von Neumann epistemic entropy, quantum coherence, and Bloch sphere coordinates.")
+
+    if report.quantum_epistemic_report:
+        q_rep = report.quantum_epistemic_report
+        q_c1, q_c2, q_c3 = st.columns(3)
+        q_c1.metric("Mean von Neumann Entropy", f"{q_rep.mean_von_neumann_entropy:.3f} nats", "Max: 0.693 nats")
+        q_c2.metric("Superposed Claims", q_rep.total_claims_in_superposition, "Equatorial Controversy")
+        q_c3.metric("Systemic Coherence", f"{q_rep.systemic_coherence_index:.3f}", "Inter-Study Coupling")
+
+        st.markdown("#### 🌐 Interactive 3D Bloch Sphere Epistemic Radar")
+        st.components.v1.html(q_rep.bloch_sphere_html, height=440, scrolling=True)
+
+        st.markdown("#### 📊 Quantum Epistemic State Telemetry Table")
+        q_table = []
+        for qs in q_rep.quantum_states:
+            coord = qs.bloch_coordinates
+            q_table.append({
+                "Claim ID": qs.claim_id,
+                "Epistemic Regime": qs.epistemic_regime,
+                "|Support⟩": qs.support_amplitude_alpha,
+                "|Contradict⟩": qs.contradiction_amplitude_beta,
+                "Bloch (x, y, z)": f"({coord.x:.2f}, {coord.y:.2f}, {coord.z:.2f})",
+                "Latitude": f"{coord.latitude_deg:.1f}°",
+                "Entropy S(ρ)": qs.von_neumann_entropy,
+                "Coherence": qs.quantum_coherence,
+                "Purity": qs.superposition_purity,
+            })
+        st.dataframe(pd.DataFrame(q_table), use_container_width=True)
+
+        st.markdown("#### ⚛️ Quantum Epistemic Insights")
+        for ins in q_rep.epistemic_phase_insights:
+            st.info(f"⚛️ {ins}")
+
+
 # ----------------- TAB: SYMBOLIC PROOFS (v6.0) -----------------
 with tab_symbolic:
+
     st.subheader("📐 Automated Theorem & Symbolic Formal Proof Verifier")
     st.caption("SymPy-powered formal symbolic derivation of asymptotic complexity, non-expansive Lipschitz regularity, and mathematical bounds underlying literature claims.")
 

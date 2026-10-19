@@ -52,6 +52,10 @@ from src.verification.novelty_sentinel import NoveltySentinel
 from src.verification.symbolic_verifier import SymbolicProofEngine
 from src.verification.adversarial_tester import AdversarialStressTester
 from src.synthesis.prisma_synthesizer import PrismaMetaAnalysisEngine
+from src.verification.bayesian_updater import BayesianBeliefUpdater
+from src.synthesis.preregistration_synthesizer import PreregistrationSynthesizer
+from src.claims.quantum_epistemic import QuantumEpistemicEngine
+
 
 logger = logging.getLogger(__name__)
 
@@ -162,6 +166,10 @@ class EvidenceFirstPipeline:
         self.symbolic_engine = SymbolicProofEngine()
         self.adversarial_tester = AdversarialStressTester()
         self.prisma_synthesizer = PrismaMetaAnalysisEngine()
+        self.bayesian_updater = BayesianBeliefUpdater()
+        self.preregistration_synthesizer = PreregistrationSynthesizer()
+        self.quantum_epistemic_engine = QuantumEpistemicEngine()
+
 
         # State
 
@@ -438,7 +446,30 @@ class EvidenceFirstPipeline:
             papers=self.indexed_papers,
         )
 
+        # Step 32: Bayesian Epistemic Belief Updating & Bayes Factor Calibration (v7.0)
+        report.bayesian_belief_report = self.bayesian_updater.evaluate_beliefs(
+            claims=claims,
+            papers=self.indexed_papers,
+            rigor_report=report.rigor_report,
+        )
+
+        # Step 33: Automated OSF Preregistration Protocol & Open Science Badge Synthesis (v7.0)
+        report.preregistration_dossier = self.preregistration_synthesizer.synthesize_dossier(
+            claims=claims,
+            conflicts=conflicts,
+            hypotheses=report.hypotheses,
+            robustness=report.robustness,
+        )
+
+        # Step 34: Quantum-Inspired Epistemic State & Hilbert Space Superposition (v7.0)
+        report.quantum_epistemic_report = self.quantum_epistemic_engine.evaluate_epistemic_states(
+            claims=claims,
+            conflicts=conflicts,
+        )
+
         return report
+
+
 
 
 
