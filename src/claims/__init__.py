@@ -6,6 +6,7 @@ from src.claims.citation_network import BibliometricNetworkAnalyzer
 from src.claims.causal_graph import CausalGraphEngine
 from src.claims.analogy_engine import CrossDomainAnalogyEngine
 from src.claims.quantum_epistemic import QuantumEpistemicEngine
+from src.claims.semantic_entropy import SemanticEntropyEngine
 
 __all__ = [
     "ClaimExtractor",
@@ -16,6 +17,7 @@ __all__ = [
     "CausalGraphEngine",
     "CrossDomainAnalogyEngine",
     "QuantumEpistemicEngine",
+    "SemanticEntropyEngine",
 ]
 
 

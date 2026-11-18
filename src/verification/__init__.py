@@ -11,6 +11,7 @@ from src.verification.novelty_sentinel import NoveltySentinel
 from src.verification.symbolic_verifier import SymbolicProofEngine
 from src.verification.adversarial_tester import AdversarialStressTester
 from src.verification.bayesian_updater import BayesianBeliefUpdater
+from src.verification.conformal_risk import ConformalRiskEngine
 
 __all__ = [
     "NLIEntailmentChecker",
@@ -26,6 +27,7 @@ __all__ = [
     "SymbolicProofEngine",
     "AdversarialStressTester",
     "BayesianBeliefUpdater",
+    "ConformalRiskEngine",
 ]
 
 

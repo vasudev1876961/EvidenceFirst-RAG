@@ -55,6 +55,10 @@ from src.synthesis.prisma_synthesizer import PrismaMetaAnalysisEngine
 from src.verification.bayesian_updater import BayesianBeliefUpdater
 from src.synthesis.preregistration_synthesizer import PreregistrationSynthesizer
 from src.claims.quantum_epistemic import QuantumEpistemicEngine
+from src.verification.conformal_risk import ConformalRiskEngine
+from src.claims.semantic_entropy import SemanticEntropyEngine
+from src.synthesis.astute_arbiter import AstuteConflictArbiter
+from src.evaluation.ragchecker import RAGCheckerEvaluator
 
 
 logger = logging.getLogger(__name__)
@@ -169,6 +173,10 @@ class EvidenceFirstPipeline:
         self.bayesian_updater = BayesianBeliefUpdater()
         self.preregistration_synthesizer = PreregistrationSynthesizer()
         self.quantum_epistemic_engine = QuantumEpistemicEngine()
+        self.conformal_risk_engine = ConformalRiskEngine(target_alpha=0.05, confidence_level=0.95)
+        self.semantic_entropy_engine = SemanticEntropyEngine(llm_client=self.llm, entropy_threshold=0.45)
+        self.astute_arbiter = AstuteConflictArbiter(llm_client=self.llm)
+        self.ragchecker_evaluator = RAGCheckerEvaluator()
 
 
         # State
@@ -345,10 +353,6 @@ class EvidenceFirstPipeline:
             claims=claims, papers_pool=self.indexed_papers
         )
 
-        # Step 13: Export LaTeX & BibTeX Publication Artifacts
-        report.latex_code = self.latex_exporter.generate_latex(report)
-        report.bibtex_code = self.latex_exporter.generate_bibtex(report)
-
         # Step 14: Agentic Verification Trajectory
         report.verification_trajectory = trajectory
 
@@ -466,6 +470,32 @@ class EvidenceFirstPipeline:
             claims=claims,
             conflicts=conflicts,
         )
+
+        # Step 35: Conformal Risk Control & Finite-Sample Hallucination Guarantees (v8.0)
+        report.conformal_risk_report = self.conformal_risk_engine.evaluate_claims(
+            claims=claims,
+            alpha=0.05,
+        )
+
+        # Step 36: Semantic Entropy & Meaning-Space Epistemic Uncertainty (v8.0)
+        report.semantic_entropy_report = self.semantic_entropy_engine.evaluate_entropy_report(
+            claims=claims,
+        )
+
+        # Step 37: Astute Parametric-Evidence Conflict Arbitration (v8.0)
+        report.astute_arbitration_report = self.astute_arbiter.arbitrate_corpus(
+            claims=claims,
+        )
+
+        # Step 38: RAGChecker Fine-Grained Diagnostic Evaluation Suite (v8.0)
+        report.ragchecker_report = self.ragchecker_evaluator.evaluate_pipeline_output(
+            report=report,
+            target_name="EvidenceFirst-RAG (v8.0 Frontier)",
+        )
+
+        # Step 39: Export Publication-Grade LaTeX & BibTeX Artifacts (v8.0)
+        report.latex_code = self.latex_exporter.generate_latex(report)
+        report.bibtex_code = self.latex_exporter.generate_bibtex(report)
 
         return report
 

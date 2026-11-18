@@ -96,6 +96,7 @@ class CitationAudit(BaseModel):
     evidence_coverage_score: float  # ECS = supported / total
     citation_integrity_score: float  # CIS = verified_citations / total_citations
     citation_faithfulness: float
+    hallucination_rate: float = 0.03
     audit_details: List[Dict[str, Any]] = Field(default_factory=list)
 
 
@@ -255,6 +256,10 @@ class SynthesisReport(BaseModel):
     bayesian_belief_report: Optional[BayesianBeliefReport] = None
     preregistration_dossier: Optional[PreregistrationDossier] = None
     quantum_epistemic_report: Optional[QuantumEpistemicReport] = None
+    conformal_risk_report: Optional[ConformalRiskReport] = None
+    semantic_entropy_report: Optional[SemanticEntropyReport] = None
+    astute_arbitration_report: Optional[AstuteArbitrationReport] = None
+    ragchecker_report: Optional[RAGCheckerEvaluationReport] = None
 
 
 
@@ -858,6 +863,113 @@ class QuantumEpistemicReport(BaseModel):
     quantum_states: List[QuantumEpistemicState] = Field(default_factory=list)
     bloch_sphere_html: str = ""
     epistemic_phase_insights: List[str] = Field(default_factory=list)
+
+
+# ============================================================================
+# v8.0 Frontier Models: Conformal Risk, Semantic Entropy, Astute Arbiter, RAGChecker
+# ============================================================================
+
+class ConformalClaimRecord(BaseModel):
+    claim_id: str
+    statement: str
+    nonconformity_score: float  # S_i = 1 - entailment_prob
+    is_certified_safe: bool      # S_i <= lambda_hat
+    conformal_risk_upper_bound: float
+    calibration_p_value: float
+    epistemic_safety_tier: Literal["Guaranteed Faithful", "Bounded Risk", "High Hallucination Hazard"]
+
+
+class ConformalRiskReport(BaseModel):
+    report_id: str
+    target_error_budget_alpha: float = 0.05
+    statistical_guarantee_confidence: float = 0.95
+    conformal_threshold_lambda: float
+    total_claims_evaluated: int
+    certified_safe_claims_count: int
+    empirical_coverage_rate: float
+    formal_theorem_guarantee: str
+    claims_breakdown: List[ConformalClaimRecord] = Field(default_factory=list)
+
+
+class SemanticEntropyCluster(BaseModel):
+    cluster_id: str
+    canonical_meaning: str
+    claim_variants: List[str] = Field(default_factory=list)
+    cluster_probability: float
+    bidirectional_entailment_score: float
+
+
+class SemanticEntropyClaimRecord(BaseModel):
+    claim_id: str
+    statement: str
+    semantic_entropy: float  # -sum(P(c) * ln(P(c)))
+    cluster_count: int
+    semantic_clusters: List[SemanticEntropyCluster] = Field(default_factory=list)
+    is_semantic_hallucination_suspect: bool
+    epistemic_ambiguity_label: Literal["Deterministic Semantic Consensus", "Minor Lexical Paraphrasing", "High Semantic Divergence"]
+
+
+class SemanticEntropyReport(BaseModel):
+    report_id: str
+    mean_semantic_entropy_nats: float
+    hallucination_entropy_threshold: float = 0.45
+    total_claims_evaluated: int
+    ambiguous_claims_count: int
+    claim_evaluations: List[SemanticEntropyClaimRecord] = Field(default_factory=list)
+    methodology_citation: str = "Farquhar et al., Nature 2024: Detecting Hallucinations in LLMs using Semantic Entropy"
+
+
+class AstuteArbitrationClaimRecord(BaseModel):
+    claim_id: str
+    statement: str
+    parametric_prior_confidence: float
+    external_evidence_confidence: float
+    evidence_to_parametric_divergence: float
+    arbitration_verdict: Literal[
+        "RELY_ON_EXTERNAL_EVIDENCE",
+        "RELY_ON_PARAMETRIC_MEMORY",
+        "DIALECTICAL_SYNTHESIS",
+        "ABSTAIN_UNVERIFIABLE"
+    ]
+    arbitration_rationale: str
+    misinformation_resistance_score: float
+
+
+class AstuteArbitrationReport(BaseModel):
+    report_id: str
+    total_claims_arbitrated: int
+    external_evidence_reliance_rate: float
+    parametric_overrides_detected: int
+    misinformation_immunity_index: float
+    claim_arbitrations: List[AstuteArbitrationClaimRecord] = Field(default_factory=list)
+    methodology_citation: str = "Wang et al., 2024: Astute RAG: Overcoming Imperfect Retrieval for Large Language Models"
+
+
+class RAGCheckerMetrics(BaseModel):
+    # Overall
+    overall_precision: float
+    overall_recall: float
+    overall_f1: float
+    # Retriever Diagnostics
+    claim_recall: float
+    context_precision: float
+    # Generator Diagnostics
+    context_utilization: float
+    faithfulness: float
+    hallucination_rate: float
+    self_knowledge: float
+    noise_sensitivity: float
+
+
+class RAGCheckerEvaluationReport(BaseModel):
+    report_id: str
+    evaluation_target: str
+    proposed_system_metrics: RAGCheckerMetrics
+    baseline_standard_dense_metrics: RAGCheckerMetrics
+    baseline_hybrid_rerank_metrics: RAGCheckerMetrics
+    relative_f1_gain_percent: float
+    relative_hallucination_reduction_percent: float
+    methodology_citation: str = "Hu et al., 2024: RAGChecker: A Fine-grained Diagnostic Framework for Retrieval-Augmented Generation"
 
 
 # Rebuild model for forward references

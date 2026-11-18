@@ -11,6 +11,7 @@ from src.synthesis.dossier_generator import DossierGenerator
 from src.synthesis.in_silico_simulator import InSilicoSimulator
 from src.synthesis.prisma_synthesizer import PrismaMetaAnalysisEngine
 from src.synthesis.preregistration_synthesizer import PreregistrationSynthesizer
+from src.synthesis.astute_arbiter import AstuteConflictArbiter
 
 __all__ = [
     "EvidenceSynthesizer",
@@ -26,6 +27,7 @@ __all__ = [
     "InSilicoSimulator",
     "PrismaMetaAnalysisEngine",
     "PreregistrationSynthesizer",
+    "AstuteConflictArbiter",
 ]
 
 

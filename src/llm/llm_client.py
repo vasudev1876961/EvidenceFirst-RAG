@@ -133,9 +133,20 @@ class MockResearchLLMClient(BaseLLMClient):
     def generate_json(self, prompt: str, system_prompt: Optional[str] = None, **kwargs) -> Dict[str, Any]:
         prompt_lower = prompt.lower()
         
-        # Domain detection: NLP vs Biomedical vs Vision
-        is_nlp = any(k in prompt_lower for k in ["nlp", "rag", "long-context", "context window", "hotpotqa", "multihop", "token", "hallucinat"])
-        is_biomed = any(k in prompt_lower for k in ["med", "clinical", "drug", "pubmed", "contraindication", "adverse", "bioasq", "patient"])
+        # Domain detection: prioritize user query string when present
+        query_segment = prompt_lower
+        if "user research query:" in prompt_lower:
+            query_segment = prompt_lower.split("user research query:")[1].split("\n")[0]
+        elif "query:" in prompt_lower:
+            query_segment = prompt_lower.split("query:")[1].split("\n")[0]
+
+        is_biomed = any(k in query_segment for k in ["medical", "clinical", "drug", "pubmed", "contraindication", "adverse", "bioasq", "patient", "pharmacology"])
+        is_nlp = any(k in query_segment for k in ["nlp", "long context", "long-context", "context window", "hotpotqa", "multihop", "chunking", "retrieval augmented", "language model", "attention"])
+
+        # Fallback to general prompt scanning if not detected from query header
+        if not is_biomed and not is_nlp:
+            is_biomed = any(k in prompt_lower for k in ["medical", "clinical", "drug", "pubmed", "contraindication", "adverse", "bioasq", "pharmacology"])
+            is_nlp = not is_biomed and any(k in prompt_lower for k in ["nlp", "long context", "long-context", "context window", "hotpotqa", "multihop", "chunking", "retrieval augmented", "language model"])
 
         if "decompose" in prompt_lower or "subqueries" in prompt_lower:
             if is_nlp:

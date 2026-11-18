@@ -82,6 +82,7 @@ class CitationAuditor:
         cis = round(verified_citations / total_citations, 4) if total_citations > 0 else (1.0 if supported_count > 0 else 0.0)
 
         faithfulness = round((supported_count + 0.5 * conflicting_count) / total_claims, 4) if total_claims > 0 else 0.0
+        hallucination = round(unsupported_count / total_claims, 4) if total_claims > 0 else 0.0
 
         return CitationAudit(
             total_claims=total_claims,
@@ -91,5 +92,6 @@ class CitationAuditor:
             evidence_coverage_score=ecs,
             citation_integrity_score=cis,
             citation_faithfulness=faithfulness,
+            hallucination_rate=hallucination,
             audit_details=details,
         )

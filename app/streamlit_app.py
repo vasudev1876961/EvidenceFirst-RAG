@@ -211,9 +211,13 @@ with m6:
 st.markdown("---")
 
 # Navigation Tabs
-tab_syn, tab_claims, tab_bayesian, tab_prereg, tab_quantum, tab_symbolic, tab_adversarial, tab_prisma, tab_sim, tab_transfer, tab_sentinel, tab_causal, tab_repro, tab_roadmap, tab_dossier, tab_conflicts, tab_council, tab_peer_review, tab_hypo, tab_trajectory, tab_rigor, tab_biblio, tab_sankey, tab_graph, tab_empirical, tab_robustness, tab_slides, tab_arxiv, tab_latex, tab_audit, tab_ablation = st.tabs([
+tab_syn, tab_claims, tab_conformal, tab_semantic_entropy, tab_astute, tab_ragchecker, tab_bayesian, tab_prereg, tab_quantum, tab_symbolic, tab_adversarial, tab_prisma, tab_sim, tab_transfer, tab_sentinel, tab_causal, tab_repro, tab_roadmap, tab_dossier, tab_conflicts, tab_council, tab_peer_review, tab_hypo, tab_trajectory, tab_rigor, tab_biblio, tab_sankey, tab_graph, tab_empirical, tab_robustness, tab_slides, tab_arxiv, tab_latex, tab_audit, tab_ablation = st.tabs([
     "📑 Executive Synthesis",
     "🔍 Claim-Level Evidence",
+    "🛡️ Conformal Risk (v8.0)",
+    "🌐 Semantic Entropy (v8.0)",
+    "⚖️ Astute Arbiter (v8.0)",
+    "📊 RAGChecker Diagnostics (v8.0)",
     "🧠 Bayesian Beliefs",
     "📋 OSF Preregistration",
     "⚛️ Quantum Bloch Radar",
@@ -314,6 +318,103 @@ with tab_claims:
                         st.json(ev.extracted_attributes)
         else:
             st.caption("No contradictory passages detected.")
+
+
+# ----------------- TAB: CONFORMAL RISK CONTROL (v8.0) -----------------
+with tab_conformal:
+    st.subheader("🛡️ Conformal Risk Control (CRC) & Finite-Sample Hallucination Guarantees")
+    st.caption("Distribution-free statistical bounds on claim hallucination risk (Angelopoulos et al. 2024; Kumar et al. 2024).")
+    if report.conformal_risk_report:
+        crc = report.conformal_risk_report
+        c1, c2, c3, c4 = st.columns(4)
+        c1.metric("Target Error Budget (α)", f"{crc.target_error_budget_alpha * 100:.1f}%")
+        c2.metric("Confidence Level (1-α)", f"{crc.statistical_guarantee_confidence * 100:.1f}%")
+        c3.metric("Calibrated Threshold (λ̂)", f"{crc.conformal_threshold_lambda:.4f}")
+        c4.metric("Empirical Coverage", f"{crc.empirical_coverage_rate * 100:.1f}%", f"{crc.certified_safe_claims_count}/{crc.total_claims_evaluated} Certified")
+
+        st.info(f"**Formal Statistical Theorem Guarantee:** {crc.formal_theorem_guarantee}")
+        st.markdown("#### Certified Claims Breakdown")
+        df_crc = pd.DataFrame([{
+            "Claim ID": r.claim_id,
+            "Statement": r.statement,
+            "Nonconformity S_i": r.nonconformity_score,
+            "Certified Safe": "✅ Yes" if r.is_certified_safe else "⚠️ Hazard",
+            "P-Value": r.calibration_p_value,
+            "Safety Tier": r.epistemic_safety_tier,
+        } for r in crc.claims_breakdown])
+        st.dataframe(df_crc, use_container_width=True)
+
+
+# ----------------- TAB: SEMANTIC ENTROPY (v8.0) -----------------
+with tab_semantic_entropy:
+    st.subheader("🌐 Semantic Entropy & Meaning-Space Uncertainty")
+    st.caption("Detecting hallucinations by clustering paraphrases into semantic equivalence classes (Farquhar et al., Nature 2024).")
+    if report.semantic_entropy_report:
+        se = report.semantic_entropy_report
+        s1, s2, s3 = st.columns(3)
+        s1.metric("Mean Semantic Entropy", f"{se.mean_semantic_entropy_nats:.4f} nats")
+        s2.metric("Hallucination Threshold", f"{se.hallucination_entropy_threshold:.4f} nats")
+        s3.metric("Ambiguous Claims", f"{se.ambiguous_claims_count}/{se.total_claims_evaluated}")
+        st.caption(f"Grounding: *{se.methodology_citation}*")
+
+        for ev in se.claim_evaluations:
+            with st.expander(f"{'🚨' if ev.is_semantic_hallucination_suspect else '🟢'} [{ev.claim_id}] {ev.statement[:80]}... (H_sem: {ev.semantic_entropy:.3f} nats)"):
+                st.write(f"**Epistemic Ambiguity Status:** `{ev.epistemic_ambiguity_label}`")
+                for cl in ev.semantic_clusters:
+                    st.markdown(f"- **Cluster {cl.cluster_id}** (P={cl.cluster_probability:.2f}, Entailment={cl.bidirectional_entailment_score:.2f}): *{cl.canonical_meaning}*")
+
+
+# ----------------- TAB: ASTUTE ARBITER (v8.0) -----------------
+with tab_astute:
+    st.subheader("⚖️ Astute Parametric-Evidence Conflict Arbiter")
+    st.caption("Disentangling internal LLM memory vs. external retrieved evidence to resist noisy/poisoned context (Wang et al. 2024).")
+    if report.astute_arbitration_report:
+        astute = report.astute_arbitration_report
+        a1, a2, a3 = st.columns(3)
+        a1.metric("External Evidence Reliance", f"{astute.external_evidence_reliance_rate * 100:.1f}%")
+        a2.metric("Parametric Overrides", astute.parametric_overrides_detected)
+        a3.metric("Misinformation Immunity", f"{astute.misinformation_immunity_index * 100:.1f}%")
+        st.caption(f"Grounding: *{astute.methodology_citation}*")
+
+        df_astute = pd.DataFrame([{
+            "Claim ID": a.claim_id,
+            "Statement": a.statement,
+            "P(Evidence)": a.external_evidence_confidence,
+            "P(Parametric)": a.parametric_prior_confidence,
+            "Divergence (Δ)": a.evidence_to_parametric_divergence,
+            "Arbitration Verdict": a.arbitration_verdict,
+            "Rationale": a.arbitration_rationale,
+            "Resistance": f"{a.misinformation_resistance_score * 100:.1f}%",
+        } for a in astute.claim_arbitrations])
+        st.dataframe(df_astute, use_container_width=True)
+
+
+# ----------------- TAB: RAGCHECKER DIAGNOSTICS (v8.0) -----------------
+with tab_ragchecker:
+    st.subheader("📊 RAGChecker Diagnostic Evaluation Leaderboard")
+    st.caption("Fine-grained claim-level diagnostic framework (Hu et al. 2024 - Amazon AWS AI / SJTU / Westlake).")
+    if report.ragchecker_report:
+        rc = report.ragchecker_report
+        r1, r2 = st.columns(2)
+        r1.metric("Claim-Level F1 Gain", f"{rc.relative_f1_gain_percent:+.1f}%", "vs. Standard Dense RAG")
+        r2.metric("Hallucination Reduction", f"-{rc.relative_hallucination_reduction_percent:.1f}%", "Fewer Unsupported Claims")
+
+        p = rc.proposed_system_metrics
+        d = rc.baseline_standard_dense_metrics
+        h = rc.baseline_hybrid_rerank_metrics
+
+        df_rc = pd.DataFrame([
+            {"Metric": "Overall Precision", "EvidenceFirst (v8.0)": f"{p.overall_precision * 100:.1f}%", "Hybrid + Rerank": f"{h.overall_precision * 100:.1f}%", "Standard Dense": f"{d.overall_precision * 100:.1f}%"},
+            {"Metric": "Overall Recall", "EvidenceFirst (v8.0)": f"{p.overall_recall * 100:.1f}%", "Hybrid + Rerank": f"{h.overall_recall * 100:.1f}%", "Standard Dense": f"{d.overall_recall * 100:.1f}%"},
+            {"Metric": "Overall F1 Score", "EvidenceFirst (v8.0)": f"{p.overall_f1 * 100:.1f}%", "Hybrid + Rerank": f"{h.overall_f1 * 100:.1f}%", "Standard Dense": f"{d.overall_f1 * 100:.1f}%"},
+            {"Metric": "Claim Recall (CR)", "EvidenceFirst (v8.0)": f"{p.claim_recall * 100:.1f}%", "Hybrid + Rerank": f"{h.claim_recall * 100:.1f}%", "Standard Dense": f"{d.claim_recall * 100:.1f}%"},
+            {"Metric": "Context Precision (CP)", "EvidenceFirst (v8.0)": f"{p.context_precision * 100:.1f}%", "Hybrid + Rerank": f"{h.context_precision * 100:.1f}%", "Standard Dense": f"{d.context_precision * 100:.1f}%"},
+            {"Metric": "Context Utilization (CU)", "EvidenceFirst (v8.0)": f"{p.context_utilization * 100:.1f}%", "Hybrid + Rerank": f"{h.context_utilization * 100:.1f}%", "Standard Dense": f"{d.context_utilization * 100:.1f}%"},
+            {"Metric": "Faithfulness", "EvidenceFirst (v8.0)": f"{p.faithfulness * 100:.1f}%", "Hybrid + Rerank": f"{h.faithfulness * 100:.1f}%", "Standard Dense": f"{d.faithfulness * 100:.1f}%"},
+            {"Metric": "Hallucination Rate", "EvidenceFirst (v8.0)": f"{p.hallucination_rate * 100:.1f}%", "Hybrid + Rerank": f"{h.hallucination_rate * 100:.1f}%", "Standard Dense": f"{d.hallucination_rate * 100:.1f}%"},
+            {"Metric": "Noise Sensitivity (NS)", "EvidenceFirst (v8.0)": f"{p.noise_sensitivity * 100:.1f}%", "Hybrid + Rerank": f"{h.noise_sensitivity * 100:.1f}%", "Standard Dense": f"{d.noise_sensitivity * 100:.1f}%"},
+        ])
+        st.table(df_rc)
 
 
 # ----------------- TAB: BAYESIAN EPISTEMIC BELIEFS (v7.0) -----------------

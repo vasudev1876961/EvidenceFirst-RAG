@@ -220,6 +220,26 @@ def main():
         help="Export standalone interactive 3D HTML Quantum Epistemic Bloch Sphere Radar dashboard",
     )
     parser.add_argument(
+        "--conformal-risk",
+        action="store_true",
+        help="Run Conformal Risk Control (CRC) and compute distribution-free finite-sample hallucination error bounds",
+    )
+    parser.add_argument(
+        "--semantic-entropy",
+        action="store_true",
+        help="Run Semantic Entropy Engine (Nature 2024) to isolate meaning-space hallucination from lexical paraphrase",
+    )
+    parser.add_argument(
+        "--astute",
+        action="store_true",
+        help="Run Astute Parametric-Evidence Conflict Arbiter to resolve internal LLM memory vs noisy external retrieval",
+    )
+    parser.add_argument(
+        "--ragchecker",
+        action="store_true",
+        help="Run RAGChecker Fine-Grained Diagnostic Suite (AWS AI / SJTU 2024) across 9 diagnostic dimensions",
+    )
+    parser.add_argument(
         "--serve-api",
         action="store_true",
         help="Launch the EvidenceFirst-RAG FastAPI REST server on port 8000",
@@ -744,6 +764,81 @@ def main():
         with open(out_bloch_html, "w", encoding="utf-8") as f:
             f.write(q_rep.bloch_sphere_html)
         print(f"⚛️ Quantum Epistemic Bloch Sphere Radar HTML exported to: {out_bloch_html}\n")
+
+    # Conformal Risk Control Flag (v8.0)
+    if args.conformal_risk and report.conformal_risk_report:
+        crc = report.conformal_risk_report
+        print("\n" + "=" * 80)
+        print(f"  🛡️ Conformal Risk Control (CRC) Hallucination Error Bound [{crc.report_id}]")
+        print("=" * 80)
+        print(f"Target Error Budget (α): {crc.target_error_budget_alpha * 100:.1f}% | Statistical Confidence: {crc.statistical_guarantee_confidence * 100:.1f}%")
+        print(f"Calibrated Threshold (λ̂): {crc.conformal_threshold_lambda:.4f} | Coverage: {crc.empirical_coverage_rate * 100:.1f}% ({crc.certified_safe_claims_count}/{crc.total_claims_evaluated} certified)")
+        print(f"\nFormal Mathematical Guarantee:\n  {crc.formal_theorem_guarantee}\n")
+        print("Certified Claims Breakdown:")
+        for rec in crc.claims_breakdown:
+            status = "✅ CERTIFIED SAFE" if rec.is_certified_safe else "⚠️ BOUNDED HAZARD"
+            print(f"  • [{rec.claim_id}] {status} | Tier: {rec.epistemic_safety_tier}")
+            print(f"    Statement: {rec.statement[:65]}...")
+            print(f"    Nonconformity S_i: {rec.nonconformity_score:.4f} (Threshold: {crc.conformal_threshold_lambda:.4f}) | p-value: {rec.calibration_p_value:.4f}")
+            print()
+        print("=" * 80 + "\n")
+
+    # Semantic Entropy Flag (v8.0)
+    if args.semantic_entropy and report.semantic_entropy_report:
+        se = report.semantic_entropy_report
+        print("\n" + "=" * 80)
+        print(f"  🌐 Semantic Entropy & Meaning-Space Uncertainty (Nature 2024) [{se.report_id}]")
+        print("=" * 80)
+        print(f"Mean Semantic Entropy: {se.mean_semantic_entropy_nats:.4f} nats | Ambiguous Claims: {se.ambiguous_claims_count}/{se.total_claims_evaluated}")
+        print(f"Hallucination Threshold: {se.hallucination_entropy_threshold:.4f} nats | Citation: {se.methodology_citation}\n")
+        for rec in se.claim_evaluations:
+            hazard = "🚨 HALLUCINATION HAZARD" if rec.is_semantic_hallucination_suspect else "🟢 SEMANTIC CONSENSUS"
+            print(f"  • [{rec.claim_id}] {hazard} | H_sem: {rec.semantic_entropy:.4f} nats ({rec.cluster_count} clusters)")
+            print(f"    Statement: {rec.statement[:65]}...")
+            print(f"    Label: {rec.epistemic_ambiguity_label}")
+            for cl in rec.semantic_clusters:
+                print(f"      - Cluster [{cl.cluster_id}] (P={cl.cluster_probability:.2f}, Entail={cl.bidirectional_entailment_score:.2f}): {cl.canonical_meaning[:60]}...")
+            print()
+        print("=" * 80 + "\n")
+
+    # Astute Arbitration Flag (v8.0)
+    if args.astute and report.astute_arbitration_report:
+        astute = report.astute_arbitration_report
+        print("\n" + "=" * 80)
+        print(f"  ⚖️ Astute Parametric-Evidence Conflict Arbiter [{astute.report_id}]")
+        print("=" * 80)
+        print(f"External Reliance Rate: {astute.external_evidence_reliance_rate * 100:.1f}% | Parametric Overrides: {astute.parametric_overrides_detected}")
+        print(f"Misinformation Immunity Index: {astute.misinformation_immunity_index * 100:.1f}%\n")
+        for rec in astute.claim_arbitrations:
+            print(f"  • [{rec.claim_id}] Verdict: {rec.arbitration_verdict}")
+            print(f"    Statement: {rec.statement[:65]}...")
+            print(f"    P(Evidence)={rec.external_evidence_confidence:.2f} vs P(Parametric)={rec.parametric_prior_confidence:.2f} (Δ={rec.evidence_to_parametric_divergence:.2f})")
+            print(f"    Rationale: {rec.arbitration_rationale}")
+            print(f"    Misinformation Resistance: {rec.misinformation_resistance_score * 100:.1f}%")
+            print()
+        print("=" * 80 + "\n")
+
+    # RAGChecker Diagnostic Flag (v8.0)
+    if args.ragchecker and report.ragchecker_report:
+        rc = report.ragchecker_report
+        p = rc.proposed_system_metrics
+        d = rc.baseline_standard_dense_metrics
+        print("\n" + "=" * 80)
+        print(f"  📊 RAGChecker Diagnostic Evaluation Suite [{rc.report_id}]")
+        print("=" * 80)
+        print(f"Target: {rc.evaluation_target} | Reference: {rc.methodology_citation}\n")
+        print(f"{'Metric':<30} | {'Proposed System':<16} | {'Standard Dense RAG':<18} | {'Relative Gain':<14}")
+        print("-" * 84)
+        print(f"{'Overall Precision':<30} | {p.overall_precision * 100:>14.1f}% | {d.overall_precision * 100:>16.1f}% | {((p.overall_precision - d.overall_precision)/d.overall_precision)*100:>+12.1f}%")
+        print(f"{'Overall Recall':<30} | {p.overall_recall * 100:>14.1f}% | {d.overall_recall * 100:>16.1f}% | {((p.overall_recall - d.overall_recall)/d.overall_recall)*100:>+12.1f}%")
+        print(f"{'Overall F1 Score':<30} | {p.overall_f1 * 100:>14.1f}% | {d.overall_f1 * 100:>16.1f}% | {rc.relative_f1_gain_percent:>+12.1f}%")
+        print(f"{'Retriever Claim Recall (CR)':<30} | {p.claim_recall * 100:>14.1f}% | {d.claim_recall * 100:>16.1f}% | {((p.claim_recall - d.claim_recall)/d.claim_recall)*100:>+12.1f}%")
+        print(f"{'Retriever Context Prec. (CP)':<30} | {p.context_precision * 100:>14.1f}% | {d.context_precision * 100:>16.1f}% | {((p.context_precision - d.context_precision)/d.context_precision)*100:>+12.1f}%")
+        print(f"{'Context Utilization (CU)':<30} | {p.context_utilization * 100:>14.1f}% | {d.context_utilization * 100:>16.1f}% | {((p.context_utilization - d.context_utilization)/d.context_utilization)*100:>+12.1f}%")
+        print(f"{'Faithfulness':<30} | {p.faithfulness * 100:>14.1f}% | {d.faithfulness * 100:>16.1f}% | {((p.faithfulness - d.faithfulness)/d.faithfulness)*100:>+12.1f}%")
+        print(f"{'Hallucination Rate':<30} | {p.hallucination_rate * 100:>14.1f}% | {d.hallucination_rate * 100:>16.1f}% | {-rc.relative_hallucination_reduction_percent:>+12.1f}%")
+        print(f"{'Noise Sensitivity (NS)':<30} | {p.noise_sensitivity * 100:>14.1f}% | {d.noise_sensitivity * 100:>16.1f}% | {((p.noise_sensitivity - d.noise_sensitivity)/d.noise_sensitivity)*100:>+12.1f}%")
+        print("=" * 80 + "\n")
 
 
 

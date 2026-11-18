@@ -1,6 +1,6 @@
 """EvidenceFirst-RAG: Claim-Level Evidence Verification and Contradiction-Aware RAG for Scientific Literature."""
 
-__version__ = "0.7.0"
+__version__ = "0.8.0"
 
 from src.pipeline import EvidenceFirstPipeline
 from src.models import (
@@ -34,6 +34,14 @@ from src.models import (
     QuantumEpistemicReport,
     QuantumEpistemicState,
     BlochSphereCoordinate,
+    ConformalRiskReport,
+    ConformalClaimRecord,
+    SemanticEntropyReport,
+    SemanticEntropyClaimRecord,
+    AstuteArbitrationReport,
+    AstuteArbitrationClaimRecord,
+    RAGCheckerEvaluationReport,
+    RAGCheckerMetrics,
 )
 
 __all__ = [
@@ -68,5 +76,13 @@ __all__ = [
     "QuantumEpistemicReport",
     "QuantumEpistemicState",
     "BlochSphereCoordinate",
+    "ConformalRiskReport",
+    "ConformalClaimRecord",
+    "SemanticEntropyReport",
+    "SemanticEntropyClaimRecord",
+    "AstuteArbitrationReport",
+    "AstuteArbitrationClaimRecord",
+    "RAGCheckerEvaluationReport",
+    "RAGCheckerMetrics",
 ]
 

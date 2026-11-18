@@ -805,6 +805,76 @@ def export_quantum_bloch_radar(query: str = "Vision Transformers for low-light o
     }
 
 
+# ============================================================================
+# v8.0 Frontier Endpoints: Conformal Risk, Semantic Entropy, Astute Arbiter, RAGChecker
+# ============================================================================
+
+@app.post("/api/v1/verification/conformal-risk", tags=["Conformal Risk Control"])
+def evaluate_conformal_risk(req: QueryRequest, alpha: float = 0.05):
+    """Compute distribution-free Conformal Risk Control and statistical hallucination error bounds."""
+    if not pipeline_instance:
+        raise HTTPException(status_code=503, detail="Pipeline not initialized")
+
+    if req.domain:
+        pipeline_instance.filter_by_domain(req.domain)
+
+    report = pipeline_instance.run(req.query)
+    crc_report = pipeline_instance.conformal_risk_engine.evaluate_claims(
+        claims=report.claims,
+        alpha=alpha,
+    )
+    return crc_report.model_dump()
+
+
+@app.post("/api/v1/claims/semantic-entropy", tags=["Semantic Entropy"])
+def evaluate_semantic_entropy(req: QueryRequest):
+    """Evaluate discrete semantic entropy over equivalence classes in meaning space (Nature 2024)."""
+    if not pipeline_instance:
+        raise HTTPException(status_code=503, detail="Pipeline not initialized")
+
+    if req.domain:
+        pipeline_instance.filter_by_domain(req.domain)
+
+    report = pipeline_instance.run(req.query)
+    se_report = pipeline_instance.semantic_entropy_engine.evaluate_entropy_report(
+        claims=report.claims,
+    )
+    return se_report.model_dump()
+
+
+@app.post("/api/v1/synthesis/astute-arbitration", tags=["Astute Arbitration"])
+def run_astute_arbitration(req: QueryRequest):
+    """Arbitrate internal parametric memory vs. external retrieved evidence (Astute RAG 2024)."""
+    if not pipeline_instance:
+        raise HTTPException(status_code=503, detail="Pipeline not initialized")
+
+    if req.domain:
+        pipeline_instance.filter_by_domain(req.domain)
+
+    report = pipeline_instance.run(req.query)
+    astute_report = pipeline_instance.astute_arbiter.arbitrate_corpus(
+        claims=report.claims,
+    )
+    return astute_report.model_dump()
+
+
+@app.post("/api/v1/evaluation/ragchecker", tags=["RAGChecker Evaluation"])
+def run_ragchecker_diagnostics(req: QueryRequest):
+    """Execute complete 9-metric RAGChecker diagnostic evaluation suite (AWS AI / SJTU 2024)."""
+    if not pipeline_instance:
+        raise HTTPException(status_code=503, detail="Pipeline not initialized")
+
+    if req.domain:
+        pipeline_instance.filter_by_domain(req.domain)
+
+    report = pipeline_instance.run(req.query)
+    ragck_report = pipeline_instance.ragchecker_evaluator.evaluate_pipeline_output(
+        report=report,
+        target_name="EvidenceFirst-RAG (v8.0 Frontier)",
+    )
+    return ragck_report.model_dump()
+
+
 
 
 

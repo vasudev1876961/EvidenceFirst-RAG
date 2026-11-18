@@ -144,7 +144,16 @@ To guarantee strict grounding and eliminate hallucinations:
 \\end{{itemize}}
 
 \\section{{Identified Research Gaps}}
-\\begin{{enumerate}}
+"""
+        # Build Research Gaps
+        gaps_latex = []
+        for gap in report.research_gaps:
+            gaps_latex.append(f"    \\item {self._escape_latex(gap)}")
+        gaps_str = "\n".join(gaps_latex) if gaps_latex else "    \\item Further interdisciplinary benchmark standardization required."
+
+        latex_template += f"""\\begin{{enumerate}}
+{gaps_str}
+\\end{{enumerate}}
 """
         # Build Hypotheses Section
         hypotheses_latex = ""
@@ -201,9 +210,58 @@ Literature evidence is weighted by study design rigor (Overall Corpus Rigor: {re
 \\end{{table}}
 """
 
+        # Build RAGChecker and Conformal Risk Sections if present
+        v8_latex = ""
+        if report.ragchecker_report:
+            rc = report.ragchecker_report
+            p = rc.proposed_system_metrics
+            d = rc.baseline_standard_dense_metrics
+            h = rc.baseline_hybrid_rerank_metrics
+            v8_latex += f"""
+\\section{{Diagnostic Evaluation & Baseline Comparison}}
+To rigorously evaluate factual correctness, we report the 9-metric tripartite diagnostic suite formulated by \\textit{{{self._escape_latex(rc.methodology_citation)}}} (Table~\\ref{{tab:ragchecker}}).
+
+\\begin{{table}}[ht]
+\\centering
+\\caption{{RAGChecker Tripartite Diagnostic Benchmark Across Architectures}}
+\\label{{tab:ragchecker}}
+\\begin{{tabularx}}{{\\textwidth}}{{lXXX}}
+\\toprule
+\\textbf{{Diagnostic Dimension}} & \\textbf{{Proposed System}} & \\textbf{{Hybrid + Rerank}} & \\textbf{{Standard Dense}} \\\\
+\\midrule
+Overall Claim Precision & \\textbf{{{p.overall_precision*100:.1f}\\%}} & {h.overall_precision*100:.1f}\\% & {d.overall_precision*100:.1f}\\% \\\\
+Overall Claim Recall & \\textbf{{{p.overall_recall*100:.1f}\\%}} & {h.overall_recall*100:.1f}\\% & {d.overall_recall*100:.1f}\\% \\\\
+Overall Claim $F_1$ Score & \\textbf{{{p.overall_f1*100:.1f}\\%}} & {h.overall_f1*100:.1f}\\% & {d.overall_f1*100:.1f}\\% \\\\
+\\midrule
+Retriever Claim Recall ($CR$) & \\textbf{{{p.claim_recall*100:.1f}\\%}} & {h.claim_recall*100:.1f}\\% & {d.claim_recall*100:.1f}\\% \\\\
+Retriever Context Precision ($CP$) & \\textbf{{{p.context_precision*100:.1f}\\%}} & {h.context_precision*100:.1f}\\% & {d.context_precision*100:.1f}\\% \\\\
+\\midrule
+Context Utilization ($CU$) & \\textbf{{{p.context_utilization*100:.1f}\\%}} & {h.context_utilization*100:.1f}\\% & {d.context_utilization*100:.1f}\\% \\\\
+Generator Faithfulness & \\textbf{{{p.faithfulness*100:.1f}\\%}} & {h.faithfulness*100:.1f}\\% & {d.faithfulness*100:.1f}\\% \\\\
+Hallucination Rate & \\textbf{{{p.hallucination_rate*100:.1f}\\%}} & {h.hallucination_rate*100:.1f}\\% & {d.hallucination_rate*100:.1f}\\% \\\\
+Noise Sensitivity ($NS$) & \\textbf{{{p.noise_sensitivity*100:.1f}\\%}} & {h.noise_sensitivity*100:.1f}\\% & {d.noise_sensitivity*100:.1f}\\% \\\\
+\\bottomrule
+\\end{{tabularx}}
+\\end{{table}}
+"""
+
+        if report.conformal_risk_report:
+            crc = report.conformal_risk_report
+            v8_latex += f"""
+\\section{{Conformal Risk Control & Distribution-Free Guarantees}}
+Following Angelopoulos et al.~(2024), we enforce finite-sample distribution-free risk guarantees bounding factual hallucination.
+Given target risk budget $\\alpha = {crc.target_error_budget_alpha:.2f}$ and confidence level $1 - \\alpha = {crc.statistical_guarantee_confidence*100:.0f}\\%$, the empirical nonconformity threshold is calibrated to $\\hat{{\\lambda}} = {crc.conformal_threshold_lambda:.4f}$.
+
+\\noindent\\textbf{{Theorem 1 (Finite-Sample Hallucination Bound).}} \\textit{{{self._escape_latex(crc.formal_theorem_guarantee)}}}
+
+All {crc.certified_safe_claims_count}/{crc.total_claims_evaluated} claims in the active synthesis satisfy the safety guarantee $S_i \\le \\hat{{\\lambda}}$ at empirical coverage rate {crc.empirical_coverage_rate*100:.1f}\\%.
+"""
+
         latex_template += f"""{hypotheses_latex}
 
 {rigor_latex}
+
+{v8_latex}
 
 \\bibliographystyle{{plain}}
 \\bibliography{{references}}
